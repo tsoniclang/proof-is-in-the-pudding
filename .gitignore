@@ -137,3 +137,16 @@ dist
 # Vite logs files
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
+
+# VS Code
+.vscode/
+
+# Tsonic build artifacts
+**/generated/
+**/out/
+*.cs
+!*.d.cs
+
+# .NET build artifacts
+**/bin/
+**/obj/
