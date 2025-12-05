@@ -15,8 +15,22 @@ This repository contains example projects in two runtime modes:
 
 Basic "Hello World" example showing the differences between runtime modes.
 
-- [dotnet/hello-world](./dotnet/hello-world) - Uses `Console.WriteLine` from `@tsonic/dotnet/System`
+- [dotnet/hello-world](./dotnet/hello-world) - Uses `Console.writeLine` from `@tsonic/dotnet/System`
 - [js/hello-world](./js/hello-world) - Uses standard `console.log`
+
+### calculator
+
+Simple calculator with add, subtract, multiply, divide operations and division-by-zero handling.
+
+- [dotnet/calculator](./dotnet/calculator) - Uses `Console.writeLine` from `@tsonic/dotnet/System`
+- [js/calculator](./js/calculator) - Uses standard `console.log`
+
+### fibonacci
+
+Fibonacci sequence with both recursive and iterative implementations.
+
+- [dotnet/fibonacci](./dotnet/fibonacci) - Uses `Console.writeLine` from `@tsonic/dotnet/System`
+- [js/fibonacci](./js/fibonacci) - Uses standard `console.log`
 
 ## Building
 
