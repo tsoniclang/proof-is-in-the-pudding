@@ -1,0 +1,13 @@
+# .NET build artifacts
+generated/bin/
+generated/obj/
+
+# Optional: Uncomment to ignore generated C# files
+# generated/**/*.cs
+
+# Output executables
+*.exe
+app
+
+# Dependencies
+node_modules/
