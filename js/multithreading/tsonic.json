@@ -5,7 +5,7 @@
   "sourceRoot": "src",
   "outputDirectory": "generated",
   "outputName": "app",
-  "runtime": "js",
+  "runtime": "dotnet",
   "optimize": "speed",
   "packages": [],
   "buildOptions": {
@@ -14,7 +14,8 @@
   },
   "dotnet": {
     "typeRoots": [
-      "node_modules/@tsonic/js-globals"
+      "node_modules/@tsonic/js-globals",
+      "node_modules/@tsonic/dotnet"
     ]
   }
 }
