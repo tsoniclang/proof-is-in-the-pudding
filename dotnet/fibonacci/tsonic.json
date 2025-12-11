@@ -14,7 +14,7 @@
   },
   "dotnet": {
     "typeRoots": [
-      "node_modules/@tsonic/dotnet-globals"
+      "node_modules/@tsonic/globals"
     ]
   }
 }

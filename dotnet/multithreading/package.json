@@ -8,7 +8,7 @@
   },
   "devDependencies": {
     "@tsonic/dotnet": "^0.7.2",
-    "@tsonic/dotnet-globals": "^0.1.2",
+    "@tsonic/globals": "^0.2.0",
     "@tsonic/tsonic": "^0.1.19"
   }
 }
