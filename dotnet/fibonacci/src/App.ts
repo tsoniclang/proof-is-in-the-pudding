@@ -1,20 +1,21 @@
 import { Console } from "@tsonic/dotnet/System";
+import { int } from "@tsonic/core/types.js";
 
-function fibonacci(n: number): number {
+function fibonacci(n: int): int {
   if (n <= 1) {
     return n;
   }
   return fibonacci(n - 1) + fibonacci(n - 2);
 }
 
-function fibonacciIterative(n: number): number {
+function fibonacciIterative(n: int): int {
   if (n <= 1) {
     return n;
   }
-  let prev = 0;
-  let curr = 1;
-  for (let i = 2; i <= n; i++) {
-    const next = prev + curr;
+  let prev: int = 0;
+  let curr: int = 1;
+  for (let i: int = 2; i <= n; i++) {
+    const next: int = prev + curr;
     prev = curr;
     curr = next;
   }
@@ -26,12 +27,12 @@ export function main(): void {
   Console.writeLine("");
 
   Console.writeLine("Recursive fibonacci:");
-  for (let i = 0; i <= 10; i++) {
+  for (let i: int = 0; i <= 10; i++) {
     Console.writeLine(`  fib(${i}) = ${fibonacci(i)}`);
   }
 
   Console.writeLine("");
   Console.writeLine("Iterative fibonacci (faster for large n):");
-  const largeN = 40;
+  const largeN: int = 40;
   Console.writeLine(`  fib(${largeN}) = ${fibonacciIterative(largeN)}`);
 }

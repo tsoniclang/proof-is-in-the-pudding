@@ -1,5 +1,6 @@
 import { Console, Environment } from "@tsonic/dotnet/System";
 import { Parallel } from "@tsonic/dotnet/System.Threading.Tasks";
+import { long } from "@tsonic/core/types.js";
 
 export function main(): void {
   Console.writeLine("=== Parallel Computation Test (nodejs mode - dotnet runtime) ===");
@@ -11,14 +12,14 @@ export function main(): void {
   Console.writeLine(`Running 3 workers in PARALLEL with ${iterations} iterations each...`);
   Console.writeLine("");
 
-  // Results array to capture values from parallel workers
-  const results: number[] = [0, 0, 0];
+  // Results array to capture values from parallel workers (long for large sums)
+  const results: long[] = [0, 0, 0];
 
   // Run all three computations in parallel using Parallel.invoke
   Parallel.invoke(
     () => {
       Console.writeLine("Worker 1 starting on thread...");
-      let sum = 0;
+      let sum: long = 0;
       for (let i = 0; i < iterations; i++) {
         sum += i;
       }
@@ -27,7 +28,7 @@ export function main(): void {
     },
     () => {
       Console.writeLine("Worker 2 starting on thread...");
-      let sum = 0;
+      let sum: long = 0;
       for (let i = 0; i < iterations; i++) {
         sum += i;
       }
@@ -36,7 +37,7 @@ export function main(): void {
     },
     () => {
       Console.writeLine("Worker 3 starting on thread...");
-      let sum = 0;
+      let sum: long = 0;
       for (let i = 0; i < iterations; i++) {
         sum += i;
       }
