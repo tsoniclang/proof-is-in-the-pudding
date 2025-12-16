@@ -13,9 +13,9 @@ function multiply(a: number, b: number): number {
 }
 
 function divide(a: number, b: number): number {
-  if (b === 0) {
+  if (b === 0.0) {
     Console.writeLine("Error: Division by zero!");
-    return 0;
+    return 0.0;
   }
   return a / b;
 }
@@ -23,8 +23,8 @@ function divide(a: number, b: number): number {
 export function main(): void {
   Console.writeLine("=== Calculator Demo ===");
 
-  const x = 10;
-  const y = 3;
+  const x: number = 10.0;
+  const y: number = 3.0;
 
   Console.writeLine(`x = ${x}`);
   Console.writeLine(`y = ${y}`);
@@ -37,5 +37,5 @@ export function main(): void {
   Console.writeLine("");
 
   Console.writeLine("Testing division by zero:");
-  divide(x, 0);
+  divide(x, 0.0);
 }

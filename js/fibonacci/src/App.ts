@@ -1,11 +1,13 @@
-function fibonacci(n: number): number {
+import { int } from "@tsonic/core/types.js";
+
+function fibonacci(n: int): int {
   if (n <= 1) {
     return n;
   }
   return fibonacci(n - 1) + fibonacci(n - 2);
 }
 
-function fibonacciIterative(n: number): number {
+function fibonacciIterative(n: int): int {
   if (n <= 1) {
     return n;
   }
