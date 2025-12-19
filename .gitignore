@@ -150,3 +150,9 @@ vite.config.ts.timestamp-*
 # .NET build artifacts
 **/bin/
 **/obj/
+
+# Build output directories
+**/lib/
+
+# Visual Studio solution files
+*.sln
