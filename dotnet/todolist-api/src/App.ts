@@ -122,6 +122,10 @@ function handleRequest(context: HttpListenerContext): void {
   const response = context.response;
   const method = request.httpMethod;
   const url = request.url;
+  if (url === undefined) {
+    sendJsonResponse(response, 400 as int, serializeError("Invalid request URL"));
+    return;
+  }
   const path = url.absolutePath;
 
   Console.writeLine(method + " " + path);
