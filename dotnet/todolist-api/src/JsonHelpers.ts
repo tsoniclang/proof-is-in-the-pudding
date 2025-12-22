@@ -58,7 +58,11 @@ export function parseTodoCreate(json: string): { title: string } | undefined {
     return undefined;
   }
 
-  return { title: titleProp.getString() };
+  const title = titleProp.getString();
+  if (title === undefined) {
+    return undefined;
+  }
+  return { title };
 }
 
 // Parse JSON to extract update data
@@ -81,8 +85,12 @@ export function parseTodoUpdate(json: string): { title: string; completed: boole
     return undefined;
   }
 
+  const title = titleProp.getString();
+  if (title === undefined) {
+    return undefined;
+  }
   return {
-    title: titleProp.getString(),
+    title,
     completed: completedProp.getBoolean()
   };
 }
