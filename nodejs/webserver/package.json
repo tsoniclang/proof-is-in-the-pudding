@@ -1,0 +1,15 @@
+{
+  "name": "nodejs-webserver",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "build": "tsonic build",
+    "dev": "tsonic run"
+  },
+  "devDependencies": {
+    "@tsonic/core": "*",
+    "@tsonic/globals": "*",
+    "@tsonic/js-globals": "*",
+    "@tsonic/nodejs": "*"
+  }
+}
