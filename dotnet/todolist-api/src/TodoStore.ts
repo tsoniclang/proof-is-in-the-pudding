@@ -30,7 +30,7 @@ export function getById(id: int): Todo | undefined {
 // Create a new todo
 export function create(title: string): Todo {
   const id = nextId.value;
-  nextId.value = ((id as number) + 1) as int;
+  nextId.value = id + 1;
 
   const todo: Todo = {
     id,
