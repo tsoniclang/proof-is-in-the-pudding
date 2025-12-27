@@ -10,7 +10,6 @@
     "@tsonic/dotnet": "^0.7.4",
     "@tsonic/globals": "^0.2.0",
     "@tsonic/js-globals": "^0.3.0",
-    "@tsonic/nodejs": "^0.2.0",
-    "@tsonic/tsonic": "^0.1.19"
+    "@tsonic/nodejs": "^0.2.0"
   }
 }

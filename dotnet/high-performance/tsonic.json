@@ -1,0 +1,20 @@
+{
+  "$schema": "https://tsonic.dev/schema/v1.json",
+  "rootNamespace": "HighPerformance",
+  "entryPoint": "src/App.ts",
+  "sourceRoot": "src",
+  "outputDirectory": "generated",
+  "outputName": "app",
+  "runtime": "dotnet",
+  "optimize": "speed",
+  "packages": [],
+  "buildOptions": {
+    "stripSymbols": true,
+    "invariantGlobalization": true
+  },
+  "dotnet": {
+    "typeRoots": [
+      "node_modules/@tsonic/globals"
+    ]
+  }
+}

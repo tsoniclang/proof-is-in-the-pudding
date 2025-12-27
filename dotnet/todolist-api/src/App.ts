@@ -6,10 +6,10 @@
 //   PUT    /todos/:id   - Update a todo
 //   DELETE /todos/:id   - Delete a todo
 
-import { Console, Int32 } from "@tsonic/dotnet/System";
-import { HttpListener, HttpListenerContext, HttpListenerRequest, HttpListenerResponse } from "@tsonic/dotnet/System.Net";
-import { StreamReader, StreamWriter } from "@tsonic/dotnet/System.IO";
-import { Encoding } from "@tsonic/dotnet/System.Text";
+import { Console, Int32 } from "@tsonic/dotnet/System.js";
+import { HttpListener, HttpListenerContext, HttpListenerRequest, HttpListenerResponse } from "@tsonic/dotnet/System.Net.js";
+import { StreamReader, StreamWriter } from "@tsonic/dotnet/System.IO.js";
+import { Encoding } from "@tsonic/dotnet/System.Text.js";
 import { int } from "@tsonic/core/types.js";
 import * as TodoStore from "./TodoStore.ts";
 import { serializeTodo, serializeTodos, serializeError, parseTodoCreate, parseTodoUpdate } from "./JsonHelpers.ts";

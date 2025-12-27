@@ -1,7 +1,7 @@
 // Debug test: Compare direct instantiation vs property access
-import { Console } from "@tsonic/dotnet/System";
-import { List } from "@tsonic/dotnet/System.Collections.Generic";
-import { HttpListener } from "@tsonic/dotnet/System.Net";
+import { Console } from "@tsonic/dotnet/System.js";
+import { List } from "@tsonic/dotnet/System.Collections.Generic.js";
+import { HttpListener } from "@tsonic/dotnet/System.Net.js";
 import { int } from "@tsonic/core/types.js";
 
 export function main(): void {

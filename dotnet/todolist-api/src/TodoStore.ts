@@ -1,6 +1,6 @@
 // In-memory Todo storage with CRUD operations
-import { Console } from "@tsonic/dotnet/System";
-import { List, Dictionary } from "@tsonic/dotnet/System.Collections.Generic";
+import { Console } from "@tsonic/dotnet/System.js";
+import { List, Dictionary } from "@tsonic/dotnet/System.Collections.Generic.js";
 import { int } from "@tsonic/core/types.js";
 import { Todo } from "./Todo.ts";
 

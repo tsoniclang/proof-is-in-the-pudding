@@ -1,4 +1,4 @@
-import { Console } from "@tsonic/dotnet/System";
+import { Console } from "@tsonic/dotnet/System.js";
 import { int } from "@tsonic/core/types.js";
 
 function fibonacci(n: int): int {

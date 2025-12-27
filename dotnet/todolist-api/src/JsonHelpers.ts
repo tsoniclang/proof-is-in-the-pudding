@@ -1,7 +1,7 @@
 // JSON serialization helpers for Todo API
-import { JsonElement, JsonDocument, JsonValueKind } from "@tsonic/dotnet/System.Text.Json";
-import { List } from "@tsonic/dotnet/System.Collections.Generic";
-import { String as ClrString } from "@tsonic/dotnet/System";
+import { JsonElement, JsonDocument, JsonValueKind } from "@tsonic/dotnet/System.Text.Json.js";
+import { List } from "@tsonic/dotnet/System.Collections.Generic.js";
+import { String as ClrString } from "@tsonic/dotnet/System.js";
 import { int } from "@tsonic/core/types.js";
 import { Todo } from "./Todo.ts";
 

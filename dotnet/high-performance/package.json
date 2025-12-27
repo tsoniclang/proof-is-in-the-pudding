@@ -1,12 +1,14 @@
 {
-  "name": "my-tsonic-app",
+  "name": "high-performance",
   "version": "1.0.0",
+  "description": "High-performance examples using Span, Memory, and value types",
   "type": "module",
   "scripts": {
     "build": "tsonic build src/App.ts",
-    "dev": "tsonic run src/App.ts"
+    "run": "./out/app"
   },
   "devDependencies": {
+    "@tsonic/core": "*",
     "@tsonic/dotnet": "^0.8.3",
     "@tsonic/globals": "^0.3.5"
   }
