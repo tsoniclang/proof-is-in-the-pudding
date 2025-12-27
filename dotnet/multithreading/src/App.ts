@@ -1,5 +1,5 @@
-import { Console, Environment } from "@tsonic/dotnet/System";
-import { Parallel } from "@tsonic/dotnet/System.Threading.Tasks";
+import { Console, Environment } from "@tsonic/dotnet/System.js";
+import { Parallel } from "@tsonic/dotnet/System.Threading.Tasks.js";
 import { int, long } from "@tsonic/core/types.js";
 
 export function main(): void {

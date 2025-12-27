@@ -11,7 +11,6 @@
     "@tsonic/dotnet": "^0.7.4",
     "@tsonic/globals": "^0.3.3",
     "@tsonic/js-globals": "^0.4.0",
-    "@tsonic/tsonic": "^0.1.19",
     "@tsonic/types": "^0.3.1"
   }
 }
