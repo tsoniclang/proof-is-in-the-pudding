@@ -1,4 +1,4 @@
-import { fs } from "@tsonic/nodejs/nodejs.js";
+import { console, fs } from "@tsonic/nodejs/index.js";
 
 export async function main(): Promise<void> {
   console.log("Reading current directory...");

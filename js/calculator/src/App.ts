@@ -1,3 +1,5 @@
+import { console } from "@tsonic/js/index.js";
+
 function add(a: number, b: number): number {
   return a + b;
 }

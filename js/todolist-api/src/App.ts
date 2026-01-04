@@ -8,8 +8,9 @@
 //   PUT    /todos/:id   - Update a todo
 //   DELETE /todos/:id   - Delete a todo
 
+import { console, JSON, Number } from "@tsonic/js/index.js";
 import { HttpListener, HttpListenerContext, HttpListenerRequest, HttpListenerResponse } from "@tsonic/dotnet/System.Net.js";
-import { StreamReader, StreamWriter } from "@tsonic/dotnet/System.IO.js";
+import { StreamReader } from "@tsonic/dotnet/System.IO.js";
 import { Encoding } from "@tsonic/dotnet/System.Text.js";
 import { int, long } from "@tsonic/core/types.js";
 import * as TodoStore from "./TodoStore.ts";
@@ -24,10 +25,8 @@ function extractIdFromPath(path: string): long | undefined {
   }
   const idStr = parts[2];
   if (idStr !== "") {
-    const parsed = Number.parseInt(idStr, 10);
-    if (parsed !== undefined) {
-      return parsed;
-    }
+    const parsed = Number.parseInt(idStr);
+    if (parsed.hasValue) return parsed.value;
   }
   return undefined;
 }

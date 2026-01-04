@@ -8,8 +8,8 @@
     "run": "./out/app"
   },
   "devDependencies": {
-    "@tsonic/core": "*",
+    "@tsonic/core": "^0.6.0",
     "@tsonic/dotnet": "^0.8.3",
-    "@tsonic/globals": "^0.3.5"
+    "@tsonic/globals": "^0.3.6"
   }
 }

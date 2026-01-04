@@ -7,8 +7,8 @@
     "dev": "tsonic run src/App.ts"
   },
   "devDependencies": {
-    "@tsonic/core": "*",
-    "@tsonic/dotnet": "^0.7.3",
-    "@tsonic/globals": "^0.3.3"
+    "@tsonic/core": "^0.6.0",
+    "@tsonic/dotnet": "^0.8.3",
+    "@tsonic/globals": "^0.3.6"
   }
 }

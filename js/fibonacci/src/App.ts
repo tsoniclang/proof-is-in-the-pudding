@@ -1,4 +1,5 @@
 import { int } from "@tsonic/core/types.js";
+import { console } from "@tsonic/js/index.js";
 
 function fibonacci(n: int): int {
   if (n <= 1) {

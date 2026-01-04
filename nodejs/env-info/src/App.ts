@@ -1,4 +1,4 @@
-import { process, path } from "@tsonic/nodejs/nodejs.js";
+import { console, process, path } from "@tsonic/nodejs/index.js";
 
 export function main(): void {
   console.log("=== Environment Info ===\n");

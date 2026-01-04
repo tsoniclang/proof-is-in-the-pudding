@@ -1,13 +1,17 @@
 {
-  "name": "my-tsonic-app",
+  "name": "notes-webapp-js",
   "version": "1.0.0",
   "type": "module",
   "scripts": {
     "build": "tsonic build src/App.ts",
+    "emit": "tsonic emit src/App.ts",
     "dev": "tsonic run src/App.ts"
   },
   "devDependencies": {
+    "@tsonic/core": "^0.6.0",
     "@tsonic/dotnet": "^0.8.3",
-    "@tsonic/globals": "^0.3.6"
+    "@tsonic/globals": "^0.3.6",
+    "@tsonic/js": "^0.1.0",
+    "@tsonic/js-globals": "^0.4.3"
   }
 }
