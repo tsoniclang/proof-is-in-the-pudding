@@ -84,6 +84,7 @@ High-performance examples using `Span<T>`, `ReadOnlySpan<T>`, and `Memory<T>`.
 Simple ASP.NET Core blog app.
 
 - [aspnetcore/blog](./aspnetcore/blog)
+- [aspnetcore/blog-ef](./aspnetcore/blog-ef) - EF Core + SQLite backend
 
 ### Node.js Examples
 

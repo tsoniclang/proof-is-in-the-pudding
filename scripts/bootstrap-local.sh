@@ -12,6 +12,7 @@ projects=(
   "bcl/multithreading"
   "bcl/high-performance"
   "aspnetcore/blog"
+  "aspnetcore/blog-ef"
   "js/hello-world"
   "js/calculator"
   "js/fibonacci"
