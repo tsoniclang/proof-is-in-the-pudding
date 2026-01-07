@@ -150,7 +150,7 @@ const sendTextResponse = (
   response.contentType = contentType;
 
   const buffer = Encoding.UTF8.getBytes(body);
-  const bufferLength = Encoding.UTF8.getByteCount(body) as int;
+  const bufferLength = Encoding.UTF8.getByteCount(body);
   response.contentLength64 = bufferLength;
 
   const output = response.outputStream;

@@ -45,7 +45,7 @@ function sendJsonResponse(response: HttpListenerResponse, statusCode: int, json:
   response.contentType = "application/json";
 
   const buffer = Encoding.UTF8.getBytes(json);
-  const bufferLength = Encoding.UTF8.getByteCount(json) as int;
+  const bufferLength = Encoding.UTF8.getByteCount(json);
   response.contentLength64 = bufferLength;
 
   const output = response.outputStream;

@@ -23,7 +23,7 @@ export interface ErrorResponse {
 }
 
 const posts = new List<Post>();
-const nextId: { value: int } = { value: 1 as int };
+const nextId: { value: int } = { value: 1 };
 
 const INDEX_HTML = `<!doctype html>
 <html>
@@ -144,18 +144,18 @@ const writeJson = (response: HttpResponse, statusCode: int, body: string): Task 
   writeText(response, statusCode, "application/json", body);
 
 const handleIndex = (ctx: HttpContext): Task =>
-  writeText(ctx.response, 200 as int, "text/html; charset=utf-8", INDEX_HTML);
+  writeText(ctx.response, 200, "text/html; charset=utf-8", INDEX_HTML);
 
 const handleListPosts = (ctx: HttpContext): Task => {
   const json = JsonSerializer.serialize<List<Post>>(posts);
-  return writeJson(ctx.response, 200 as int, json);
+  return writeJson(ctx.response, 200, json);
 };
 
 const handleCreatePost = (ctx: HttpContext): Task => {
   const body = readRequestBody(ctx);
   const input = JsonSerializer.deserialize<PostCreateInput>(body);
   if (input === undefined || typeof input.title !== "string" || typeof input.content !== "string") {
-    return writeJson(ctx.response, 400 as int, serializeError("Invalid JSON: expected {\"title\": \"...\", \"content\": \"...\"}"));
+    return writeJson(ctx.response, 400, serializeError("Invalid JSON: expected {\"title\": \"...\", \"content\": \"...\"}"));
   }
 
   const id = nextId.value;
@@ -168,7 +168,7 @@ const handleCreatePost = (ctx: HttpContext): Task => {
   };
 
   posts.add(post);
-  return writeJson(ctx.response, 201 as int, JsonSerializer.serialize<Post>(post));
+  return writeJson(ctx.response, 201, JsonSerializer.serialize<Post>(post));
 };
 
 export function main(): void {
@@ -186,4 +186,3 @@ export function main(): void {
 
   app.run("http://localhost:8090");
 }
-
