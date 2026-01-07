@@ -1,4 +1,4 @@
-// Todo List REST API (JS mode)
+// Todo List REST API (JSRuntime bindings)
 // Uses JS Array/String semantics with .NET HttpListener
 //
 // Endpoints:
@@ -169,7 +169,7 @@ export function main(): void {
 
   console.log("");
   console.log("=================================");
-  console.log("  Todo List API Server (JS mode)");
+  console.log("  Todo List API Server (JSRuntime bindings)");
   console.log("  Running on http://localhost:8080");
   console.log("=================================");
   console.log("");

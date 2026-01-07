@@ -52,6 +52,20 @@ run_http_server() {
   done
 
   kill "${pid}" >/dev/null 2>&1 || true
+
+  # Some servers (notably Node.js bindings hosts) may take a moment to exit on SIGTERM.
+  # Keep the verifier deterministic: escalate to SIGKILL after a short grace period.
+  for _ in {1..50}; do
+    if ! kill -0 "${pid}" >/dev/null 2>&1; then
+      break
+    fi
+    sleep 0.1
+  done
+
+  if kill -0 "${pid}" >/dev/null 2>&1; then
+    kill -9 "${pid}" >/dev/null 2>&1 || true
+  fi
+
   wait "${pid}" >/dev/null 2>&1 || true
 
   if [[ "${ok}" != "1" ]]; then
@@ -60,14 +74,197 @@ run_http_server() {
   fi
 }
 
+run_aspnetcore_blog() {
+  local project="$1"
+  local base_url="http://localhost:8090"
+  local index_url="${base_url}/"
+
+  echo "=== run (server): ${project} (${base_url}) ==="
+
+  pushd "${repo_root}/${project}" >/dev/null
+  ./out/app &
+  local pid=$!
+  popd >/dev/null
+
+  cleanup() {
+    kill "${pid}" >/dev/null 2>&1 || true
+    for _ in {1..50}; do
+      if ! kill -0 "${pid}" >/dev/null 2>&1; then
+        break
+      fi
+      sleep 0.1
+    done
+    if kill -0 "${pid}" >/dev/null 2>&1; then
+      kill -9 "${pid}" >/dev/null 2>&1 || true
+    fi
+    wait "${pid}" >/dev/null 2>&1 || true
+  }
+
+  local ok=0
+  for _ in {1..30}; do
+    if curl --silent --fail "${index_url}" >/dev/null; then
+      ok=1
+      break
+    fi
+    sleep 0.2
+  done
+
+  if [[ "${ok}" != "1" ]]; then
+    cleanup
+    echo "FAIL: server did not respond: ${project} (${index_url})" >&2
+    exit 1
+  fi
+
+  if ! curl --silent --fail \
+    -X POST \
+    -H "content-type: application/json" \
+    -d '{"title":"Curl Post","content":"Hello from curl"}' \
+    "${base_url}/api/posts" >/dev/null; then
+    cleanup
+    echo "FAIL: POST /api/posts failed: ${project}" >&2
+    exit 1
+  fi
+
+  if ! curl --silent --fail "${base_url}/api/posts" | grep -q "\"title\":\"Curl Post\""; then
+    cleanup
+    echo "FAIL: expected POSTed item in list: ${project}" >&2
+    exit 1
+  fi
+
+  cleanup
+}
+
+run_aspnetcore_blog_ef() {
+  local project="$1"
+  local base_url="http://localhost:8091"
+  local health_url="${base_url}/api/health"
+
+  echo "=== run (server): ${project} (${base_url}) ==="
+
+  rm -f "${repo_root}/${project}/app.db" \
+    "${repo_root}/${project}/app.db-shm" \
+    "${repo_root}/${project}/app.db-wal" \
+    "${repo_root}/${project}/app.db-journal" >/dev/null 2>&1 || true
+
+  pushd "${repo_root}/${project}" >/dev/null
+  ./out/app &
+  local pid=$!
+  popd >/dev/null
+
+  cleanup() {
+    kill "${pid}" >/dev/null 2>&1 || true
+    for _ in {1..50}; do
+      if ! kill -0 "${pid}" >/dev/null 2>&1; then
+        break
+      fi
+      sleep 0.1
+    done
+    if kill -0 "${pid}" >/dev/null 2>&1; then
+      kill -9 "${pid}" >/dev/null 2>&1 || true
+    fi
+    wait "${pid}" >/dev/null 2>&1 || true
+  }
+
+  local ok=0
+  for _ in {1..50}; do
+    if curl --silent --fail "${health_url}" >/dev/null; then
+      ok=1
+      break
+    fi
+    sleep 0.2
+  done
+
+  if [[ "${ok}" != "1" ]]; then
+    cleanup
+    echo "FAIL: server did not respond: ${project} (${health_url})" >&2
+    exit 1
+  fi
+
+  local post_json
+  if ! post_json="$(curl --silent --fail \
+    -X POST \
+    -H "content-type: application/json" \
+    -d '{"title":"Curl Post","content":"Hello from curl"}' \
+    "${base_url}/api/posts")"; then
+    cleanup
+    echo "FAIL: POST /api/posts failed: ${project}" >&2
+    exit 1
+  fi
+
+  local post_id
+  post_id="$(echo "${post_json}" | sed -n 's/.*"id":\([0-9][0-9]*\).*/\1/p')"
+  if [[ -z "${post_id}" ]]; then
+    cleanup
+    echo "FAIL: could not parse post id from response: ${post_json}" >&2
+    exit 1
+  fi
+
+  if ! curl --silent --fail "${base_url}/api/posts" | grep -q "\"id\":${post_id}"; then
+    cleanup
+    echo "FAIL: expected post in list response: ${post_id}" >&2
+    exit 1
+  fi
+  if ! curl --silent --fail "${base_url}/api/posts/${post_id}" | grep -q "\"title\":\"Curl Post\""; then
+    cleanup
+    echo "FAIL: expected post detail response: ${post_id}" >&2
+    exit 1
+  fi
+
+  if ! curl --silent --fail \
+    -X POST \
+    -H "content-type: application/json" \
+    -d '{"author":"curl","body":"Nice post"}' \
+    "${base_url}/api/posts/${post_id}/comments" >/dev/null; then
+    cleanup
+    echo "FAIL: POST /comments failed: ${post_id}" >&2
+    exit 1
+  fi
+
+  if ! curl --silent --fail "${base_url}/api/posts/${post_id}" | grep -q "\"author\":\"curl\""; then
+    cleanup
+    echo "FAIL: expected comment in post detail: ${post_id}" >&2
+    exit 1
+  fi
+
+  if ! curl --silent --fail \
+    -X PUT \
+    -H "content-type: application/json" \
+    -d '{"title":"Curl Post (edited)","content":"Updated"}' \
+    "${base_url}/api/posts/${post_id}" >/dev/null; then
+    cleanup
+    echo "FAIL: PUT /api/posts failed: ${post_id}" >&2
+    exit 1
+  fi
+
+  if ! curl --silent --fail "${base_url}/api/posts/${post_id}" | grep -F -q "\"title\":\"Curl Post (edited)\""; then
+    cleanup
+    echo "FAIL: expected updated title: ${post_id}" >&2
+    exit 1
+  fi
+
+  if ! curl --silent --fail -X DELETE "${base_url}/api/posts/${post_id}" >/dev/null; then
+    cleanup
+    echo "FAIL: DELETE /api/posts failed: ${post_id}" >&2
+    exit 1
+  fi
+  if curl --silent --fail "${base_url}/api/posts/${post_id}" >/dev/null; then
+    cleanup
+    echo "FAIL: expected deleted post to be missing: ${post_id}" >&2
+    exit 1
+  fi
+
+  cleanup
+}
+
 projects=(
-  "dotnet/hello-world"
-  "dotnet/calculator"
-  "dotnet/fibonacci"
-  "dotnet/todolist-api"
-  "dotnet/multithreading"
-  "dotnet/high-performance"
-  "dotnet/aspnetcore-blog"
+  "bcl/hello-world"
+  "bcl/calculator"
+  "bcl/fibonacci"
+  "bcl/todolist-api"
+  "bcl/multithreading"
+  "bcl/high-performance"
+  "aspnetcore/blog"
+  "aspnetcore/blog-ef"
   "js/hello-world"
   "js/calculator"
   "js/fibonacci"
@@ -84,11 +281,14 @@ for project in "${projects[@]}"; do
   typecheck_and_build "${project}"
 
   case "${project}" in
-    "dotnet/todolist-api")
+    "bcl/todolist-api")
       run_http_server "${project}" "http://localhost:8080/todos"
       ;;
-    "dotnet/aspnetcore-blog")
-      run_http_server "${project}" "http://localhost:8090/"
+    "aspnetcore/blog")
+      run_aspnetcore_blog "${project}"
+      ;;
+    "aspnetcore/blog-ef")
+      run_aspnetcore_blog_ef "${project}"
       ;;
     "js/todolist-api")
       run_http_server "${project}" "http://localhost:8080/todos"

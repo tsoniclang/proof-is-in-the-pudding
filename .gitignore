@@ -146,6 +146,10 @@ vite.config.ts.timestamp-*
 **/out/
 *.cs
 !*.d.cs
+*.db
+*.db-shm
+*.db-wal
+*.db-journal
 
 # .NET build artifacts
 **/bin/

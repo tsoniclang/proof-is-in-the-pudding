@@ -3,7 +3,7 @@ import { StreamReader } from "@tsonic/dotnet/System.IO.js";
 import { Encoding } from "@tsonic/dotnet/System.Text.js";
 import { JsonSerializer } from "@tsonic/dotnet/System.Text.Json.js";
 import { List } from "@tsonic/dotnet/System.Collections.Generic.js";
-import { Task } from "@tsonic/dotnet/System.Threading.Tasks.js";
+import { Task, TaskExtensions } from "@tsonic/dotnet/System.Threading.Tasks.js";
 import { WebApplication, EndpointRouteBuilderExtensions } from "@tsonic/aspnetcore/Microsoft.AspNetCore.Builder.js";
 import { HttpContext, HttpResponse, HttpResponseWritingExtensions } from "@tsonic/aspnetcore/Microsoft.AspNetCore.Http.js";
 
@@ -127,11 +127,12 @@ const INDEX_HTML = `<!doctype html>
 const serializeError = (message: string): string =>
   JsonSerializer.serialize<ErrorResponse>({ error: message });
 
-const readRequestBody = (ctx: HttpContext): string => {
+const readRequestBodyAsync = (ctx: HttpContext): Task<string> => {
   const reader = new StreamReader(ctx.request.body, Encoding.UTF8);
-  const body = reader.readToEnd();
-  reader.close();
-  return body;
+  return reader.readToEndAsync().continueWith<string>((t: Task<string>, _state) => {
+    reader.close();
+    return t.result;
+  }, undefined);
 };
 
 const writeText = (response: HttpResponse, statusCode: int, contentType: string, body: string): Task => {
@@ -152,23 +153,30 @@ const handleListPosts = (ctx: HttpContext): Task => {
 };
 
 const handleCreatePost = (ctx: HttpContext): Task => {
-  const body = readRequestBody(ctx);
-  const input = JsonSerializer.deserialize<PostCreateInput>(body);
-  if (input === undefined || typeof input.title !== "string" || typeof input.content !== "string") {
-    return writeJson(ctx.response, 400, serializeError("Invalid JSON: expected {\"title\": \"...\", \"content\": \"...\"}"));
-  }
+  return TaskExtensions.unwrap(
+    readRequestBodyAsync(ctx).continueWith<Task>((t: Task<string>, _state) => {
+      const input = JsonSerializer.deserialize<PostCreateInput>(t.result);
+      if (input === undefined || typeof input.title !== "string" || typeof input.content !== "string") {
+        return writeJson(
+          ctx.response,
+          400,
+          serializeError("Invalid JSON: expected {\"title\": \"...\", \"content\": \"...\"}")
+        );
+      }
 
-  const id = nextId.value;
-  nextId.value = id + 1;
+      const id = nextId.value;
+      nextId.value = id + 1;
 
-  const post: Post = {
-    id,
-    title: input.title,
-    content: input.content,
-  };
+      const post: Post = {
+        id,
+        title: input.title,
+        content: input.content,
+      };
 
-  posts.add(post);
-  return writeJson(ctx.response, 201, JsonSerializer.serialize<Post>(post));
+      posts.add(post);
+      return writeJson(ctx.response, 201, JsonSerializer.serialize<Post>(post));
+    }, undefined)
+  );
 };
 
 export function main(): void {

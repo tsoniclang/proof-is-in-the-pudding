@@ -3,7 +3,7 @@ import { Parallel } from "@tsonic/dotnet/System.Threading.Tasks.js";
 import { long } from "@tsonic/core/types.js";
 
 export function main(): void {
-  Console.writeLine("=== Parallel Computation Test (js mode - dotnet runtime) ===");
+  Console.writeLine("=== Parallel Computation Test (JSRuntime bindings) ===");
   Console.writeLine("");
 
   const iterations = 100000;
