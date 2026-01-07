@@ -297,13 +297,13 @@ export function main(): void {
   NotesStore.seed();
 
   const listener = new HttpListener();
-  listener.prefixes.add("http://localhost:8080/");
+  listener.prefixes.add("http://localhost:8081/");
   listener.start();
 
   console.log("");
   console.log("=================================");
   console.log("  Notes WebApp (JS mode)");
-  console.log("  http://localhost:8080");
+  console.log("  http://localhost:8081");
   console.log("=================================");
   console.log("");
 

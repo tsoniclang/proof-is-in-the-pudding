@@ -1,6 +1,6 @@
 {
   "$schema": "https://tsonic.dev/schema/v1.json",
-  "rootNamespace": "MyApp",
+  "rootNamespace": "AspNetCoreBlog",
   "entryPoint": "src/App.ts",
   "sourceRoot": "src",
   "outputDirectory": "generated",
@@ -13,6 +13,10 @@
   "dotnet": {
     "typeRoots": [
       "node_modules/@tsonic/globals"
+    ],
+    "frameworkReferences": [
+      "Microsoft.AspNetCore.App"
     ]
   }
 }
+

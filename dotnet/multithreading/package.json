@@ -3,12 +3,15 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "build": "tsonic build src/App.ts",
-    "dev": "tsonic run src/App.ts"
+    "typecheck": "tsc -p tsconfig.json",
+    "build": "tsonic build",
+    "dev": "tsonic run"
   },
   "devDependencies": {
-    "@tsonic/core": "^0.6.0",
-    "@tsonic/dotnet": "^0.8.3",
-    "@tsonic/globals": "^0.3.6"
+    "@tsonic/core": "^0.6.2",
+    "@tsonic/dotnet": "^0.8.7",
+    "@tsonic/globals": "^0.3.6",
+    "tsonic": "^0.0.14",
+    "typescript": "^5.0.0"
   }
 }
