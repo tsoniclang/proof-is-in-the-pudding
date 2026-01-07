@@ -5,9 +5,7 @@
   "sourceRoot": "src",
   "outputDirectory": "generated",
   "outputName": "app",
-  "runtime": "dotnet",
   "optimize": "speed",
-  "packages": [],
   "buildOptions": {
     "stripSymbols": true,
     "invariantGlobalization": true

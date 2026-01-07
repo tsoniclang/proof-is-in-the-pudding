@@ -1,5 +1,6 @@
 // JSON serialization helpers for Todo API
 // Uses JS JSON.parse/stringify with generics
+import { JSON } from "@tsonic/js/index.js";
 import { Todo } from "./Todo.ts";
 
 // Named types for JSON parsing/serialization (exported for C# accessibility)
@@ -18,12 +19,12 @@ export interface ErrorResponse {
 
 // Serialize a Todo to JSON string
 export function serializeTodo(todo: Todo): string {
-  return JSON.stringify<Todo>(todo);
+  return JSON.stringify(todo);
 }
 
 // Serialize an array of Todos to JSON string
 export function serializeTodos(todos: Todo[]): string {
-  return JSON.stringify<Todo[]>(todos);
+  return JSON.stringify(todos);
 }
 
 // Parse JSON to extract title for creating a todo
@@ -51,5 +52,5 @@ export function parseTodoUpdate(json: string): TodoUpdateInput | undefined {
 
 // Create error response JSON
 export function serializeError(message: string): string {
-  return JSON.stringify<ErrorResponse>({ error: message });
+  return JSON.stringify({ error: message });
 }

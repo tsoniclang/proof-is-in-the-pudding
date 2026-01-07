@@ -25,7 +25,7 @@ function extractIdFromPath(path: string): int | undefined {
   const idStr = parts[2];
   if (idStr !== "") {
     // Use Int32.TryParse pattern - returns result via out parameter
-    const parseResult = 0 as int;
+    const parseResult: int = 0;
     const success = Int32.tryParse(idStr, parseResult);
     if (success) {
       return parseResult;
@@ -48,11 +48,11 @@ function sendJsonResponse(response: HttpListenerResponse, statusCode: int, json:
   response.contentType = "application/json";
 
   const buffer = Encoding.UTF8.getBytes(json);
-  const bufferLength = Encoding.UTF8.getByteCount(json) as int;
+  const bufferLength = Encoding.UTF8.getByteCount(json);
   response.contentLength64 = bufferLength;
 
   const output = response.outputStream;
-  output.write(buffer, 0 as int, bufferLength);
+  output.write(buffer, 0, bufferLength);
   output.close();
   response.close();
 }
@@ -61,17 +61,17 @@ function sendJsonResponse(response: HttpListenerResponse, statusCode: int, json:
 function handleGetAll(response: HttpListenerResponse): void {
   const todos = TodoStore.getAll();
   const json = serializeTodos(todos);
-  sendJsonResponse(response, 200 as int, json);
+  sendJsonResponse(response, 200, json);
 }
 
 // Handle GET /todos/:id - Get a specific todo
 function handleGetOne(response: HttpListenerResponse, id: int): void {
   const todo = TodoStore.getById(id);
   if (todo === undefined) {
-    sendJsonResponse(response, 404 as int, serializeError("Todo not found"));
+    sendJsonResponse(response, 404, serializeError("Todo not found"));
     return;
   }
-  sendJsonResponse(response, 200 as int, serializeTodo(todo));
+  sendJsonResponse(response, 200, serializeTodo(todo));
 }
 
 // Handle POST /todos - Create a new todo
@@ -80,12 +80,12 @@ function handleCreate(request: HttpListenerRequest, response: HttpListenerRespon
   const data = parseTodoCreate(body);
 
   if (data === undefined) {
-    sendJsonResponse(response, 400 as int, serializeError("Invalid JSON: expected {\"title\": \"...\"}"));
+    sendJsonResponse(response, 400, serializeError("Invalid JSON: expected {\"title\": \"...\"}"));
     return;
   }
 
   const todo = TodoStore.create(data.title);
-  sendJsonResponse(response, 201 as int, serializeTodo(todo));
+  sendJsonResponse(response, 201, serializeTodo(todo));
 }
 
 // Handle PUT /todos/:id - Update a todo
@@ -94,26 +94,26 @@ function handleUpdate(request: HttpListenerRequest, response: HttpListenerRespon
   const data = parseTodoUpdate(body);
 
   if (data === undefined) {
-    sendJsonResponse(response, 400 as int, serializeError("Invalid JSON: expected {\"title\": \"...\", \"completed\": true/false}"));
+    sendJsonResponse(response, 400, serializeError("Invalid JSON: expected {\"title\": \"...\", \"completed\": true/false}"));
     return;
   }
 
   const todo = TodoStore.update(id, data.title, data.completed);
   if (todo === undefined) {
-    sendJsonResponse(response, 404 as int, serializeError("Todo not found"));
+    sendJsonResponse(response, 404, serializeError("Todo not found"));
     return;
   }
-  sendJsonResponse(response, 200 as int, serializeTodo(todo));
+  sendJsonResponse(response, 200, serializeTodo(todo));
 }
 
 // Handle DELETE /todos/:id - Delete a todo
 function handleDelete(response: HttpListenerResponse, id: int): void {
   const deleted = TodoStore.remove(id);
   if (!deleted) {
-    sendJsonResponse(response, 404 as int, serializeError("Todo not found"));
+    sendJsonResponse(response, 404, serializeError("Todo not found"));
     return;
   }
-  sendJsonResponse(response, 204 as int, "");
+  sendJsonResponse(response, 204, "");
 }
 
 // Route request to appropriate handler
@@ -123,7 +123,7 @@ function handleRequest(context: HttpListenerContext): void {
   const method = request.httpMethod;
   const url = request.url;
   if (url === undefined) {
-    sendJsonResponse(response, 400 as int, serializeError("Invalid request URL"));
+    sendJsonResponse(response, 400, serializeError("Invalid request URL"));
     return;
   }
   const path = url.absolutePath;
@@ -132,7 +132,7 @@ function handleRequest(context: HttpListenerContext): void {
 
   // Check if path starts with /todos
   if (!path.startsWith("/todos")) {
-    sendJsonResponse(response, 404 as int, serializeError("Not found"));
+    sendJsonResponse(response, 404, serializeError("Not found"));
     return;
   }
 
@@ -156,7 +156,7 @@ function handleRequest(context: HttpListenerContext): void {
     // DELETE /todos/:id
     handleDelete(response, id);
   } else {
-    sendJsonResponse(response, 405 as int, serializeError("Method not allowed"));
+    sendJsonResponse(response, 405, serializeError("Method not allowed"));
   }
 }
 

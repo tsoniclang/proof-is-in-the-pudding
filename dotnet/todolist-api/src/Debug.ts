@@ -7,7 +7,7 @@ import { int } from "@tsonic/core/types.js";
 export function main(): void {
   // Case 1: Direct instantiation - this works
   const numbers = new List<int>();
-  numbers.add(1 as int);  // Should translate to Add
+  numbers.add(1);  // Should translate to Add
   Console.writeLine("Count: " + numbers.count);  // Should translate to Count
 
   // Case 2: Property access - does this work?

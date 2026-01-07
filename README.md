@@ -23,7 +23,7 @@ import { List } from "@tsonic/dotnet/System.Collections.Generic.js";
 import { int, long } from "@tsonic/core/types.js";
 
 // Node.js APIs
-import { fs } from "@tsonic/nodejs/nodejs.js";
+import { fs } from "@tsonic/nodejs/index.js";
 
 // Local imports
 import { MyModule } from "./MyModule.ts";

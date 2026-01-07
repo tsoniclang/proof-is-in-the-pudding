@@ -10,7 +10,7 @@ function fillArray(data: Span<int>, value: int): void {
 
 // Example 2: Process array in chunks using slicing
 function processInChunks(span: Span<int>, chunkSize: int): void {
-  let offset = 0 as int;
+  let offset: int = 0;
 
   while (offset < span.length) {
     const remaining = span.length - offset;

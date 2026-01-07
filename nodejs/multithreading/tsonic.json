@@ -5,9 +5,7 @@
   "sourceRoot": "src",
   "outputDirectory": "generated",
   "outputName": "app",
-  "runtime": "nodejs",
   "optimize": "speed",
-  "packages": [],
   "buildOptions": {
     "stripSymbols": true,
     "invariantGlobalization": true
@@ -15,6 +13,9 @@
   "dotnet": {
     "typeRoots": [
       "node_modules/@tsonic/globals"
+    ],
+    "frameworkReferences": [
+      "Microsoft.AspNetCore.App"
     ]
   }
 }

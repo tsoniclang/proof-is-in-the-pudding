@@ -1,31 +1,28 @@
 // In-memory Todo storage with CRUD operations
 // Uses JS Array semantics (push, filter, find, etc.)
-import { int, long } from "@tsonic/core/types.js";
+import { List } from "@tsonic/dotnet/System.Collections.Generic.js";
+import { console } from "@tsonic/js/index.js";
+import { long } from "@tsonic/core/types.js";
 import { Todo } from "./Todo.ts";
 
-// Type for mutable ID counter
-interface IdCounter {
-  value: long;
-}
-
 // Global store state (module-level variables)
-const todos: Todo[] = [];
-const nextId: IdCounter = { value: 1 as long };
+const todos = new List<Todo>();
+let nextId: long = 1 as long;
 
 // Get all todos
 export function getAll(): Todo[] {
-  return todos;
+  return todos.toArray();
 }
 
 // Get a todo by ID
 export function getById(id: long): Todo | undefined {
-  return todos.find(t => t.id === id);
+  return todos.find((t) => t.id === id);
 }
 
 // Create a new todo
 export function create(title: string): Todo {
-  const id = nextId.value;
-  nextId.value = id + 1;
+  const id = nextId;
+  nextId = (id + 1) as long;
 
   const todo: Todo = {
     id,
@@ -33,13 +30,13 @@ export function create(title: string): Todo {
     completed: false
   };
 
-  todos.push(todo);
+  todos.add(todo);
   return todo;
 }
 
 // Update a todo
 export function update(id: long, title: string, completed: boolean): Todo | undefined {
-  const index = todos.findIndex(t => t.id === id);
+  const index = todos.findIndex((t) => t.id === id);
   if (index === -1) {
     return undefined;
   }
@@ -50,17 +47,18 @@ export function update(id: long, title: string, completed: boolean): Todo | unde
     completed
   };
 
-  todos[index] = updated;
+  todos.removeAt(index);
+  todos.insert(index, updated);
   return updated;
 }
 
 // Delete a todo
 export function remove(id: long): boolean {
-  const index = todos.findIndex(t => t.id === id);
+  const index = todos.findIndex((t) => t.id === id);
   if (index === -1) {
     return false;
   }
-  todos.splice(index, 1);
+  todos.removeAt(index);
   return true;
 }
 

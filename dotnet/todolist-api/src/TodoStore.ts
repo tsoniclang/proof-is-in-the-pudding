@@ -6,7 +6,7 @@ import { Todo } from "./Todo.ts";
 
 // Global store state (module-level variables)
 const todos = new Dictionary<int, Todo>();
-const nextId: { value: int } = { value: 1 as int };
+const nextId: { value: int } = { value: 1 };
 
 // Get all todos
 export function getAll(): List<Todo> {
