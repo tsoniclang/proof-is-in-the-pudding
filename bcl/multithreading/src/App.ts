@@ -3,7 +3,7 @@ import { Parallel } from "@tsonic/dotnet/System.Threading.Tasks.js";
 import { int, long } from "@tsonic/core/types.js";
 
 export function main(): void {
-  Console.writeLine("=== Parallel Computation Test (dotnet mode) ===");
+  Console.writeLine("=== Parallel Computation Test (BCL) ===");
   Console.writeLine("");
   Console.writeLine(`Processors: ${Environment.processorCount}`);
   Console.writeLine("");

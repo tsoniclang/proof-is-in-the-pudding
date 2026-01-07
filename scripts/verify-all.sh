@@ -52,6 +52,20 @@ run_http_server() {
   done
 
   kill "${pid}" >/dev/null 2>&1 || true
+
+  # Some servers (notably Node.js bindings hosts) may take a moment to exit on SIGTERM.
+  # Keep the verifier deterministic: escalate to SIGKILL after a short grace period.
+  for _ in {1..50}; do
+    if ! kill -0 "${pid}" >/dev/null 2>&1; then
+      break
+    fi
+    sleep 0.1
+  done
+
+  if kill -0 "${pid}" >/dev/null 2>&1; then
+    kill -9 "${pid}" >/dev/null 2>&1 || true
+  fi
+
   wait "${pid}" >/dev/null 2>&1 || true
 
   if [[ "${ok}" != "1" ]]; then
@@ -61,13 +75,13 @@ run_http_server() {
 }
 
 projects=(
-  "dotnet/hello-world"
-  "dotnet/calculator"
-  "dotnet/fibonacci"
-  "dotnet/todolist-api"
-  "dotnet/multithreading"
-  "dotnet/high-performance"
-  "dotnet/aspnetcore-blog"
+  "bcl/hello-world"
+  "bcl/calculator"
+  "bcl/fibonacci"
+  "bcl/todolist-api"
+  "bcl/multithreading"
+  "bcl/high-performance"
+  "aspnetcore/blog"
   "js/hello-world"
   "js/calculator"
   "js/fibonacci"
@@ -84,10 +98,10 @@ for project in "${projects[@]}"; do
   typecheck_and_build "${project}"
 
   case "${project}" in
-    "dotnet/todolist-api")
+    "bcl/todolist-api")
       run_http_server "${project}" "http://localhost:8080/todos"
       ;;
-    "dotnet/aspnetcore-blog")
+    "aspnetcore/blog")
       run_http_server "${project}" "http://localhost:8090/"
       ;;
     "js/todolist-api")

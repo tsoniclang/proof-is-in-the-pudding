@@ -5,7 +5,7 @@
   "scripts": {
     "typecheck": "tsc -p tsconfig.json",
     "build": "tsonic build",
-    "emit": "tsonic emit",
+    "generate": "tsonic generate",
     "dev": "tsonic run"
   },
   "devDependencies": {
@@ -18,4 +18,3 @@
     "typescript": "^5.0.0"
   }
 }
-

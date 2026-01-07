@@ -302,7 +302,7 @@ export function main(): void {
 
   console.log("");
   console.log("=================================");
-  console.log("  Notes WebApp (JS mode)");
+  console.log("  Notes WebApp (JSRuntime bindings)");
   console.log("  http://localhost:8081");
   console.log("=================================");
   console.log("");
