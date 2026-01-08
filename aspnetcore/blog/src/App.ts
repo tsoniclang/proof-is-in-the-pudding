@@ -4,7 +4,8 @@ import { Encoding } from "@tsonic/dotnet/System.Text.js";
 import { JsonSerializer } from "@tsonic/dotnet/System.Text.Json.js";
 import { List } from "@tsonic/dotnet/System.Collections.Generic.js";
 import { Task, TaskExtensions } from "@tsonic/dotnet/System.Threading.Tasks.js";
-import { WebApplication, EndpointRouteBuilderExtensions } from "@tsonic/aspnetcore/Microsoft.AspNetCore.Builder.js";
+import { WebApplication } from "@tsonic/aspnetcore/Microsoft.AspNetCore.Builder.js";
+import type { ExtensionMethods } from "@tsonic/aspnetcore/Microsoft.AspNetCore.Builder.js";
 import { HttpContext, HttpResponse, HttpResponseWritingExtensions } from "@tsonic/aspnetcore/Microsoft.AspNetCore.Http.js";
 
 export interface Post {
@@ -186,11 +187,11 @@ export function main(): void {
   }
 
   const builder = WebApplication.createBuilder();
-  const app = builder.build();
+  const app = builder.build() as ExtensionMethods<WebApplication>;
 
-  EndpointRouteBuilderExtensions.mapGet(app, "/", handleIndex);
-  EndpointRouteBuilderExtensions.mapGet(app, "/api/posts", handleListPosts);
-  EndpointRouteBuilderExtensions.mapPost(app, "/api/posts", handleCreatePost);
+  app.mapGet("/", handleIndex);
+  app.mapGet("/api/posts", handleListPosts);
+  app.mapPost("/api/posts", handleCreatePost);
 
   app.run("http://localhost:8090");
 }

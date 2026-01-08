@@ -1,6 +1,7 @@
 import { Console } from "@tsonic/dotnet/System.js";
 
-import { WebApplication, EndpointRouteBuilderExtensions } from "@tsonic/aspnetcore/Microsoft.AspNetCore.Builder.js";
+import { WebApplication } from "@tsonic/aspnetcore/Microsoft.AspNetCore.Builder.js";
+import type { ExtensionMethods } from "@tsonic/aspnetcore/Microsoft.AspNetCore.Builder.js";
 
 import { DB_PATH } from "./db/options.ts";
 import { ensureCreatedAndSeed } from "./db/seed.ts";
@@ -19,19 +20,19 @@ export function run(): void {
   Console.writeLine("=================================");
 
   const builder = WebApplication.createBuilder();
-  const app = builder.build();
+  const app = builder.build() as ExtensionMethods<WebApplication>;
 
-  EndpointRouteBuilderExtensions.mapGet(app, "/", handleIndex);
-  EndpointRouteBuilderExtensions.mapGet(app, "/api/health", handleHealth);
+  app.mapGet("/", handleIndex);
+  app.mapGet("/api/health", handleHealth);
 
-  EndpointRouteBuilderExtensions.mapGet(app, "/api/posts", handleListPosts);
-  EndpointRouteBuilderExtensions.mapGet(app, "/api/posts/{id:int}", handleGetPost);
-  EndpointRouteBuilderExtensions.mapPost(app, "/api/posts", handleCreatePost);
-  EndpointRouteBuilderExtensions.mapPut(app, "/api/posts/{id:int}", handleUpdatePost);
-  EndpointRouteBuilderExtensions.mapDelete(app, "/api/posts/{id:int}", handleDeletePost);
+  app.mapGet("/api/posts", handleListPosts);
+  app.mapGet("/api/posts/{id:int}", handleGetPost);
+  app.mapPost("/api/posts", handleCreatePost);
+  app.mapPut("/api/posts/{id:int}", handleUpdatePost);
+  app.mapDelete("/api/posts/{id:int}", handleDeletePost);
 
-  EndpointRouteBuilderExtensions.mapGet(app, "/api/posts/{id:int}/comments", handleListComments);
-  EndpointRouteBuilderExtensions.mapPost(app, "/api/posts/{id:int}/comments", handleCreateComment);
+  app.mapGet("/api/posts/{id:int}/comments", handleListComments);
+  app.mapPost("/api/posts/{id:int}/comments", handleCreateComment);
 
   app.run("http://localhost:8091");
 }
