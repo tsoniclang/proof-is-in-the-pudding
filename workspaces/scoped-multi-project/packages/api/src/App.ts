@@ -1,0 +1,10 @@
+import { Console } from "@tsonic/dotnet/System.js";
+import { TodoItem } from "@acme/domain/Acme.Domain.js";
+
+export function main(): void {
+  const item = new TodoItem("1", "Make npm workspaces work in Tsonic");
+  Console.writeLine(item.toString());
+
+  item.toggle();
+  Console.writeLine(item.toString());
+}
