@@ -1,0 +1,19 @@
+{
+  "name": "acme-domain",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "exports": {
+    "./package.json": "./package.json",
+    "./*.js": {
+      "types": "./dist/tsonic/bindings/*.d.ts",
+      "default": "./dist/tsonic/bindings/*.js"
+    }
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json",
+    "build": "tsonic build",
+    "bindings": "node ./scripts/generate-bindings.mjs"
+  }
+}
+

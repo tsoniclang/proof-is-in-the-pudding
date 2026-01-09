@@ -1,0 +1,26 @@
+{
+  "$schema": "https://tsonic.dev/schema/v1.json",
+  "rootNamespace": "Acme.Api",
+  "entryPoint": "src/App.ts",
+  "sourceRoot": "src",
+  "outputDirectory": "generated",
+  "outputName": "api",
+  "output": {
+    "nativeAot": false,
+    "trimmed": false,
+    "singleFile": false
+  },
+  "buildOptions": {
+    "stripSymbols": true,
+    "invariantGlobalization": true
+  },
+  "dotnet": {
+    "typeRoots": [
+      "../../node_modules/@tsonic/globals"
+    ],
+    "libraries": [
+      "../domain/dist/net10.0/Acme.Domain.dll"
+    ]
+  }
+}
+

@@ -10,6 +10,7 @@ This repository groups example projects by which bindings packages they opt into
 - `js/` - Examples using the JSRuntime bindings via `@tsonic/js`
 - `nodejs/` - Examples using the Node.js bindings via `@tsonic/nodejs`
 - `aspnetcore/` - Examples using ASP.NET Core via `@tsonic/aspnetcore`
+- `workspaces/` - Examples showing npm workspaces and multi-assembly repos
 
 There is no special compiler "js mode" anymore: everything compiles to .NET; `@tsonic/js` and `@tsonic/nodejs` are just additional assemblies you can import.
 
