@@ -130,7 +130,7 @@ const serializeError = (message: string): string =>
 
 const readRequestBodyAsync = (ctx: HttpContext): Task<string> => {
   const reader = new StreamReader(ctx.request.body, Encoding.UTF8);
-  return reader.readToEndAsync().continueWith<string>((t: Task<string>, _state) => {
+  return reader.readToEndAsync().continueWith<string>((t, _state) => {
     reader.close();
     return t.result;
   }, undefined);
@@ -155,7 +155,7 @@ const handleListPosts = (ctx: HttpContext): Task => {
 
 const handleCreatePost = (ctx: HttpContext): Task => {
   return TaskExtensions.unwrap(
-    readRequestBodyAsync(ctx).continueWith<Task>((t: Task<string>, _state) => {
+    readRequestBodyAsync(ctx).continueWith<Task>((t, _state) => {
       const input = JsonSerializer.deserialize<PostCreateInput>(t.result);
       if (input === undefined || typeof input.title !== "string" || typeof input.content !== "string") {
         return writeJson(
