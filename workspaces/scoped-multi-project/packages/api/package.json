@@ -9,7 +9,6 @@
     "dev": "tsonic run"
   },
   "dependencies": {
-    "@acme/domain": "workspace:*"
+    "@acme/domain": "*"
   }
 }
-
