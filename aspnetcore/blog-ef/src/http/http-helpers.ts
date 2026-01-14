@@ -23,6 +23,11 @@ export const readRequestBodyAsync = (ctx: HttpContext): Task<string> => {
 export const writeText = (response: HttpResponse, statusCode: int, contentType: string, body: string): Task => {
   response.statusCode = statusCode;
   response.contentType = contentType;
+  // HTTP 204 (No Content) and 304 (Not Modified) must not include a response body.
+  // Kestrel throws if we attempt to write a body for these status codes.
+  if (statusCode === 204 || statusCode === 304 || (statusCode >= 100 && statusCode < 200)) {
+    return Task.completedTask;
+  }
   return HttpResponseWritingExtensions.writeAsync(response, body);
 };
 

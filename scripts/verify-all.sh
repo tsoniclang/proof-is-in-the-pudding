@@ -9,7 +9,9 @@ typecheck_and_build() {
   echo "=== typecheck: ${project} ==="
   (
     cd "${repo_root}/${project}"
-    if [[ -x "./node_modules/.bin/tsc" ]]; then
+    if [[ -n "${TSC_BIN:-}" ]]; then
+      "${TSC_BIN}" -p tsconfig.json
+    elif [[ -x "./node_modules/.bin/tsc" ]]; then
       ./node_modules/.bin/tsc -p tsconfig.json
     else
       node "${tsonic_repo_root}/node_modules/typescript/bin/tsc" -p tsconfig.json
@@ -18,7 +20,9 @@ typecheck_and_build() {
   echo "=== build: ${project} ==="
   (
     cd "${repo_root}/${project}"
-    if [[ -x "./node_modules/.bin/tsonic" ]]; then
+    if [[ -n "${TSONIC_BIN:-}" ]]; then
+      "${TSONIC_BIN}" build
+    elif [[ -x "./node_modules/.bin/tsonic" ]]; then
       ./node_modules/.bin/tsonic build
     else
       node "${tsonic_repo_root}/packages/cli/dist/index.js" build
@@ -35,15 +39,22 @@ run_console_app() {
 run_http_server() {
   local project="$1"
   local url="$2"
+  local log_file="${repo_root}/${project}/.tmp-server.log"
   echo "=== run (server): ${project} (${url}) ==="
 
   pushd "${repo_root}/${project}" >/dev/null
-  ./out/app &
+  rm -f "${log_file}" >/dev/null 2>&1 || true
+  ./out/app >"${log_file}" 2>&1 &
   local pid=$!
   popd >/dev/null
 
   local ok=0
   for _ in {1..30}; do
+    if ! kill -0 "${pid}" >/dev/null 2>&1; then
+      echo "FAIL: server exited early: ${project}" >&2
+      tail -200 "${log_file}" >&2 || true
+      exit 1
+    fi
     if curl --silent --fail "${url}" >/dev/null; then
       ok=1
       break
@@ -68,8 +79,15 @@ run_http_server() {
 
   wait "${pid}" >/dev/null 2>&1 || true
 
+  if grep -q "Unhandled exception\\|An unhandled exception was thrown by the application" "${log_file}" 2>/dev/null; then
+    echo "FAIL: server logged unhandled exception: ${project}" >&2
+    tail -200 "${log_file}" >&2 || true
+    exit 1
+  fi
+
   if [[ "${ok}" != "1" ]]; then
     echo "FAIL: server did not respond: ${project} (${url})" >&2
+    tail -200 "${log_file}" >&2 || true
     exit 1
   fi
 }
@@ -78,11 +96,13 @@ run_aspnetcore_blog() {
   local project="$1"
   local base_url="http://localhost:8090"
   local index_url="${base_url}/"
+  local log_file="${repo_root}/${project}/.tmp-server.log"
 
   echo "=== run (server): ${project} (${base_url}) ==="
 
   pushd "${repo_root}/${project}" >/dev/null
-  ./out/app &
+  rm -f "${log_file}" >/dev/null 2>&1 || true
+  ./out/app >"${log_file}" 2>&1 &
   local pid=$!
   popd >/dev/null
 
@@ -102,6 +122,12 @@ run_aspnetcore_blog() {
 
   local ok=0
   for _ in {1..30}; do
+    if ! kill -0 "${pid}" >/dev/null 2>&1; then
+      cleanup
+      echo "FAIL: server exited early: ${project}" >&2
+      tail -200 "${log_file}" >&2 || true
+      exit 1
+    fi
     if curl --silent --fail "${index_url}" >/dev/null; then
       ok=1
       break
@@ -112,6 +138,7 @@ run_aspnetcore_blog() {
   if [[ "${ok}" != "1" ]]; then
     cleanup
     echo "FAIL: server did not respond: ${project} (${index_url})" >&2
+    tail -200 "${log_file}" >&2 || true
     exit 1
   fi
 
@@ -128,16 +155,24 @@ run_aspnetcore_blog() {
   if ! curl --silent --fail "${base_url}/api/posts" | grep -q "\"title\":\"Curl Post\""; then
     cleanup
     echo "FAIL: expected POSTed item in list: ${project}" >&2
+    tail -200 "${log_file}" >&2 || true
     exit 1
   fi
 
   cleanup
+
+  if grep -q "Unhandled exception\\|An unhandled exception was thrown by the application" "${log_file}" 2>/dev/null; then
+    echo "FAIL: server logged unhandled exception: ${project}" >&2
+    tail -200 "${log_file}" >&2 || true
+    exit 1
+  fi
 }
 
 run_aspnetcore_blog_ef() {
   local project="$1"
   local base_url="http://localhost:8091"
   local health_url="${base_url}/api/health"
+  local log_file="${repo_root}/${project}/.tmp-server.log"
 
   echo "=== run (server): ${project} (${base_url}) ==="
 
@@ -147,7 +182,8 @@ run_aspnetcore_blog_ef() {
     "${repo_root}/${project}/app.db-journal" >/dev/null 2>&1 || true
 
   pushd "${repo_root}/${project}" >/dev/null
-  ./out/app &
+  rm -f "${log_file}" >/dev/null 2>&1 || true
+  ./out/app >"${log_file}" 2>&1 &
   local pid=$!
   popd >/dev/null
 
@@ -167,6 +203,12 @@ run_aspnetcore_blog_ef() {
 
   local ok=0
   for _ in {1..50}; do
+    if ! kill -0 "${pid}" >/dev/null 2>&1; then
+      cleanup
+      echo "FAIL: server exited early: ${project}" >&2
+      tail -200 "${log_file}" >&2 || true
+      exit 1
+    fi
     if curl --silent --fail "${health_url}" >/dev/null; then
       ok=1
       break
@@ -177,6 +219,7 @@ run_aspnetcore_blog_ef() {
   if [[ "${ok}" != "1" ]]; then
     cleanup
     echo "FAIL: server did not respond: ${project} (${health_url})" >&2
+    tail -200 "${log_file}" >&2 || true
     exit 1
   fi
 
@@ -196,6 +239,7 @@ run_aspnetcore_blog_ef() {
   if [[ -z "${post_id}" ]]; then
     cleanup
     echo "FAIL: could not parse post id from response: ${post_json}" >&2
+    tail -200 "${log_file}" >&2 || true
     exit 1
   fi
 
@@ -250,10 +294,17 @@ run_aspnetcore_blog_ef() {
   if curl --silent --fail "${base_url}/api/posts/${post_id}" >/dev/null; then
     cleanup
     echo "FAIL: expected deleted post to be missing: ${post_id}" >&2
+    tail -200 "${log_file}" >&2 || true
     exit 1
   fi
 
   cleanup
+
+  if grep -q "Unhandled exception\\|An unhandled exception was thrown by the application" "${log_file}" 2>/dev/null; then
+    echo "FAIL: server logged unhandled exception: ${project}" >&2
+    tail -200 "${log_file}" >&2 || true
+    exit 1
+  fi
 }
 
 projects=(
