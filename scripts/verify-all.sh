@@ -50,6 +50,11 @@ run_http_server() {
 
   local ok=0
   for _ in {1..30}; do
+    if ! kill -0 "${pid}" >/dev/null 2>&1; then
+      echo "FAIL: server exited early: ${project}" >&2
+      tail -200 "${log_file}" >&2 || true
+      exit 1
+    fi
     if curl --silent --fail "${url}" >/dev/null; then
       ok=1
       break
@@ -74,7 +79,7 @@ run_http_server() {
 
   wait "${pid}" >/dev/null 2>&1 || true
 
-  if grep -q "An unhandled exception was thrown by the application" "${log_file}" 2>/dev/null; then
+  if grep -q "Unhandled exception\\|An unhandled exception was thrown by the application" "${log_file}" 2>/dev/null; then
     echo "FAIL: server logged unhandled exception: ${project}" >&2
     tail -200 "${log_file}" >&2 || true
     exit 1
@@ -117,6 +122,12 @@ run_aspnetcore_blog() {
 
   local ok=0
   for _ in {1..30}; do
+    if ! kill -0 "${pid}" >/dev/null 2>&1; then
+      cleanup
+      echo "FAIL: server exited early: ${project}" >&2
+      tail -200 "${log_file}" >&2 || true
+      exit 1
+    fi
     if curl --silent --fail "${index_url}" >/dev/null; then
       ok=1
       break
@@ -150,7 +161,7 @@ run_aspnetcore_blog() {
 
   cleanup
 
-  if grep -q "An unhandled exception was thrown by the application" "${log_file}" 2>/dev/null; then
+  if grep -q "Unhandled exception\\|An unhandled exception was thrown by the application" "${log_file}" 2>/dev/null; then
     echo "FAIL: server logged unhandled exception: ${project}" >&2
     tail -200 "${log_file}" >&2 || true
     exit 1
@@ -192,6 +203,12 @@ run_aspnetcore_blog_ef() {
 
   local ok=0
   for _ in {1..50}; do
+    if ! kill -0 "${pid}" >/dev/null 2>&1; then
+      cleanup
+      echo "FAIL: server exited early: ${project}" >&2
+      tail -200 "${log_file}" >&2 || true
+      exit 1
+    fi
     if curl --silent --fail "${health_url}" >/dev/null; then
       ok=1
       break
@@ -283,7 +300,7 @@ run_aspnetcore_blog_ef() {
 
   cleanup
 
-  if grep -q "An unhandled exception was thrown by the application" "${log_file}" 2>/dev/null; then
+  if grep -q "Unhandled exception\\|An unhandled exception was thrown by the application" "${log_file}" 2>/dev/null; then
     echo "FAIL: server logged unhandled exception: ${project}" >&2
     tail -200 "${log_file}" >&2 || true
     exit 1
