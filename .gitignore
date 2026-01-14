@@ -142,6 +142,7 @@ vite.config.ts.timestamp-*
 .vscode/
 
 # Tsonic build artifacts
+**/.tsonic/
 **/generated/
 **/out/
 *.cs
