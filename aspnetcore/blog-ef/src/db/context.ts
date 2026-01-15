@@ -4,15 +4,14 @@ import type { CommentEntity, PostEntity } from "./entities.ts";
 
 export class BlogDbContext extends DbContext {
   get posts(): DbSet<PostEntity> {
-    return this.set_<PostEntity>();
+    return this.set<PostEntity>();
   }
 
   get comments(): DbSet<CommentEntity> {
-    return this.set_<CommentEntity>();
+    return this.set<CommentEntity>();
   }
 
   constructor(options: DbContextOptions) {
     super(options);
   }
 }
-
