@@ -10,7 +10,7 @@ export const ensureCreatedAndSeed = (): void => {
   try {
     db.database.ensureCreated();
 
-    if (!Queryable.any_(db.posts.asQueryable())) {
+    if (!Queryable.any(db.posts.asQueryable())) {
       const now = DateTime.utcNow;
       const post: PostEntity = {
         Id: 0,
