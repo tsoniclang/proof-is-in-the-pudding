@@ -14,6 +14,10 @@
     "typeRoots": [
       "node_modules/@tsonic/globals"
     ],
+    "libraries": [
+      "node_modules/@tsonic/cli/runtime/Tsonic.JSRuntime.dll",
+      "node_modules/@tsonic/cli/runtime/nodejs.dll"
+    ],
     "frameworkReferences": [
       "Microsoft.AspNetCore.App"
     ]
