@@ -14,13 +14,9 @@
     "stripSymbols": true,
     "invariantGlobalization": true
   },
-  "dotnet": {
-    "typeRoots": [
-      "../../node_modules/@tsonic/globals"
-    ],
+  "references": {
     "libraries": [
       "../domain/dist/net10.0/Acme.Domain.dll"
     ]
   }
 }
-

@@ -1,0 +1,18 @@
+{
+  "name": "nodejs-multithreading",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json",
+    "build": "tsonic build",
+    "dev": "tsonic run"
+  },
+  "devDependencies": {
+    "@tsonic/core": "10.0.1",
+    "@tsonic/dotnet": "10.0.1",
+    "@tsonic/globals": "10.0.1",
+    "@tsonic/nodejs": "10.0.1",
+    "tsonic": "0.0.27",
+    "typescript": "^5.0.0"
+  }
+}

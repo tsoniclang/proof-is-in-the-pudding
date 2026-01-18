@@ -1,0 +1,20 @@
+{
+  "$schema": "https://tsonic.org/schema/workspace/v1.json",
+  "dotnetVersion": "net10.0",
+  "dotnet": {
+    "frameworkReferences": [
+      {
+        "id": "Microsoft.AspNetCore.App",
+        "types": "@tsonic/aspnetcore"
+      }
+    ],
+    "packageReferences": [
+      {
+        "id": "Microsoft.EntityFrameworkCore.Sqlite",
+        "version": "10.0.1",
+        "types": "@tsonic/efcore-sqlite"
+      }
+    ]
+  }
+}
+
