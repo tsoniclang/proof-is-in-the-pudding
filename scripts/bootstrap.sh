@@ -3,30 +3,18 @@ set -euo pipefail
 
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
-projects=(
-  "bcl/hello-world"
-  "bcl/calculator"
-  "bcl/fibonacci"
-  "bcl/todolist-api"
-  "bcl/multithreading"
-  "bcl/high-performance"
-  "aspnetcore/blog"
-  "aspnetcore/blog-ef"
-  "js/hello-world"
-  "js/calculator"
-  "js/fibonacci"
-  "js/todolist-api"
-  "js/notes-webapp"
-  "js/multithreading"
-  "nodejs/env-info"
-  "nodejs/file-reader"
-  "nodejs/webserver"
-  "nodejs/multithreading"
+workspaces=(
+  "bcl"
+  "js"
+  "nodejs"
+  "aspnetcore"
+  "workspaces/scoped-multi-project"
+  "workspaces/unscoped-multi-project"
 )
 
-for project in "${projects[@]}"; do
-  echo "=== npm install: ${project} ==="
-  (cd "${repo_root}/${project}" && npm install --no-fund --no-audit)
+for workspace in "${workspaces[@]}"; do
+  echo "=== npm install: ${workspace} ==="
+  (cd "${repo_root}/${workspace}" && npm install --no-fund --no-audit)
 done
 
 echo "=== DONE ==="

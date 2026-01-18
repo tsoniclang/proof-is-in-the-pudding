@@ -1,0 +1,19 @@
+{
+  "name": "bcl-high-performance",
+  "version": "1.0.0",
+  "description": "High-performance examples using Span, Memory, and value types",
+  "type": "module",
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json",
+    "build": "tsonic build",
+    "dev": "tsonic run",
+    "run": "./out/app"
+  },
+  "devDependencies": {
+    "@tsonic/core": "10.0.1",
+    "@tsonic/dotnet": "10.0.1",
+    "@tsonic/globals": "10.0.1",
+    "tsonic": "0.0.27",
+    "typescript": "^5.0.0"
+  }
+}

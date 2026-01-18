@@ -4,6 +4,20 @@ set -euo pipefail
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 tsonic_repo_root="$(cd "${repo_root}/../tsonic" && pwd)"
 
+ensure_interop_dlls() {
+  # JS workspace: copy JSRuntime DLL if needed
+  if [[ -f "${repo_root}/js/tsonic.workspace.json" ]] && [[ ! -f "${repo_root}/js/libs/Tsonic.JSRuntime.dll" ]]; then
+    echo "=== add js (copy DLLs): js ==="
+    (cd "${repo_root}/js" && node "${tsonic_repo_root}/packages/cli/dist/index.js" add js --config tsonic.workspace.json)
+  fi
+
+  # Node.js workspace: copy JSRuntime + nodejs DLLs if needed
+  if [[ -f "${repo_root}/nodejs/tsonic.workspace.json" ]] && [[ ! -f "${repo_root}/nodejs/libs/nodejs.dll" ]]; then
+    echo "=== add nodejs (copy DLLs): nodejs ==="
+    (cd "${repo_root}/nodejs" && node "${tsonic_repo_root}/packages/cli/dist/index.js" add nodejs --config tsonic.workspace.json)
+  fi
+}
+
 typecheck_and_build() {
   local project="$1"
   echo "=== typecheck: ${project} ==="
@@ -307,47 +321,49 @@ run_aspnetcore_blog_ef() {
   fi
 }
 
+ensure_interop_dlls
+
 projects=(
-  "bcl/hello-world"
-  "bcl/calculator"
-  "bcl/fibonacci"
-  "bcl/todolist-api"
-  "bcl/multithreading"
-  "bcl/high-performance"
-  "aspnetcore/blog"
-  "aspnetcore/blog-ef"
-  "js/hello-world"
-  "js/calculator"
-  "js/fibonacci"
-  "js/todolist-api"
-  "js/notes-webapp"
-  "js/multithreading"
-  "nodejs/env-info"
-  "nodejs/file-reader"
-  "nodejs/webserver"
-  "nodejs/multithreading"
+  "bcl/packages/hello-world"
+  "bcl/packages/calculator"
+  "bcl/packages/fibonacci"
+  "bcl/packages/todolist-api"
+  "bcl/packages/multithreading"
+  "bcl/packages/high-performance"
+  "aspnetcore/packages/blog"
+  "aspnetcore/packages/blog-ef"
+  "js/packages/hello-world"
+  "js/packages/calculator"
+  "js/packages/fibonacci"
+  "js/packages/todolist-api"
+  "js/packages/notes-webapp"
+  "js/packages/multithreading"
+  "nodejs/packages/env-info"
+  "nodejs/packages/file-reader"
+  "nodejs/packages/webserver"
+  "nodejs/packages/multithreading"
 )
 
 for project in "${projects[@]}"; do
   typecheck_and_build "${project}"
 
   case "${project}" in
-    "bcl/todolist-api")
+    "bcl/packages/todolist-api")
       run_http_server "${project}" "http://localhost:8080/todos"
       ;;
-    "aspnetcore/blog")
+    "aspnetcore/packages/blog")
       run_aspnetcore_blog "${project}"
       ;;
-    "aspnetcore/blog-ef")
+    "aspnetcore/packages/blog-ef")
       run_aspnetcore_blog_ef "${project}"
       ;;
-    "js/todolist-api")
+    "js/packages/todolist-api")
       run_http_server "${project}" "http://localhost:8080/todos"
       ;;
-    "js/notes-webapp")
+    "js/packages/notes-webapp")
       run_http_server "${project}" "http://localhost:8081/"
       ;;
-    "nodejs/webserver")
+    "nodejs/packages/webserver")
       run_http_server "${project}" "http://localhost:3000/"
       ;;
     *)

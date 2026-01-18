@@ -42,7 +42,7 @@ import { MyModule } from "./MyModule.ts";
 
 Basic "Hello World" example.
 
-- [bcl/hello-world](./bcl/hello-world) - Uses `Console.writeLine` from `@tsonic/dotnet/System.js`
+- [bcl/hello-world](./bcl/hello-world) - Uses `Console.WriteLine` from `@tsonic/dotnet/System.js`
 - [js/hello-world](./js/hello-world) - Uses standard `console.log`
 
 ### calculator

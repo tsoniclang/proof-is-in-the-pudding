@@ -158,6 +158,7 @@ vite.config.ts.timestamp-*
 
 # Build output directories
 **/lib/
+**/libs/
 
 # Visual Studio solution files
 *.sln
