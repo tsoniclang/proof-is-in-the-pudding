@@ -14,8 +14,7 @@
     "@tsonic/core": "10.0.1",
     "@tsonic/efcore-sqlite": "10.0.1",
     "@tsonic/globals": "10.0.1",
-    "tsonic": "0.0.27",
+    "tsonic": "0.0.30",
     "typescript": "^5.0.0"
   }
 }
-
