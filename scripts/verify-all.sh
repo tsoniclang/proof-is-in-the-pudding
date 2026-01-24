@@ -2,19 +2,96 @@
 set -euo pipefail
 
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-tsonic_repo_root="$(cd "${repo_root}/../tsonic" && pwd)"
+
+find_nearest_bin() {
+  local start_dir="$1"
+  local bin_name="$2"
+  local dir="${start_dir}"
+
+  while [[ "${dir}" != "/" ]]; do
+    local candidate="${dir}/node_modules/.bin/${bin_name}"
+    if [[ -x "${candidate}" ]]; then
+      echo "${candidate}"
+      return 0
+    fi
+    dir="$(dirname "${dir}")"
+  done
+
+  return 1
+}
+
+ensure_npm_install() {
+  local workspace_dir="$1"
+  if [[ ! -f "${workspace_dir}/package.json" ]]; then
+    return 0
+  fi
+  if [[ -d "${workspace_dir}/node_modules" ]]; then
+    return 0
+  fi
+  echo "=== npm install: ${workspace_dir} ==="
+  (cd "${workspace_dir}" && npm install)
+}
+
+resolve_out_binary() {
+  local project_dir="$1"
+  local name="app"
+
+  if [[ -f "${project_dir}/tsonic.json" ]]; then
+    name="$(node -e "
+      const fs = require('fs');
+      const cfg = JSON.parse(fs.readFileSync(process.argv[1], 'utf8'));
+      const outputName = cfg.outputName ?? cfg.output?.name;
+      process.stdout.write(String(outputName ?? 'app'));
+    " "${project_dir}/tsonic.json")"
+  fi
+
+  if [[ -x "${project_dir}/out/${name}" ]]; then
+    echo "${project_dir}/out/${name}"
+    return 0
+  fi
+  if [[ -x "${project_dir}/out/${name}.exe" ]]; then
+    echo "${project_dir}/out/${name}.exe"
+    return 0
+  fi
+  if [[ -x "${project_dir}/out/app" ]]; then
+    echo "${project_dir}/out/app"
+    return 0
+  fi
+  if [[ -x "${project_dir}/out/app.exe" ]]; then
+    echo "${project_dir}/out/app.exe"
+    return 0
+  fi
+
+  echo "${project_dir}/out/${name}"
+  return 0
+}
 
 ensure_interop_dlls() {
+  ensure_npm_install "${repo_root}/bcl"
+  ensure_npm_install "${repo_root}/aspnetcore"
+  ensure_npm_install "${repo_root}/js"
+  ensure_npm_install "${repo_root}/nodejs"
+  if [[ -f "${repo_root}/workspaces/scoped-multi-project/package.json" ]]; then
+    ensure_npm_install "${repo_root}/workspaces/scoped-multi-project"
+  fi
+  if [[ -f "${repo_root}/workspaces/unscoped-multi-project/package.json" ]]; then
+    ensure_npm_install "${repo_root}/workspaces/unscoped-multi-project"
+  fi
+
   # JS workspace: copy JSRuntime DLL if needed
   if [[ -f "${repo_root}/js/tsonic.workspace.json" ]] && [[ ! -f "${repo_root}/js/libs/Tsonic.JSRuntime.dll" ]]; then
     echo "=== add js (copy DLLs): js ==="
-    (cd "${repo_root}/js" && node "${tsonic_repo_root}/packages/cli/dist/index.js" add js --config tsonic.workspace.json)
+    local tsonic_bin
+    tsonic_bin="$(find_nearest_bin "${repo_root}/js" tsonic)"
+    (cd "${repo_root}/js" && "${tsonic_bin}" add js --config tsonic.workspace.json)
   fi
 
   # Node.js workspace: copy JSRuntime + nodejs DLLs if needed
   if [[ -f "${repo_root}/nodejs/tsonic.workspace.json" ]] && [[ ! -f "${repo_root}/nodejs/libs/nodejs.dll" ]]; then
     echo "=== add nodejs (copy DLLs): nodejs ==="
-    (cd "${repo_root}/nodejs" && node "${tsonic_repo_root}/packages/cli/dist/index.js" add nodejs --config tsonic.workspace.json)
+    local tsonic_bin
+    tsonic_bin="$(find_nearest_bin "${repo_root}/nodejs" tsonic)"
+    (cd "${repo_root}/nodejs" && "${tsonic_bin}" add nodejs --config tsonic.workspace.json)
   fi
 }
 
@@ -23,31 +100,34 @@ typecheck_and_build() {
   echo "=== typecheck: ${project} ==="
   (
     cd "${repo_root}/${project}"
+    local tsc_bin
     if [[ -n "${TSC_BIN:-}" ]]; then
-      "${TSC_BIN}" -p tsconfig.json
-    elif [[ -x "./node_modules/.bin/tsc" ]]; then
-      ./node_modules/.bin/tsc -p tsconfig.json
+      tsc_bin="${TSC_BIN}"
     else
-      node "${tsonic_repo_root}/node_modules/typescript/bin/tsc" -p tsconfig.json
+      tsc_bin="$(find_nearest_bin "$(pwd)" tsc)"
     fi
+    "${tsc_bin}" -p tsconfig.json
   )
   echo "=== build: ${project} ==="
   (
     cd "${repo_root}/${project}"
+    local tsonic_bin
     if [[ -n "${TSONIC_BIN:-}" ]]; then
-      "${TSONIC_BIN}" build
-    elif [[ -x "./node_modules/.bin/tsonic" ]]; then
-      ./node_modules/.bin/tsonic build
+      tsonic_bin="${TSONIC_BIN}"
     else
-      node "${tsonic_repo_root}/packages/cli/dist/index.js" build
+      tsonic_bin="$(find_nearest_bin "$(pwd)" tsonic)"
     fi
+    "${tsonic_bin}" build
   )
 }
 
 run_console_app() {
   local project="$1"
   echo "=== run: ${project} ==="
-  (cd "${repo_root}/${project}" && ./out/app)
+  local project_dir="${repo_root}/${project}"
+  local binary
+  binary="$(resolve_out_binary "${project_dir}")"
+  (cd "${project_dir}" && "./${binary#"${project_dir}/"}")
 }
 
 run_http_server() {
@@ -58,7 +138,9 @@ run_http_server() {
 
   pushd "${repo_root}/${project}" >/dev/null
   rm -f "${log_file}" >/dev/null 2>&1 || true
-  ./out/app >"${log_file}" 2>&1 &
+  local binary
+  binary="$(resolve_out_binary "$(pwd)")"
+  "./${binary#"$(pwd)/"}" >"${log_file}" 2>&1 &
   local pid=$!
   popd >/dev/null
 
@@ -116,7 +198,9 @@ run_aspnetcore_blog() {
 
   pushd "${repo_root}/${project}" >/dev/null
   rm -f "${log_file}" >/dev/null 2>&1 || true
-  ./out/app >"${log_file}" 2>&1 &
+  local binary
+  binary="$(resolve_out_binary "$(pwd)")"
+  "./${binary#"$(pwd)/"}" >"${log_file}" 2>&1 &
   local pid=$!
   popd >/dev/null
 
@@ -197,7 +281,9 @@ run_aspnetcore_blog_ef() {
 
   pushd "${repo_root}/${project}" >/dev/null
   rm -f "${log_file}" >/dev/null 2>&1 || true
-  ./out/app >"${log_file}" 2>&1 &
+  local binary
+  binary="$(resolve_out_binary "$(pwd)")"
+  "./${binary#"$(pwd)/"}" >"${log_file}" 2>&1 &
   local pid=$!
   popd >/dev/null
 
@@ -342,6 +428,10 @@ projects=(
   "nodejs/packages/file-reader"
   "nodejs/packages/webserver"
   "nodejs/packages/multithreading"
+  "workspaces/scoped-multi-project/packages/domain"
+  "workspaces/scoped-multi-project/packages/api"
+  "workspaces/unscoped-multi-project/packages/acme-domain"
+  "workspaces/unscoped-multi-project/packages/acme-api"
 )
 
 for project in "${projects[@]}"; do
@@ -365,6 +455,9 @@ for project in "${projects[@]}"; do
       ;;
     "nodejs/packages/webserver")
       run_http_server "${project}" "http://localhost:3000/"
+      ;;
+    "workspaces/scoped-multi-project/packages/domain" | "workspaces/unscoped-multi-project/packages/acme-domain")
+      # These are libraries; build/typecheck only.
       ;;
     *)
       run_console_app "${project}"
