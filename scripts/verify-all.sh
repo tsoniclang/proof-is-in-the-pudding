@@ -3,6 +3,9 @@ set -euo pipefail
 
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
+echo "=== workspace hygiene ==="
+"${repo_root}/scripts/clean-nested-node-modules.sh"
+
 find_nearest_bin() {
   local start_dir="$1"
   local bin_name="$2"

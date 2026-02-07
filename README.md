@@ -95,6 +95,10 @@ Simple ASP.NET Core blog app.
 
 ## Building
 
+Important: install dependencies **only at the workspace root** (e.g. `bcl/`, `js/`, `aspnetcore/`), not inside individual packages under `packages/*`.
+
+Accidentally running `npm install` inside a workspace package can create nested `node_modules/` trees (multiple copies of `@tsonic/*` types), which can break TypeScript type identity and cause confusing errors.
+
 Each example can be built individually:
 
 ```bash
