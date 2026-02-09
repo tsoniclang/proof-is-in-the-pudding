@@ -34,7 +34,7 @@ export const writeText = (response: HttpResponse, statusCode: int, contentType: 
 export const writeJson = (response: HttpResponse, statusCode: int, body: string): Task =>
   writeText(response, statusCode, "application/json", body);
 
-export const getPath = (ctx: HttpContext): string => ctx.Request.Path.Value;
+export const getPath = (ctx: HttpContext): string => ctx.Request.Path.ToString();
 
 export const parsePostIdFromPath = (path: string): int | undefined => {
   const parts = path.Split("/");
