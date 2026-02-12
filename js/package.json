@@ -10,10 +10,10 @@
     "typecheck": "npm -ws --if-present run typecheck"
   },
   "devDependencies": {
-    "@tsonic/core": "10.0.10",
-    "@tsonic/globals": "10.0.10",
-    "@tsonic/js": "10.0.8",
-    "tsonic": "0.0.44",
+    "@tsonic/core": "10.0.11",
+    "@tsonic/globals": "10.0.11",
+    "@tsonic/js": "10.0.11",
+    "tsonic": "0.0.45",
     "typescript": "^5.0.0"
   }
 }
