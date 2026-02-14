@@ -9,11 +9,11 @@
     "dev": "tsonic run"
   },
   "devDependencies": {
-    "@tsonic/core": "10.0.11",
-    "@tsonic/dotnet": "10.0.11",
-    "@tsonic/globals": "10.0.11",
-    "@tsonic/js": "10.0.11",
-    "tsonic": "0.0.45",
+    "@tsonic/core": "10.0.16",
+    "@tsonic/dotnet": "10.0.16",
+    "@tsonic/globals": "10.0.16",
+    "@tsonic/js": "10.0.16",
+    "tsonic": "0.0.47",
     "typescript": "^5.0.0"
   }
 }

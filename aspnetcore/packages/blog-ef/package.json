@@ -9,14 +9,14 @@
     "dev": "tsonic run"
   },
   "devDependencies": {
-    "@tsonic/aspnetcore": "10.0.11",
-    "@tsonic/core": "10.0.11",
-    "@tsonic/dotnet": "10.0.11",
-    "@tsonic/efcore": "10.0.11",
-    "@tsonic/efcore-sqlite": "10.0.11",
-    "@tsonic/globals": "10.0.11",
-    "@tsonic/microsoft-extensions": "10.0.11",
-    "tsonic": "0.0.45",
+    "@tsonic/aspnetcore": "10.0.16",
+    "@tsonic/core": "10.0.16",
+    "@tsonic/dotnet": "10.0.16",
+    "@tsonic/efcore": "10.0.16",
+    "@tsonic/efcore-sqlite": "10.0.16",
+    "@tsonic/globals": "10.0.16",
+    "@tsonic/microsoft-extensions": "10.0.16",
+    "tsonic": "0.0.47",
     "typescript": "^5.0.0"
   }
 }
