@@ -1,6 +1,7 @@
 // In-memory Todo storage with CRUD operations
 import { Console } from "@tsonic/dotnet/System.js";
 import { List, Dictionary } from "@tsonic/dotnet/System.Collections.Generic.js";
+import { defaultof, out } from "@tsonic/core/lang.js";
 import { int } from "@tsonic/core/types.js";
 import { Todo } from "./Todo.ts";
 
@@ -21,9 +22,8 @@ export function getAll(): List<Todo> {
 
 // Get a todo by ID
 export function getById(id: int): Todo | undefined {
-  if (todos.ContainsKey(id)) {
-    return todos[id];
-  }
+  let value = defaultof<Todo>();
+  if (todos.TryGetValue(id, out(value))) return value;
   return undefined;
 }
 
@@ -55,7 +55,8 @@ export function update(id: int, title: string, completed: boolean): Todo | undef
     completed
   };
 
-  todos[id] = updated;
+  todos.Remove(id);
+  todos.Add(id, updated);
   return updated;
 }
 
