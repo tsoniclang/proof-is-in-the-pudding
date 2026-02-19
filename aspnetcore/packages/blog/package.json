@@ -9,12 +9,12 @@
     "dev": "tsonic run"
   },
   "devDependencies": {
-    "@tsonic/aspnetcore": "10.0.21",
-    "@tsonic/core": "10.0.21",
-    "@tsonic/dotnet": "10.0.21",
-    "@tsonic/globals": "10.0.21",
-    "@tsonic/microsoft-extensions": "10.0.21",
-    "tsonic": "0.0.54",
+    "@tsonic/aspnetcore": "10.0.27",
+    "@tsonic/core": "10.0.27",
+    "@tsonic/dotnet": "10.0.27",
+    "@tsonic/globals": "10.0.27",
+    "@tsonic/microsoft-extensions": "10.0.27",
+    "tsonic": "0.0.59",
     "typescript": "^5.0.0"
   }
 }
