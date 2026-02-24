@@ -3,6 +3,11 @@ set -euo pipefail
 
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
+if [[ -z "${TSONIC_BIN:-}" ]]; then
+  echo "FAIL: TSONIC_BIN is not set. Set it to the tsonic CLI path." >&2
+  exit 1
+fi
+
 echo "=== workspace hygiene ==="
 "${repo_root}/scripts/clean-nested-node-modules.sh"
 
@@ -84,17 +89,13 @@ ensure_interop_dlls() {
   # JS workspace: copy JSRuntime DLL if needed
   if [[ -f "${repo_root}/js/tsonic.workspace.json" ]] && [[ ! -f "${repo_root}/js/libs/Tsonic.JSRuntime.dll" ]]; then
     echo "=== add js (copy DLLs): js ==="
-    local tsonic_bin
-    tsonic_bin="$(find_nearest_bin "${repo_root}/js" tsonic)"
-    (cd "${repo_root}/js" && "${tsonic_bin}" add js --config tsonic.workspace.json)
+    (cd "${repo_root}/js" && "${TSONIC_BIN}" add js --config tsonic.workspace.json)
   fi
 
   # Node.js workspace: copy JSRuntime + nodejs DLLs if needed
   if [[ -f "${repo_root}/nodejs/tsonic.workspace.json" ]] && [[ ! -f "${repo_root}/nodejs/libs/nodejs.dll" ]]; then
     echo "=== add nodejs (copy DLLs): nodejs ==="
-    local tsonic_bin
-    tsonic_bin="$(find_nearest_bin "${repo_root}/nodejs" tsonic)"
-    (cd "${repo_root}/nodejs" && "${tsonic_bin}" add nodejs --config tsonic.workspace.json)
+    (cd "${repo_root}/nodejs" && "${TSONIC_BIN}" add nodejs --config tsonic.workspace.json)
   fi
 }
 
@@ -114,13 +115,7 @@ typecheck_and_build() {
   echo "=== build: ${project} ==="
   (
     cd "${repo_root}/${project}"
-    local tsonic_bin
-    if [[ -n "${TSONIC_BIN:-}" ]]; then
-      tsonic_bin="${TSONIC_BIN}"
-    else
-      tsonic_bin="$(find_nearest_bin "$(pwd)" tsonic)"
-    fi
-    "${tsonic_bin}" build
+    "${TSONIC_BIN}" build
   )
 }
 
