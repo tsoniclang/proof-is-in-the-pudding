@@ -1,6 +1,6 @@
 // HTTP server using Node.js http module
-import { console } from "@tsonic/nodejs/index.js";
-import { http, IncomingMessage, ServerResponse } from "@tsonic/nodejs/nodejs.Http.js";
+import * as http from "node:http";
+import type { IncomingMessage, ServerResponse } from "node:http";
 import { Thread, Timeout } from "@tsonic/dotnet/System.Threading.js";
 
 export function main(): void {

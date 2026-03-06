@@ -1,4 +1,3 @@
-import { JSON } from "@tsonic/js/index.js";
 import type { Note, NoteCreateInput, NoteUpdateInput } from "./Models.ts";
 
 export const serializeNote = (note: Note): string => JSON.stringify(note);

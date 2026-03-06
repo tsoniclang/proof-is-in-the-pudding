@@ -8,7 +8,6 @@
 //   PUT    /todos/:id   - Update a todo
 //   DELETE /todos/:id   - Delete a todo
 
-import { console } from "@tsonic/js/index.js";
 import { Int32 } from "@tsonic/dotnet/System.js";
 import { HttpListener, HttpListenerContext, HttpListenerRequest, HttpListenerResponse } from "@tsonic/dotnet/System.Net.js";
 import { StreamReader } from "@tsonic/dotnet/System.IO.js";
@@ -19,9 +18,9 @@ import { serializeTodo, serializeTodos, serializeError, parseTodoCreate, parseTo
 
 // Extract ID from URL path like "/todos/123"
 function extractIdFromPath(path: string): int | undefined {
-  const parts = path.Split("/");
+  const parts = path.split("/");
   // Expected: ["", "todos", "123"]
-  if (parts.Length < 3) {
+  if (parts.length < 3) {
     return undefined;
   }
   const idStr = parts[2];
@@ -47,7 +46,7 @@ function sendJsonResponse(response: HttpListenerResponse, statusCode: int, json:
   response.ContentType = "application/json";
 
   const buffer = Encoding.UTF8.GetBytes(json);
-  const bufferLength = buffer.Length;
+  const bufferLength = buffer.length;
   response.ContentLength64 = bufferLength;
 
   const output = response.OutputStream;
@@ -130,7 +129,7 @@ function handleRequest(context: HttpListenerContext): void {
   console.log(method + " " + path);
 
   // Check if path starts with /todos
-  if (!path.StartsWith("/todos")) {
+  if (!path.startsWith("/todos")) {
     sendJsonResponse(response, 404, serializeError("Not found"));
     return;
   }

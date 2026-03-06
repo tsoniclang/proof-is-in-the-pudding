@@ -86,17 +86,6 @@ ensure_interop_dlls() {
     ensure_npm_install "${repo_root}/workspaces/unscoped-multi-project"
   fi
 
-  # JS workspace: copy JSRuntime DLL if needed
-  if [[ -f "${repo_root}/js/tsonic.workspace.json" ]] && [[ ! -f "${repo_root}/js/libs/Tsonic.JSRuntime.dll" ]]; then
-    echo "=== add js (copy DLLs): js ==="
-    (cd "${repo_root}/js" && "${TSONIC_BIN}" add js --config tsonic.workspace.json)
-  fi
-
-  # Node.js workspace: copy JSRuntime + nodejs DLLs if needed
-  if [[ -f "${repo_root}/nodejs/tsonic.workspace.json" ]] && [[ ! -f "${repo_root}/nodejs/libs/nodejs.dll" ]]; then
-    echo "=== add nodejs (copy DLLs): nodejs ==="
-    (cd "${repo_root}/nodejs" && "${TSONIC_BIN}" add nodejs --config tsonic.workspace.json)
-  fi
 }
 
 typecheck_and_build() {
