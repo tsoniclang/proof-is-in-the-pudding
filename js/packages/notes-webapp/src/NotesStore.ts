@@ -1,19 +1,17 @@
-import { List } from "@tsonic/dotnet/System.Collections.Generic.js";
-import { DateTime } from "@tsonic/dotnet/System.js";
 import { int } from "@tsonic/core/types.js";
 import type { Note, NoteCreateInput, NoteUpdateInput } from "./Models.ts";
 
-const notes = new List<Note>();
+const notes: Note[] = [];
 let nextId: int = 1;
 
-const nowIso = (): string => DateTime.UtcNow.ToString("O");
+const nowIso = (): string => new Date().toISOString();
 
 export function list(): Note[] {
-  return notes.ToArray();
+  return notes.slice();
 }
 
 export function getById(id: int): Note | undefined {
-  return notes.Find((n) => n.id === id);
+  return notes.find((n) => n.id === id);
 }
 
 export function create(input: NoteCreateInput): Note {
@@ -29,15 +27,15 @@ export function create(input: NoteCreateInput): Note {
     updatedAt: now,
   };
 
-  notes.Add(note);
+  notes.push(note);
   return note;
 }
 
 export function update(id: int, input: NoteUpdateInput): Note | undefined {
-  const index = notes.FindIndex((n) => n.id === id);
+  const index = notes.findIndex((n) => n.id === id);
   if (index === -1) return undefined;
 
-  const existing = notes.Find((n) => n.id === id);
+  const existing = notes.find((n) => n.id === id);
   if (existing === undefined) return undefined;
   const note: Note = {
     id,
@@ -47,20 +45,19 @@ export function update(id: int, input: NoteUpdateInput): Note | undefined {
     updatedAt: nowIso(),
   };
 
-  notes.RemoveAt(index);
-  notes.Insert(index, note);
+  notes.splice(index, 1, note);
   return note;
 }
 
 export function remove(id: int): boolean {
-  const index = notes.FindIndex((n) => n.id === id);
+  const index = notes.findIndex((n) => n.id === id);
   if (index === -1) return false;
-  notes.RemoveAt(index);
+  notes.splice(index, 1);
   return true;
 }
 
 export function seed(): void {
-  if (notes.Count > 0) return;
+  if (notes.length > 0) return;
 
   create({
     title: "Welcome to Tsonic Notes",

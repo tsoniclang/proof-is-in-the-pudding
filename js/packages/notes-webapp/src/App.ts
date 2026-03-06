@@ -1,4 +1,3 @@
-import { console } from "@tsonic/js/index.js";
 import { Int32 } from "@tsonic/dotnet/System.js";
 import { int, out } from "@tsonic/core/types.js";
 import {
@@ -151,7 +150,7 @@ const sendTextResponse = (
   response.ContentType = contentType;
 
   const buffer = Encoding.UTF8.GetBytes(body);
-  const bufferLength = buffer.Length;
+  const bufferLength = buffer.length;
   response.ContentLength64 = bufferLength;
 
   const output = response.OutputStream;
@@ -167,9 +166,9 @@ const sendJsonResponse = (
 ): void => sendTextResponse(response, statusCode, "application/json", json);
 
 const extractNoteIdFromPath = (path: string): int | undefined => {
-  const parts = path.Split("/");
+  const parts = path.split("/");
   // Expected: ["", "api", "notes", "<id>"]
-  if (parts.Length < 4) return undefined;
+  if (parts.length < 4) return undefined;
   const idStr = parts[3];
   if (idStr === undefined || idStr === "") return undefined;
 
@@ -210,7 +209,7 @@ const handleApi = (request: HttpListenerRequest, response: HttpListenerResponse)
     return;
   }
 
-  if (path.StartsWith("/api/notes/")) {
+  if (path.startsWith("/api/notes/")) {
     const id = extractNoteIdFromPath(path);
     if (id === undefined) {
       sendJsonResponse(response, 400, serializeError("Invalid note id"));
@@ -287,7 +286,7 @@ const handleRequest = (context: HttpListenerContext): void => {
     return;
   }
 
-  if (path.StartsWith("/api/")) {
+  if (path.startsWith("/api/")) {
     handleApi(request, response);
     return;
   }

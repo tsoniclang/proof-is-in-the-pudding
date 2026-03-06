@@ -1,22 +1,20 @@
 // In-memory Todo storage with CRUD operations
-// Uses JS Array semantics (push, filter, find, etc.)
-import { List } from "@tsonic/dotnet/System.Collections.Generic.js";
-import { console } from "@tsonic/js/index.js";
+// Uses JS Array semantics (push, find, splice, etc.)
 import { int } from "@tsonic/core/types.js";
 import { Todo } from "./Todo.ts";
 
 // Global store state (module-level variables)
-const todos = new List<Todo>();
+const todos: Todo[] = [];
 let nextId: int = 1;
 
 // Get all todos
 export function getAll(): Todo[] {
-  return todos.ToArray();
+  return todos.slice();
 }
 
 // Get a todo by ID
 export function getById(id: int): Todo | undefined {
-  return todos.Find((t) => t.id === id);
+  return todos.find((t) => t.id === id);
 }
 
 // Create a new todo
@@ -30,12 +28,12 @@ export function create(title: string): Todo {
     completed: false
   };
 
-  todos.Add(todo);
+  todos.push(todo);
   return todo;
 }
 
 export function update(id: int, title: string, completed: boolean): Todo | undefined {
-  const index = todos.FindIndex((t) => t.id === id);
+  const index = todos.findIndex((t) => t.id === id);
   if (index === -1) {
     return undefined;
   }
@@ -46,17 +44,16 @@ export function update(id: int, title: string, completed: boolean): Todo | undef
     completed
   };
 
-  todos.RemoveAt(index);
-  todos.Insert(index, updated);
+  todos.splice(index, 1, updated);
   return updated;
 }
 
 export function remove(id: int): boolean {
-  const index = todos.FindIndex((t) => t.id === id);
+  const index = todos.findIndex((t) => t.id === id);
   if (index === -1) {
     return false;
   }
-  todos.RemoveAt(index);
+  todos.splice(index, 1);
   return true;
 }
 

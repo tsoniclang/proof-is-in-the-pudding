@@ -1,6 +1,5 @@
 // JSON serialization helpers for Todo API
 // Uses JS JSON.parse/stringify with generics
-import { JSON } from "@tsonic/js/index.js";
 import { Todo } from "./Todo.ts";
 
 // Named types for JSON parsing/serialization (exported for C# accessibility)
