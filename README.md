@@ -8,11 +8,11 @@ This repository groups example projects by which bindings packages they opt into
 
 - `bcl/` - Baseline .NET BCL examples (`@tsonic/dotnet`, `@tsonic/core`, `@tsonic/globals`)
 - `js/` - Examples using the JSRuntime bindings via `@tsonic/js`
-- `nodejs/` - Examples using the Node.js bindings via `@tsonic/nodejs`
+- `nodejs/` - Examples using the JS surface plus the `@tsonic/nodejs` package
 - `aspnetcore/` - Examples using ASP.NET Core via `@tsonic/aspnetcore`
 - `workspaces/` - Examples showing npm workspaces and multi-assembly repos
 
-There is no special compiler "js mode" anymore: everything compiles to .NET; `@tsonic/js` and `@tsonic/nodejs` are just additional assemblies you can import.
+There is no special compiler "js mode" anymore: everything compiles to .NET. `@tsonic/js` is the ambient JS surface, and `@tsonic/nodejs` is a regular package that contributes `node:*` module bindings.
 
 ## Import Syntax
 
@@ -26,11 +26,11 @@ import { List } from "@tsonic/dotnet/System.Collections.Generic.js";
 // Core types
 import { int, long } from "@tsonic/core/types.js";
 
-// JSRuntime bindings
-import { console } from "@tsonic/js/index.js";
+// JS surface globals
+console.log("hello");
 
 // Node.js APIs
-import { fs } from "@tsonic/nodejs/index.js";
+import * as fs from "node:fs";
 
 // Local imports
 import { MyModule } from "./MyModule.ts";
@@ -89,8 +89,8 @@ Simple ASP.NET Core blog app.
 
 ### Node.js Examples
 
-- [nodejs/webserver](./nodejs/webserver) - HTTP server using `@tsonic/nodejs/nodejs.Http.js`
-- [nodejs/file-reader](./nodejs/file-reader) - File system operations using `@tsonic/nodejs/nodejs.js`
+- [nodejs/webserver](./nodejs/webserver) - HTTP server using `node:http`
+- [nodejs/file-reader](./nodejs/file-reader) - File system operations using `node:fs`
 - [nodejs/env-info](./nodejs/env-info) - Environment information using Node.js APIs
 
 ## Building
