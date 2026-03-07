@@ -1,7 +1,5 @@
-import { int } from "@tsonic/core/types.js";
-
 export interface Note {
-  id: int;
+  id: number;
   title: string;
   content: string;
   createdAt: string;

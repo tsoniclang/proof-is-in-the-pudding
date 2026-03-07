@@ -16,17 +16,6 @@
         "types": "@tsonic/aspnetcore"
       }
     ],
-    "packageReferences": [
-      {
-        "id": "Tsonic.JSRuntime",
-        "version": "0.0.4",
-        "types": "@tsonic/js"
-      },
-      {
-        "id": "Tsonic.Nodejs",
-        "version": "1.0.1",
-        "types": "@tsonic/nodejs"
-      }
-    ]
+    "packageReferences": []
   }
 }

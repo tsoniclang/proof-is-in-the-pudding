@@ -1,5 +1,4 @@
-// Todo List REST API (JSRuntime bindings)
-// Uses JS Array/String semantics with .NET HttpListener
+// Todo List REST API (JS surface + node:http)
 //
 // Endpoints:
 //   GET    /todos       - List all todos
@@ -8,91 +7,85 @@
 //   PUT    /todos/:id   - Update a todo
 //   DELETE /todos/:id   - Delete a todo
 
-import { Int32 } from "@tsonic/dotnet/System.js";
-import { HttpListener, HttpListenerContext, HttpListenerRequest, HttpListenerResponse } from "@tsonic/dotnet/System.Net.js";
-import { StreamReader } from "@tsonic/dotnet/System.IO.js";
-import { Encoding } from "@tsonic/dotnet/System.Text.js";
-import { int, out } from "@tsonic/core/types.js";
+import { createServer, type IncomingMessage, type ServerResponse } from "node:http";
+import { url } from "node:url";
 import * as TodoStore from "./TodoStore.ts";
-import { serializeTodo, serializeTodos, serializeError, parseTodoCreate, parseTodoUpdate } from "./JsonHelpers.ts";
+import {
+  parseTodoCreate,
+  parseTodoUpdate,
+  serializeError,
+  serializeTodo,
+  serializeTodos,
+} from "./JsonHelpers.ts";
 
-// Extract ID from URL path like "/todos/123"
-function extractIdFromPath(path: string): int | undefined {
-  const parts = path.split("/");
-  // Expected: ["", "todos", "123"]
+function extractIdFromPath(pathname: string): number | undefined {
+  const parts = pathname.split("/");
   if (parts.length < 3) {
     return undefined;
   }
-  const idStr = parts[2];
-  if (idStr !== "") {
-    let parseResult: int = 0;
-    const ok = Int32.TryParse(idStr, parseResult as out<int>);
-    if (ok) return parseResult;
+
+  const idText = parts[2];
+  if (idText === undefined || idText === "") {
+    return undefined;
   }
-  return undefined;
+
+  const parsed = parseInt(idText, 10);
+  if (parsed === undefined || Number.isNaN(parsed)) {
+    return undefined;
+  }
+
+  return parsed;
 }
 
-// Read request body as string
-function readRequestBody(request: HttpListenerRequest): string {
-  const reader = new StreamReader(request.InputStream, Encoding.UTF8);
-  const body = reader.ReadToEnd();
-  reader.Close();
-  return body;
+async function readRequestBody(request: IncomingMessage): Promise<string> {
+  return await request.readAll();
 }
 
-// Send JSON response
-function sendJsonResponse(response: HttpListenerResponse, statusCode: int, json: string): void {
-  response.StatusCode = statusCode;
-  response.ContentType = "application/json";
-
-  const buffer = Encoding.UTF8.GetBytes(json);
-  const bufferLength = buffer.length;
-  response.ContentLength64 = bufferLength;
-
-  const output = response.OutputStream;
-  output.Write(buffer, 0, bufferLength);
-  output.Close();
-  response.Close();
+function sendJsonResponse(response: ServerResponse, statusCode: number, json: string): void {
+  response.statusCode = statusCode;
+  response.setHeader("Content-Type", "application/json; charset=utf-8");
+  response.end(json);
 }
 
-// Handle GET /todos - List all todos
-function handleGetAll(response: HttpListenerResponse): void {
-  const todos = TodoStore.getAll();
-  const json = serializeTodos(todos);
-  sendJsonResponse(response, 200, json);
+function handleGetAll(response: ServerResponse): void {
+  sendJsonResponse(response, 200, serializeTodos(TodoStore.getAll()));
 }
 
-// Handle GET /todos/:id - Get a specific todo
-function handleGetOne(response: HttpListenerResponse, id: int): void {
+function handleGetOne(response: ServerResponse, id: number): void {
   const todo = TodoStore.getById(id);
   if (todo === undefined) {
     sendJsonResponse(response, 404, serializeError("Todo not found"));
     return;
   }
+
   sendJsonResponse(response, 200, serializeTodo(todo));
 }
 
-// Handle POST /todos - Create a new todo
-function handleCreate(request: HttpListenerRequest, response: HttpListenerResponse): void {
-  const body = readRequestBody(request);
-  const data = parseTodoCreate(body);
-
+async function handleCreate(
+  request: IncomingMessage,
+  response: ServerResponse
+): Promise<void> {
+  const data = parseTodoCreate(await readRequestBody(request));
   if (data === undefined) {
     sendJsonResponse(response, 400, serializeError("Invalid JSON: expected {\"title\": \"...\"}"));
     return;
   }
 
-  const todo = TodoStore.create(data.title);
-  sendJsonResponse(response, 201, serializeTodo(todo));
+  sendJsonResponse(response, 201, serializeTodo(TodoStore.create(data.title)));
 }
 
-// Handle PUT /todos/:id - Update a todo
-function handleUpdate(request: HttpListenerRequest, response: HttpListenerResponse, id: int): void {
-  const body = readRequestBody(request);
-  const data = parseTodoUpdate(body);
-
+async function handleUpdate(
+  request: IncomingMessage,
+  response: ServerResponse,
+  id: number
+): Promise<void> {
+  const data = parseTodoUpdate(await readRequestBody(request));
   if (data === undefined) {
-    sendJsonResponse(response, 400, serializeError("Invalid JSON: expected {\"title\": \"...\", \"completed\": true/false}"));
+    sendJsonResponse(
+      response,
+      400,
+      serializeError("Invalid JSON: expected {\"title\": \"...\", \"completed\": true/false}")
+    );
     return;
   }
 
@@ -101,92 +94,89 @@ function handleUpdate(request: HttpListenerRequest, response: HttpListenerRespon
     sendJsonResponse(response, 404, serializeError("Todo not found"));
     return;
   }
+
   sendJsonResponse(response, 200, serializeTodo(todo));
 }
 
-// Handle DELETE /todos/:id - Delete a todo
-function handleDelete(response: HttpListenerResponse, id: int): void {
-  const deleted = TodoStore.remove(id);
-  if (!deleted) {
+function handleDelete(response: ServerResponse, id: number): void {
+  if (!TodoStore.remove(id)) {
     sendJsonResponse(response, 404, serializeError("Todo not found"));
     return;
   }
-  sendJsonResponse(response, 204, "");
+
+  response.statusCode = 204;
+  response.end();
 }
 
-// Route request to appropriate handler
-function handleRequest(context: HttpListenerContext): void {
-  const request = context.Request;
-  const response = context.Response;
-  const method = request.HttpMethod;
-  const url = request.Url;
-  if (url === undefined) {
-    sendJsonResponse(response, 400, serializeError("Invalid request URL"));
-    return;
-  }
-  const path = url.AbsolutePath;
+async function handleRequest(
+  request: IncomingMessage,
+  response: ServerResponse
+): Promise<void> {
+  const method = request.method ?? "GET";
+  const parsedUrl = url.parse(request.url ?? "/");
+  const path = parsedUrl?.pathname ?? "/";
 
-  console.log(method + " " + path);
+  console.log(`${method} ${path}`);
 
-  // Check if path starts with /todos
   if (!path.startsWith("/todos")) {
     sendJsonResponse(response, 404, serializeError("Not found"));
     return;
   }
 
-  // Extract ID if present
   const id = extractIdFromPath(path);
 
-  // Route based on method and path
   if (method === "GET" && id === undefined) {
-    // GET /todos
     handleGetAll(response);
-  } else if (method === "GET" && id !== undefined) {
-    // GET /todos/:id
-    handleGetOne(response, id);
-  } else if (method === "POST" && id === undefined) {
-    // POST /todos
-    handleCreate(request, response);
-  } else if (method === "PUT" && id !== undefined) {
-    // PUT /todos/:id
-    handleUpdate(request, response, id);
-  } else if (method === "DELETE" && id !== undefined) {
-    // DELETE /todos/:id
-    handleDelete(response, id);
-  } else {
-    sendJsonResponse(response, 405, serializeError("Method not allowed"));
+    return;
   }
+
+  if (method === "GET" && id !== undefined) {
+    handleGetOne(response, id);
+    return;
+  }
+
+  if (method === "POST" && id === undefined) {
+    await handleCreate(request, response);
+    return;
+  }
+
+  if (method === "PUT" && id !== undefined) {
+    await handleUpdate(request, response, id);
+    return;
+  }
+
+  if (method === "DELETE" && id !== undefined) {
+    handleDelete(response, id);
+    return;
+  }
+
+  sendJsonResponse(response, 405, serializeError("Method not allowed"));
 }
 
-// Main entry point
 export function main(): void {
-  // Initialize sample data
   TodoStore.initSampleData();
 
-  // Create and start HTTP listener
-  const listener = new HttpListener();
-  listener.Prefixes.Add("http://localhost:8080/");
-  listener.Start();
+  const server = createServer((request: IncomingMessage, response: ServerResponse) => {
+    void handleRequest(request, response);
+  });
 
-  console.log("");
-  console.log("=================================");
-  console.log("  Todo List API Server (JSRuntime bindings)");
-  console.log("  Running on http://localhost:8080");
-  console.log("=================================");
-  console.log("");
-  console.log("Endpoints:");
-  console.log("  GET    /todos       - List all todos");
-  console.log("  GET    /todos/:id   - Get a specific todo");
-  console.log("  POST   /todos       - Create a new todo");
-  console.log("  PUT    /todos/:id   - Update a todo");
-  console.log("  DELETE /todos/:id   - Delete a todo");
-  console.log("");
-  console.log("Press Ctrl+C to stop the server");
-  console.log("");
+  server.listen(8080, () => {
+    console.log("");
+    console.log("=================================");
+    console.log("  Todo List API Server (JS surface + node:http)");
+    console.log("  Running on http://localhost:8080");
+    console.log("=================================");
+    console.log("");
+    console.log("Endpoints:");
+    console.log("  GET    /todos       - List all todos");
+    console.log("  GET    /todos/:id   - Get a specific todo");
+    console.log("  POST   /todos       - Create a new todo");
+    console.log("  PUT    /todos/:id   - Update a todo");
+    console.log("  DELETE /todos/:id   - Delete a todo");
+    console.log("");
+    console.log("Press Ctrl+C to stop the server");
+    console.log("");
+  });
 
-  // Request loop
-  while (true) {
-    const context = listener.GetContext();
-    handleRequest(context);
-  }
+  setInterval(() => {}, 60000);
 }

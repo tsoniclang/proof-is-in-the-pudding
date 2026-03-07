@@ -1,13 +1,5 @@
-import { Int32 } from "@tsonic/dotnet/System.js";
-import { int, out } from "@tsonic/core/types.js";
-import {
-  HttpListener,
-  HttpListenerContext,
-  HttpListenerRequest,
-  HttpListenerResponse,
-} from "@tsonic/dotnet/System.Net.js";
-import { StreamReader } from "@tsonic/dotnet/System.IO.js";
-import { Encoding } from "@tsonic/dotnet/System.Text.js";
+import { createServer, type IncomingMessage, type ServerResponse } from "node:http";
+import { url } from "node:url";
 import * as NotesStore from "./NotesStore.ts";
 import {
   parseNoteCreate,
@@ -82,34 +74,34 @@ const INDEX_HTML = `<!doctype html>
         return { ok: true, value: text ? JSON.parse(text) : null };
       }
 
-	      async function refresh() {
-	        el("error").textContent = "";
-	        const res = await api("/api/notes");
-	        if (!res.ok) {
-	          el("error").textContent = res.error;
-	          return;
-	        }
-	        const notes = res.value ?? [];
-	        const renderNote = (n) =>
-	          '<div class="card" data-id="' + n.id + '">' +
-	            "<h3>" + escapeHtml(n.title) + "</h3>" +
-	            '<div class="meta">Updated ' + escapeHtml(n.updatedAt) + "</div>" +
-	            '<pre style="white-space: pre-wrap; margin: 0 0 0.75rem 0">' +
-	              escapeHtml(n.content) +
-	            "</pre>" +
-	            '<div class="actions"><button class="delete">Delete</button></div>' +
-	          "</div>";
-	        el("notes").innerHTML = notes.map(renderNote).join("");
-	      }
+      async function refresh() {
+        el("error").textContent = "";
+        const res = await api("/api/notes");
+        if (!res.ok) {
+          el("error").textContent = res.error;
+          return;
+        }
+        const notes = res.value ?? [];
+        const renderNote = (n) =>
+          '<div class="card" data-id="' + n.id + '">' +
+            "<h3>" + escapeHtml(n.title) + "</h3>" +
+            '<div class="meta">Updated ' + escapeHtml(n.updatedAt) + "</div>" +
+            '<pre style="white-space: pre-wrap; margin: 0 0 0.75rem 0">' +
+              escapeHtml(n.content) +
+            "</pre>" +
+            '<div class="actions"><button class="delete">Delete</button></div>' +
+          "</div>";
+        el("notes").innerHTML = notes.map(renderNote).join("");
+      }
 
-	      el("notes").addEventListener("click", async (e) => {
-	        const btn = e.target;
-	        if (!btn.classList.contains("delete")) return;
-	        const card = btn.closest(".card");
-	        const id = card.getAttribute("data-id");
-	        await api("/api/notes/" + id, { method: "DELETE" });
-	        await refresh();
-	      });
+      el("notes").addEventListener("click", async (e) => {
+        const btn = e.target;
+        if (!btn.classList.contains("delete")) return;
+        const card = btn.closest(".card");
+        const id = card.getAttribute("data-id");
+        await api("/api/notes/" + id, { method: "DELETE" });
+        await refresh();
+      });
 
       el("create").addEventListener("click", async () => {
         el("status").textContent = "Creating...";
@@ -133,60 +125,57 @@ const INDEX_HTML = `<!doctype html>
 </html>
 `;
 
-const readRequestBody = (request: HttpListenerRequest): string => {
-  const reader = new StreamReader(request.InputStream, Encoding.UTF8);
-  const body = reader.ReadToEnd();
-  reader.Close();
-  return body;
-};
-
-const sendTextResponse = (
-  response: HttpListenerResponse,
-  statusCode: int,
+function sendTextResponse(
+  response: ServerResponse,
+  statusCode: number,
   contentType: string,
   body: string
-): void => {
-  response.StatusCode = statusCode;
-  response.ContentType = contentType;
+): void {
+  response.statusCode = statusCode;
+  response.setHeader("Content-Type", contentType);
+  response.end(body);
+}
 
-  const buffer = Encoding.UTF8.GetBytes(body);
-  const bufferLength = buffer.length;
-  response.ContentLength64 = bufferLength;
-
-  const output = response.OutputStream;
-  output.Write(buffer, 0, bufferLength);
-  output.Close();
-  response.Close();
-};
-
-const sendJsonResponse = (
-  response: HttpListenerResponse,
-  statusCode: int,
+function sendJsonResponse(
+  response: ServerResponse,
+  statusCode: number,
   json: string
-): void => sendTextResponse(response, statusCode, "application/json", json);
+): void {
+  sendTextResponse(response, statusCode, "application/json; charset=utf-8", json);
+}
 
-const extractNoteIdFromPath = (path: string): int | undefined => {
-  const parts = path.split("/");
-  // Expected: ["", "api", "notes", "<id>"]
-  if (parts.length < 4) return undefined;
-  const idStr = parts[3];
-  if (idStr === undefined || idStr === "") return undefined;
+function sendEmptyResponse(response: ServerResponse, statusCode: number): void {
+  response.statusCode = statusCode;
+  response.end();
+}
 
-  let parseResult: int = 0;
-  const ok = Int32.TryParse(idStr, parseResult as out<int>);
-  if (ok) return parseResult;
-  return undefined;
-};
+async function readRequestBody(request: IncomingMessage): Promise<string> {
+  return await request.readAll();
+}
 
-const handleApi = (request: HttpListenerRequest, response: HttpListenerResponse): void => {
-  const url = request.Url;
-  if (url === undefined) {
-    sendJsonResponse(response, 400, serializeError("Invalid request URL"));
-    return;
+function extractNoteIdFromPath(pathname: string): number | undefined {
+  const parts = pathname.split("/");
+  if (parts.length < 4) {
+    return undefined;
   }
 
-  const method = request.HttpMethod;
-  const path = url.AbsolutePath;
+  const idText = parts[3];
+  if (idText === undefined || idText === "") {
+    return undefined;
+  }
+
+  const parsed = parseInt(idText, 10);
+  if (parsed === undefined || Number.isNaN(parsed)) {
+    return undefined;
+  }
+
+  return parsed;
+}
+
+async function handleApi(request: IncomingMessage, response: ServerResponse): Promise<void> {
+  const method = request.method ?? "GET";
+  const parsedUrl = url.parse(request.url ?? "/");
+  const path = parsedUrl?.pathname ?? "/";
 
   if (path === "/api/notes" && method === "GET") {
     sendJsonResponse(response, 200, serializeNotes(NotesStore.list()));
@@ -194,8 +183,7 @@ const handleApi = (request: HttpListenerRequest, response: HttpListenerResponse)
   }
 
   if (path === "/api/notes" && method === "POST") {
-    const body = readRequestBody(request);
-    const input = parseNoteCreate(body);
+    const input = parseNoteCreate(await readRequestBody(request));
     if (input === undefined) {
       sendJsonResponse(
         response,
@@ -204,77 +192,74 @@ const handleApi = (request: HttpListenerRequest, response: HttpListenerResponse)
       );
       return;
     }
+
     const note = NotesStore.create(input);
     sendJsonResponse(response, 201, serializeNote(note));
     return;
   }
 
-  if (path.startsWith("/api/notes/")) {
-    const id = extractNoteIdFromPath(path);
-    if (id === undefined) {
-      sendJsonResponse(response, 400, serializeError("Invalid note id"));
-      return;
-    }
-
-    if (method === "GET") {
-      const note = NotesStore.getById(id);
-      if (note === undefined) {
-        sendJsonResponse(response, 404, serializeError("Note not found"));
-        return;
-      }
-      sendJsonResponse(response, 200, serializeNote(note));
-      return;
-    }
-
-    if (method === "PUT") {
-      const body = readRequestBody(request);
-      const input = parseNoteUpdate(body);
-      if (input === undefined) {
-        sendJsonResponse(
-          response,
-          400,
-          serializeError("Invalid JSON: expected {\"title\": \"...\", \"content\": \"...\"}")
-        );
-        return;
-      }
-      const note = NotesStore.update(id, input);
-      if (note === undefined) {
-        sendJsonResponse(response, 404, serializeError("Note not found"));
-        return;
-      }
-      sendJsonResponse(response, 200, serializeNote(note));
-      return;
-    }
-
-    if (method === "DELETE") {
-      const removed = NotesStore.remove(id);
-      if (!removed) {
-        sendJsonResponse(response, 404, serializeError("Note not found"));
-        return;
-      }
-      sendTextResponse(response, 204, "text/plain", "");
-      return;
-    }
-
-    sendJsonResponse(response, 405, serializeError("Method not allowed"));
+  if (!path.startsWith("/api/notes/")) {
+    sendJsonResponse(response, 404, serializeError("Not found"));
     return;
   }
 
-  sendJsonResponse(response, 404, serializeError("Not found"));
-};
-
-const handleRequest = (context: HttpListenerContext): void => {
-  const request = context.Request;
-  const response = context.Response;
-  const url = request.Url;
-  if (url === undefined) {
-    sendJsonResponse(response, 400, serializeError("Invalid request URL"));
+  const id = extractNoteIdFromPath(path);
+  if (id === undefined) {
+    sendJsonResponse(response, 400, serializeError("Invalid note id"));
     return;
   }
 
-  const method = request.HttpMethod;
-  const path = url.AbsolutePath;
-  console.log(method + " " + path);
+  if (method === "GET") {
+    const note = NotesStore.getById(id);
+    if (note === undefined) {
+      sendJsonResponse(response, 404, serializeError("Note not found"));
+      return;
+    }
+
+    sendJsonResponse(response, 200, serializeNote(note));
+    return;
+  }
+
+  if (method === "PUT") {
+    const input = parseNoteUpdate(await readRequestBody(request));
+    if (input === undefined) {
+      sendJsonResponse(
+        response,
+        400,
+        serializeError("Invalid JSON: expected {\"title\": \"...\", \"content\": \"...\"}")
+      );
+      return;
+    }
+
+    const note = NotesStore.update(id, input);
+    if (note === undefined) {
+      sendJsonResponse(response, 404, serializeError("Note not found"));
+      return;
+    }
+
+    sendJsonResponse(response, 200, serializeNote(note));
+    return;
+  }
+
+  if (method === "DELETE") {
+    if (!NotesStore.remove(id)) {
+      sendJsonResponse(response, 404, serializeError("Note not found"));
+      return;
+    }
+
+    sendEmptyResponse(response, 204);
+    return;
+  }
+
+  sendJsonResponse(response, 405, serializeError("Method not allowed"));
+}
+
+async function handleRequest(request: IncomingMessage, response: ServerResponse): Promise<void> {
+  const method = request.method ?? "GET";
+  const parsedUrl = url.parse(request.url ?? "/");
+  const path = parsedUrl?.pathname ?? "/";
+
+  console.log(`${method} ${path}`);
 
   if (path === "/" && method === "GET") {
     sendTextResponse(response, 200, "text/html; charset=utf-8", INDEX_HTML);
@@ -287,29 +272,28 @@ const handleRequest = (context: HttpListenerContext): void => {
   }
 
   if (path.startsWith("/api/")) {
-    handleApi(request, response);
+    await handleApi(request, response);
     return;
   }
 
   sendTextResponse(response, 404, "text/plain; charset=utf-8", "Not found");
-};
+}
 
 export function main(): void {
   NotesStore.seed();
 
-  const listener = new HttpListener();
-  listener.Prefixes.Add("http://localhost:8081/");
-  listener.Start();
+  const server = createServer((request: IncomingMessage, response: ServerResponse) => {
+    void handleRequest(request, response);
+  });
 
-  console.log("");
-  console.log("=================================");
-  console.log("  Notes WebApp (JSRuntime bindings)");
-  console.log("  http://localhost:8081");
-  console.log("=================================");
-  console.log("");
+  server.listen(8081, () => {
+    console.log("");
+    console.log("=================================");
+    console.log("  Notes WebApp (JS surface + node:http)");
+    console.log("  http://localhost:8081");
+    console.log("=================================");
+    console.log("");
+  });
 
-  while (true) {
-    const context = listener.GetContext();
-    handleRequest(context);
-  }
+  setInterval(() => {}, 60000);
 }

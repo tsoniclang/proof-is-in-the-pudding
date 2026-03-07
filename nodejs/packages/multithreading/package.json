@@ -8,11 +8,8 @@
     "dev": "tsonic run"
   },
   "devDependencies": {
-    "@tsonic/core": "10.0.37",
-    "@tsonic/dotnet": "10.0.37",
-    "@tsonic/js": "10.0.40",
     "@tsonic/nodejs": "10.0.40",
-    "tsonic": "0.0.66",
+    "tsonic": "0.0.67",
     "typescript": "^5.0.0"
   }
 }

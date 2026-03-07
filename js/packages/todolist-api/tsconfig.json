@@ -1,7 +1,7 @@
 {
   "extends": "../../../tsconfig.base.json",
   "compilerOptions": {
-    "types": ["@tsonic/js"]
+    "types": ["@tsonic/js", "@tsonic/nodejs"]
   },
   "include": ["src/**/*.ts"]
 }
