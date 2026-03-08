@@ -1,53 +1,42 @@
-import { Console } from "@tsonic/dotnet/System.js";
-import { Parallel } from "@tsonic/dotnet/System.Threading.Tasks.js";
-import { long } from "@tsonic/core/types.js";
+function yieldToEventLoop(): Promise<void> {
+  return new Promise((resolve) => {
+    setTimeout(() => resolve(), 0);
+  });
+}
 
-export function main(): void {
-  Console.WriteLine("=== Parallel Computation Test (JSRuntime bindings) ===");
-  Console.WriteLine("");
+async function runWorker(name: string, iterations: number): Promise<number> {
+  console.log(`${name} starting...`);
+
+  let sum = 0;
+  for (let i = 0; i < iterations; i++) {
+    sum += i;
+    if ((i + 1) % 25000 === 0) {
+      await yieldToEventLoop();
+    }
+  }
+
+  console.log(`${name} done. Sum: ${sum}`);
+  return sum;
+}
+
+export async function main(): Promise<void> {
+  console.log("=== Concurrent Work Demo (JS surface) ===");
+  console.log("");
 
   const iterations = 100000;
-  Console.WriteLine(`Running 3 workers in PARALLEL with ${iterations} iterations each...`);
-  Console.WriteLine("");
+  console.log(`Running 3 concurrent workers with ${iterations} iterations each...`);
+  console.log("");
 
-  // Results array to capture values from parallel workers (long for large sums)
-  const results: long[] = [0, 0, 0];
+  const results = await Promise.all([
+    runWorker("Worker 1", iterations),
+    runWorker("Worker 2", iterations),
+    runWorker("Worker 3", iterations),
+  ]);
 
-  // Run all three computations in parallel using Parallel.Invoke
-  Parallel.Invoke(
-    () => {
-      Console.WriteLine("Worker 1 starting on thread...");
-      let sum: long = 0;
-      for (let i = 0; i < iterations; i++) {
-        sum += i;
-      }
-      Console.WriteLine(`Worker 1 done. Sum: ${sum}`);
-      results[0] = sum;
-    },
-    () => {
-      Console.WriteLine("Worker 2 starting on thread...");
-      let sum: long = 0;
-      for (let i = 0; i < iterations; i++) {
-        sum += i;
-      }
-      Console.WriteLine(`Worker 2 done. Sum: ${sum}`);
-      results[1] = sum;
-    },
-    () => {
-      Console.WriteLine("Worker 3 starting on thread...");
-      let sum: long = 0;
-      for (let i = 0; i < iterations; i++) {
-        sum += i;
-      }
-      Console.WriteLine(`Worker 3 done. Sum: ${sum}`);
-      results[2] = sum;
-    }
-  );
-
-  Console.WriteLine("");
-  Console.WriteLine("=== Results ===");
-  Console.WriteLine(`Worker 1: ${results[0]}`);
-  Console.WriteLine(`Worker 2: ${results[1]}`);
-  Console.WriteLine(`Worker 3: ${results[2]}`);
-  Console.WriteLine(`Total: ${results[0] + results[1] + results[2]}`);
+  console.log("");
+  console.log("=== Results ===");
+  console.log(`Worker 1: ${results[0]}`);
+  console.log(`Worker 2: ${results[1]}`);
+  console.log(`Worker 3: ${results[2]}`);
+  console.log(`Total: ${results[0] + results[1] + results[2]}`);
 }

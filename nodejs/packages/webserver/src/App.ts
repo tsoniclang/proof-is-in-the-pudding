@@ -1,7 +1,7 @@
 // HTTP server using Node.js http module
 import * as http from "node:http";
 import type { IncomingMessage, ServerResponse } from "node:http";
-import { Thread, Timeout } from "@tsonic/dotnet/System.Threading.js";
+import { timers } from "node:timers";
 
 export function main(): void {
   const PORT = 3000;
@@ -19,6 +19,5 @@ export function main(): void {
     console.log(`Server running at http://localhost:${PORT}/`);
   });
 
-  // Keep the process running forever (Ctrl+C to stop)
-  Thread.Sleep(Timeout.Infinite);
+  timers.setInterval(() => {}, 60000);
 }

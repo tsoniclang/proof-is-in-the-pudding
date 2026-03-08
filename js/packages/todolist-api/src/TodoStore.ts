@@ -1,11 +1,10 @@
 // In-memory Todo storage with CRUD operations
 // Uses JS Array semantics (push, find, splice, etc.)
-import { int } from "@tsonic/core/types.js";
 import { Todo } from "./Todo.ts";
 
 // Global store state (module-level variables)
 const todos: Todo[] = [];
-let nextId: int = 1;
+let nextId = 1;
 
 // Get all todos
 export function getAll(): Todo[] {
@@ -13,7 +12,7 @@ export function getAll(): Todo[] {
 }
 
 // Get a todo by ID
-export function getById(id: int): Todo | undefined {
+export function getById(id: number): Todo | undefined {
   return todos.find((t) => t.id === id);
 }
 
@@ -32,7 +31,7 @@ export function create(title: string): Todo {
   return todo;
 }
 
-export function update(id: int, title: string, completed: boolean): Todo | undefined {
+export function update(id: number, title: string, completed: boolean): Todo | undefined {
   const index = todos.findIndex((t) => t.id === id);
   if (index === -1) {
     return undefined;
@@ -48,7 +47,7 @@ export function update(id: int, title: string, completed: boolean): Todo | undef
   return updated;
 }
 
-export function remove(id: int): boolean {
+export function remove(id: number): boolean {
   const index = todos.findIndex((t) => t.id === id);
   if (index === -1) {
     return false;

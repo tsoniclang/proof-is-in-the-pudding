@@ -1,8 +1,7 @@
-import { int } from "@tsonic/core/types.js";
 import type { Note, NoteCreateInput, NoteUpdateInput } from "./Models.ts";
 
 const notes: Note[] = [];
-let nextId: int = 1;
+let nextId = 1;
 
 const nowIso = (): string => new Date().toISOString();
 
@@ -10,7 +9,7 @@ export function list(): Note[] {
   return notes.slice();
 }
 
-export function getById(id: int): Note | undefined {
+export function getById(id: number): Note | undefined {
   return notes.find((n) => n.id === id);
 }
 
@@ -31,7 +30,7 @@ export function create(input: NoteCreateInput): Note {
   return note;
 }
 
-export function update(id: int, input: NoteUpdateInput): Note | undefined {
+export function update(id: number, input: NoteUpdateInput): Note | undefined {
   const index = notes.findIndex((n) => n.id === id);
   if (index === -1) return undefined;
 
@@ -49,7 +48,7 @@ export function update(id: int, input: NoteUpdateInput): Note | undefined {
   return note;
 }
 
-export function remove(id: int): boolean {
+export function remove(id: number): boolean {
   const index = notes.findIndex((n) => n.id === id);
   if (index === -1) return false;
   notes.splice(index, 1);
