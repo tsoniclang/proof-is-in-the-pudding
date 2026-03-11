@@ -1,4 +1,5 @@
 import { createServer, type IncomingMessage, type ServerResponse } from "node:http";
+import type { int } from "@tsonic/core/types.js";
 import { url } from "node:url";
 import * as NotesStore from "./NotesStore.ts";
 import {
@@ -127,7 +128,7 @@ const INDEX_HTML = `<!doctype html>
 
 function sendTextResponse(
   response: ServerResponse,
-  statusCode: number,
+  statusCode: int,
   contentType: string,
   body: string
 ): void {
@@ -138,13 +139,13 @@ function sendTextResponse(
 
 function sendJsonResponse(
   response: ServerResponse,
-  statusCode: number,
+  statusCode: int,
   json: string
 ): void {
   sendTextResponse(response, statusCode, "application/json; charset=utf-8", json);
 }
 
-function sendEmptyResponse(response: ServerResponse, statusCode: number): void {
+function sendEmptyResponse(response: ServerResponse, statusCode: int): void {
   response.statusCode = statusCode;
   response.end();
 }

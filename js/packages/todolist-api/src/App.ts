@@ -8,6 +8,7 @@
 //   DELETE /todos/:id   - Delete a todo
 
 import { createServer, type IncomingMessage, type ServerResponse } from "node:http";
+import type { int } from "@tsonic/core/types.js";
 import { url } from "node:url";
 import * as TodoStore from "./TodoStore.ts";
 import {
@@ -41,7 +42,7 @@ async function readRequestBody(request: IncomingMessage): Promise<string> {
   return await request.readAll();
 }
 
-function sendJsonResponse(response: ServerResponse, statusCode: number, json: string): void {
+function sendJsonResponse(response: ServerResponse, statusCode: int, json: string): void {
   response.statusCode = statusCode;
   response.setHeader("Content-Type", "application/json; charset=utf-8");
   response.end(json);
