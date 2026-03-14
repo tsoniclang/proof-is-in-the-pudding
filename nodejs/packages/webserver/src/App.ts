@@ -4,7 +4,7 @@ import type { IncomingMessage, ServerResponse } from "node:http";
 import { timers } from "node:timers";
 
 export function main(): void {
-  const PORT = 3000;
+  const PORT = 8765;
 
   const server = http.createServer((req: IncomingMessage, res: ServerResponse) => {
     console.log(`${req.method} ${req.url}`);
