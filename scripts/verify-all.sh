@@ -471,7 +471,7 @@ for project in "${projects[@]}"; do
       run_http_server "${project}" "http://localhost:8081/"
       ;;
     "nodejs/packages/webserver")
-      run_http_server "${project}" "http://localhost:3000/"
+      run_http_server "${project}" "http://localhost:8765/"
       ;;
     "workspaces/scoped-multi-project/packages/domain" | "workspaces/unscoped-multi-project/packages/acme-domain")
       # These are libraries; build/typecheck only.
