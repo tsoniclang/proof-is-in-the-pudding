@@ -1,6 +1,9 @@
-import { createServer, type IncomingMessage, type ServerResponse } from "node:http";
+import {
+  createServer,
+  type IncomingMessage,
+  type ServerResponse,
+} from "node:http";
 import type { int } from "@tsonic/core/types.js";
-import { url } from "node:url";
 import * as NotesStore from "./NotesStore.ts";
 import {
   parseNoteCreate,
@@ -9,6 +12,17 @@ import {
   serializeNote,
   serializeNotes,
 } from "./JsonHelpers.ts";
+
+function getRequestPath(requestUrl: string | null | undefined): string {
+  const raw = requestUrl ?? "/";
+  const queryIndex = raw.indexOf("?");
+  if (queryIndex < 0) {
+    return raw;
+  }
+
+  const pathname = raw.slice(0, queryIndex);
+  return pathname === "" ? "/" : pathname;
+}
 
 const INDEX_HTML = `<!doctype html>
 <html>
@@ -175,8 +189,7 @@ function extractNoteIdFromPath(pathname: string): number | undefined {
 
 async function handleApi(request: IncomingMessage, response: ServerResponse): Promise<void> {
   const method = request.method ?? "GET";
-  const parsedUrl = url.parse(request.url ?? "/");
-  const path = parsedUrl?.pathname ?? "/";
+  const path = getRequestPath(request.url);
 
   if (path === "/api/notes" && method === "GET") {
     sendJsonResponse(response, 200, serializeNotes(NotesStore.list()));
@@ -257,8 +270,7 @@ async function handleApi(request: IncomingMessage, response: ServerResponse): Pr
 
 async function handleRequest(request: IncomingMessage, response: ServerResponse): Promise<void> {
   const method = request.method ?? "GET";
-  const parsedUrl = url.parse(request.url ?? "/");
-  const path = parsedUrl?.pathname ?? "/";
+  const path = getRequestPath(request.url);
 
   console.log(`${method} ${path}`);
 

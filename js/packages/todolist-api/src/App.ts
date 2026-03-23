@@ -7,9 +7,12 @@
 //   PUT    /todos/:id   - Update a todo
 //   DELETE /todos/:id   - Delete a todo
 
-import { createServer, type IncomingMessage, type ServerResponse } from "node:http";
+import {
+  createServer,
+  type IncomingMessage,
+  type ServerResponse,
+} from "node:http";
 import type { int } from "@tsonic/core/types.js";
-import { url } from "node:url";
 import * as TodoStore from "./TodoStore.ts";
 import {
   parseTodoCreate,
@@ -18,6 +21,17 @@ import {
   serializeTodo,
   serializeTodos,
 } from "./JsonHelpers.ts";
+
+function getRequestPath(requestUrl: string | null | undefined): string {
+  const raw = requestUrl ?? "/";
+  const queryIndex = raw.indexOf("?");
+  if (queryIndex < 0) {
+    return raw;
+  }
+
+  const pathname = raw.slice(0, queryIndex);
+  return pathname === "" ? "/" : pathname;
+}
 
 function extractIdFromPath(pathname: string): number | undefined {
   const parts = pathname.split("/");
@@ -114,8 +128,7 @@ async function handleRequest(
   response: ServerResponse
 ): Promise<void> {
   const method = request.method ?? "GET";
-  const parsedUrl = url.parse(request.url ?? "/");
-  const path = parsedUrl?.pathname ?? "/";
+  const path = getRequestPath(request.url);
 
   console.log(`${method} ${path}`);
 
