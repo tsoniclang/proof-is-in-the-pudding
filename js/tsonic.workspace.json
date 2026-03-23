@@ -4,6 +4,7 @@
   "dotnetVersion": "net10.0",
   "dotnet": {
     "typeRoots": [
+      "node_modules/@tsonic/js",
       "node_modules/@tsonic/nodejs"
     ],
     "libraries": [
@@ -16,6 +17,12 @@
         "types": "@tsonic/aspnetcore"
       }
     ],
-    "packageReferences": []
+    "packageReferences": [
+      {
+        "id": "Tsonic.JSRuntime",
+        "version": "0.0.4",
+        "types": "@tsonic/js"
+      }
+    ]
   }
 }
