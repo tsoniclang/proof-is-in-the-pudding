@@ -1,5 +1,5 @@
-import { os } from "node:os";
-import { timers } from "node:timers";
+import * as os from "node:os";
+import * as timers from "node:timers";
 
 function yieldToEventLoop(): Promise<void> {
   return new Promise((resolve) => {
