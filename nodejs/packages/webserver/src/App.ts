@@ -1,7 +1,7 @@
 // HTTP server using Node.js http module
 import * as http from "node:http";
 import type { IncomingMessage, ServerResponse } from "node:http";
-import { timers } from "node:timers";
+import * as timers from "node:timers";
 
 export function main(): void {
   const PORT = 8765;
