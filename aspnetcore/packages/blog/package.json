@@ -3,18 +3,18 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "typecheck": "tsc -p tsconfig.json",
+    "typecheck": "tsonic generate",
     "build": "tsonic build",
     "generate": "tsonic generate",
     "dev": "tsonic run"
   },
   "devDependencies": {
-    "@tsonic/aspnetcore": "10.0.37",
-    "@tsonic/core": "10.0.37",
-    "@tsonic/dotnet": "10.0.37",
-    "@tsonic/globals": "10.0.37",
-    "@tsonic/microsoft-extensions": "10.0.37",
-    "tsonic": "0.0.63",
+    "@tsonic/aspnetcore": "10.0.40",
+    "@tsonic/core": "10.0.40",
+    "@tsonic/dotnet": "10.0.40",
+    "@tsonic/globals": "10.0.41",
+    "@tsonic/microsoft-extensions": "10.0.40",
+    "tsonic": "0.0.74",
     "typescript": "^5.0.0"
   }
 }

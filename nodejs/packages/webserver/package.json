@@ -3,13 +3,13 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "typecheck": "tsc -p tsconfig.json",
+    "typecheck": "tsonic generate",
     "build": "tsonic build",
     "dev": "tsonic run"
   },
   "devDependencies": {
-    "@tsonic/nodejs": "10.0.40",
-    "tsonic": "0.0.67",
+    "@tsonic/nodejs": "10.0.48",
+    "tsonic": "0.0.74",
     "typescript": "^5.0.0"
   }
 }

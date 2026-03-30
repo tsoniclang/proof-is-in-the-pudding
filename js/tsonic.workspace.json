@@ -7,20 +7,12 @@
       "node_modules/@tsonic/js",
       "node_modules/@tsonic/nodejs"
     ],
-    "libraries": [
-      "libs/Tsonic.JSRuntime.dll",
-      "libs/nodejs.dll"
-    ],
-    "frameworkReferences": [
-      {
-        "id": "Microsoft.AspNetCore.App",
-        "types": "@tsonic/aspnetcore"
-      }
-    ],
+    "libraries": [],
+    "frameworkReferences": [],
     "packageReferences": [
       {
         "id": "Tsonic.JSRuntime",
-        "version": "0.0.4",
+        "version": "0.0.9",
         "types": "@tsonic/js"
       }
     ]

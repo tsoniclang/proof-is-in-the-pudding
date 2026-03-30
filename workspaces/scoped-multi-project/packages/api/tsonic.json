@@ -13,10 +13,5 @@
   "buildOptions": {
     "stripSymbols": true,
     "invariantGlobalization": true
-  },
-  "references": {
-    "libraries": [
-      "../domain/dist/net10.0/Acme.Domain.dll"
-    ]
   }
 }

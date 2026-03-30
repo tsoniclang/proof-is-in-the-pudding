@@ -4,16 +4,16 @@
   "description": "High-performance examples using Span, Memory, and value types",
   "type": "module",
   "scripts": {
-    "typecheck": "tsc -p tsconfig.json",
+    "typecheck": "tsonic generate",
     "build": "tsonic build",
     "dev": "tsonic run",
     "run": "./out/app"
   },
   "devDependencies": {
-    "@tsonic/core": "10.0.37",
-    "@tsonic/dotnet": "10.0.37",
-    "@tsonic/globals": "10.0.37",
-    "tsonic": "0.0.63",
+    "@tsonic/core": "10.0.40",
+    "@tsonic/dotnet": "10.0.40",
+    "@tsonic/globals": "10.0.41",
+    "tsonic": "0.0.74",
     "typescript": "^5.0.0"
   }
 }

@@ -7,13 +7,13 @@
   ],
   "scripts": {
     "build": "npm run -w @acme/domain build && npm run -w @acme/api build",
-    "typecheck": "npm run -w @acme/domain typecheck && npm run -w @acme/domain build && npm run -w @acme/api typecheck"
+    "typecheck": "npm run -w @acme/domain typecheck && npm run -w @acme/api typecheck"
   },
   "devDependencies": {
-    "@tsonic/core": "10.0.37",
-    "@tsonic/dotnet": "10.0.37",
-    "@tsonic/globals": "10.0.37",
-    "tsonic": "0.0.63",
+    "@tsonic/core": "10.0.40",
+    "@tsonic/dotnet": "10.0.40",
+    "@tsonic/globals": "10.0.41",
+    "tsonic": "0.0.74",
     "typescript": "^5.0.0"
   }
 }

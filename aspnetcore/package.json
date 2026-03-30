@@ -10,11 +10,11 @@
     "typecheck": "npm -ws --if-present run typecheck"
   },
   "devDependencies": {
-    "@tsonic/aspnetcore": "10.0.37",
-    "@tsonic/core": "10.0.37",
-    "@tsonic/efcore-sqlite": "10.0.37",
-    "@tsonic/globals": "10.0.37",
-    "tsonic": "0.0.63",
+    "@tsonic/aspnetcore": "10.0.40",
+    "@tsonic/core": "10.0.40",
+    "@tsonic/efcore-sqlite": "10.0.39",
+    "@tsonic/globals": "10.0.41",
+    "tsonic": "0.0.74",
     "typescript": "^5.0.0"
   }
 }

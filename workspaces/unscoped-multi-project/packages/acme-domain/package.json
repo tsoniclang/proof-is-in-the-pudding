@@ -4,14 +4,16 @@
   "version": "0.0.0",
   "type": "module",
   "exports": {
-    "./package.json": "./package.json",
-    "./*.js": {
-      "types": "./dist/tsonic/bindings/*.d.ts",
-      "default": "./dist/tsonic/bindings/*.js"
-    }
+    ".": "./src/index.ts",
+    "./index.js": "./src/index.ts",
+    "./package.json": "./package.json"
   },
+  "files": [
+    "src",
+    "tsonic.package.json"
+  ],
   "scripts": {
-    "typecheck": "tsc -p tsconfig.json",
+    "typecheck": "tsonic generate",
     "build": "tsonic build"
   }
 }
