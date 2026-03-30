@@ -2,10 +2,10 @@
 
 Same as `workspaces/scoped-multi-project/`, but using unscoped package names:
 
-- `acme-domain` (library)
-- `acme-api` (executable)
+- `acme-domain` (source package)
+- `acme-api` (executable consuming the source package)
 
-This validates that CLR import discovery works for both scoped and unscoped packages.
+This validates direct source-package consumption for both scoped and unscoped packages.
 
 ## How to build
 
@@ -13,4 +13,3 @@ This validates that CLR import discovery works for both scoped and unscoped pack
 npm install
 npm run build
 ```
-

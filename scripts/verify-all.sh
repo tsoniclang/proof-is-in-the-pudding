@@ -2,6 +2,9 @@
 set -euo pipefail
 
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+workspace_parent="$(cd "${repo_root}/.." && pwd)"
+local_js_source_package="${workspace_parent}/js/versions/10"
+local_nodejs_source_package="${workspace_parent}/nodejs/versions/10"
 
 if [[ -z "${TSONIC_BIN:-}" ]]; then
   echo "FAIL: TSONIC_BIN is not set. Set it to the tsonic CLI path." >&2
@@ -10,23 +13,6 @@ fi
 
 echo "=== workspace hygiene ==="
 "${repo_root}/scripts/clean-nested-node-modules.sh"
-
-find_nearest_bin() {
-  local start_dir="$1"
-  local bin_name="$2"
-  local dir="${start_dir}"
-
-  while [[ "${dir}" != "/" ]]; do
-    local candidate="${dir}/node_modules/.bin/${bin_name}"
-    if [[ -x "${candidate}" ]]; then
-      echo "${candidate}"
-      return 0
-    fi
-    dir="$(dirname "${dir}")"
-  done
-
-  return 1
-}
 
 ensure_npm_install() {
   local workspace_dir="$1"
@@ -38,6 +24,37 @@ ensure_npm_install() {
   fi
   echo "=== npm install: ${workspace_dir} ==="
   (cd "${workspace_dir}" && npm install)
+}
+
+overlay_local_source_packages() {
+  local workspace_dir="$1"
+
+  case "${workspace_dir}" in
+    "${repo_root}/js"|\
+    "${repo_root}/nodejs")
+      ;;
+    *)
+      return 0
+      ;;
+  esac
+
+  if [[ ! -f "${local_js_source_package}/package.json" ]]; then
+    echo "FAIL: local @tsonic/js source package not found at ${local_js_source_package}" >&2
+    exit 1
+  fi
+
+  if [[ ! -f "${local_nodejs_source_package}/package.json" ]]; then
+    echo "FAIL: local @tsonic/nodejs source package not found at ${local_nodejs_source_package}" >&2
+    exit 1
+  fi
+
+  echo "=== overlay local source packages: ${workspace_dir} ==="
+  (
+    cd "${workspace_dir}" &&
+      npm install --no-save --package-lock=false \
+        "${local_js_source_package}" \
+        "${local_nodejs_source_package}"
+  )
 }
 
 resolve_out_binary() {
@@ -74,48 +91,19 @@ resolve_out_binary() {
   return 0
 }
 
-ensure_interop_dlls() {
+ensure_workspace_dependencies() {
   ensure_npm_install "${repo_root}/bcl"
   ensure_npm_install "${repo_root}/aspnetcore"
   ensure_npm_install "${repo_root}/js"
+  overlay_local_source_packages "${repo_root}/js"
   ensure_npm_install "${repo_root}/nodejs"
+  overlay_local_source_packages "${repo_root}/nodejs"
   if [[ -f "${repo_root}/workspaces/scoped-multi-project/package.json" ]]; then
     ensure_npm_install "${repo_root}/workspaces/scoped-multi-project"
   fi
   if [[ -f "${repo_root}/workspaces/unscoped-multi-project/package.json" ]]; then
     ensure_npm_install "${repo_root}/workspaces/unscoped-multi-project"
   fi
-  local jsruntime_release="${repo_root}/../js-runtime/artifacts/bin/Tsonic.JSRuntime/Release/net10.0/Tsonic.JSRuntime.dll"
-  local jsruntime_debug="${repo_root}/../js-runtime/artifacts/bin/Tsonic.JSRuntime/Debug/net10.0/Tsonic.JSRuntime.dll"
-  local nodejs_release="${repo_root}/../nodejs-clr/artifacts/bin/nodejs/Release/net10.0/nodejs.dll"
-  local nodejs_debug="${repo_root}/../nodejs-clr/artifacts/bin/nodejs/Debug/net10.0/nodejs.dll"
-  local jsruntime_src=""
-  local nodejs_src=""
-
-  pick_newest_existing() {
-    local newest=""
-    for candidate in "$@"; do
-      [[ -f "${candidate}" ]] || continue
-      if [[ -z "${newest}" || "${candidate}" -nt "${newest}" ]]; then
-        newest="${candidate}"
-      fi
-    done
-    printf '%s' "${newest}"
-  }
-
-  jsruntime_src="$(pick_newest_existing "${jsruntime_release}" "${jsruntime_debug}")"
-  nodejs_src="$(pick_newest_existing "${nodejs_release}" "${nodejs_debug}")"
-
-  if [[ -n "${jsruntime_src}" ]]; then
-    cp "${jsruntime_src}" "${repo_root}/js/libs/Tsonic.JSRuntime.dll"
-    cp "${jsruntime_src}" "${repo_root}/nodejs/libs/Tsonic.JSRuntime.dll"
-  fi
-
-  if [[ -n "${nodejs_src}" ]]; then
-    cp "${nodejs_src}" "${repo_root}/js/libs/nodejs.dll"
-    cp "${nodejs_src}" "${repo_root}/nodejs/libs/nodejs.dll"
-  fi
-
 }
 
 typecheck_and_build() {
@@ -123,18 +111,12 @@ typecheck_and_build() {
   echo "=== typecheck: ${project} ==="
   (
     cd "${repo_root}/${project}"
-    local tsc_bin
-    if [[ -n "${TSC_BIN:-}" ]]; then
-      tsc_bin="${TSC_BIN}"
-    else
-      tsc_bin="$(find_nearest_bin "$(pwd)" tsc)"
-    fi
-    "${tsc_bin}" -p tsconfig.json
+    "${TSONIC_BIN}" generate
   )
   echo "=== build: ${project} ==="
   (
     cd "${repo_root}/${project}"
-    "${TSONIC_BIN}" build
+    "${TSONIC_BIN}" build --no-generate
   )
 }
 
@@ -424,7 +406,7 @@ run_aspnetcore_blog_ef() {
   fi
 }
 
-ensure_interop_dlls
+ensure_workspace_dependencies
 
 projects=(
   "bcl/packages/hello-world"
