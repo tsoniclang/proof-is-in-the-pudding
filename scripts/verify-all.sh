@@ -5,6 +5,13 @@ repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 workspace_parent="$(cd "${repo_root}/.." && pwd)"
 local_js_source_package="${workspace_parent}/js/versions/10"
 local_nodejs_source_package="${workspace_parent}/nodejs/versions/10"
+local_core_package="${workspace_parent}/core/versions/10"
+local_globals_package="${workspace_parent}/globals/versions/10"
+local_dotnet_package="${workspace_parent}/dotnet/versions/10"
+local_aspnetcore_package="${workspace_parent}/aspnetcore"
+local_microsoft_extensions_package="${workspace_parent}/microsoft-extensions"
+local_efcore_package="${workspace_parent}/efcore"
+local_efcore_sqlite_package="${workspace_parent}/efcore-sqlite"
 
 if [[ -z "${TSONIC_BIN:-}" ]]; then
   echo "FAIL: TSONIC_BIN is not set. Set it to the tsonic CLI path." >&2
@@ -57,6 +64,27 @@ overlay_local_source_packages() {
   )
 }
 
+link_local_package() {
+  local install_root="$1"
+  local package_name="$2"
+  local package_root="$3"
+  local scope_dir="${install_root}/node_modules/@tsonic"
+  local destination="${scope_dir}/${package_name}"
+
+  if [[ ! -d "${scope_dir}" ]]; then
+    echo "FAIL: expected scope directory missing: ${scope_dir}" >&2
+    exit 1
+  fi
+
+  if [[ ! -e "${package_root}" ]]; then
+    echo "FAIL: local package root missing: ${package_root}" >&2
+    exit 1
+  fi
+
+  rm -rf "${destination}"
+  ln -s "${package_root}" "${destination}"
+}
+
 resolve_out_binary() {
   local project_dir="$1"
   local name="app"
@@ -91,18 +119,100 @@ resolve_out_binary() {
   return 0
 }
 
+for_each_install_root() {
+  local workspace_dir="$1"
+  local callback="$2"
+
+  "${callback}" "${workspace_dir}"
+
+  if [[ ! -d "${workspace_dir}/packages" ]]; then
+    return 0
+  fi
+
+  while IFS= read -r -d '' package_dir; do
+    "${callback}" "${package_dir}"
+  done < <(
+    find "${workspace_dir}/packages" -mindepth 1 -maxdepth 1 -type d -print0
+  )
+}
+
+overlay_local_first_party_packages_for_root() {
+  local install_root="$1"
+  local workspace_dir="$2"
+
+  if [[ ! -d "${install_root}/node_modules/@tsonic" ]]; then
+    return 0
+  fi
+
+  echo "=== overlay local first-party packages: ${install_root} ==="
+
+  case "${workspace_dir}" in
+    "${repo_root}/bcl")
+      link_local_package "${install_root}" core "${local_core_package}"
+      link_local_package "${install_root}" globals "${local_globals_package}"
+      link_local_package "${install_root}" dotnet "${local_dotnet_package}"
+      ;;
+    "${repo_root}/aspnetcore")
+      link_local_package "${install_root}" core "${local_core_package}"
+      link_local_package "${install_root}" globals "${local_globals_package}"
+      link_local_package "${install_root}" dotnet "${local_dotnet_package}"
+      link_local_package "${install_root}" aspnetcore "${local_aspnetcore_package}"
+      link_local_package "${install_root}" microsoft-extensions "${local_microsoft_extensions_package}"
+      link_local_package "${install_root}" efcore "${local_efcore_package}"
+      link_local_package "${install_root}" efcore-sqlite "${local_efcore_sqlite_package}"
+      ;;
+    "${repo_root}/js")
+      link_local_package "${install_root}" core "${local_core_package}"
+      link_local_package "${install_root}" dotnet "${local_dotnet_package}"
+      link_local_package "${install_root}" js "${local_js_source_package}"
+      link_local_package "${install_root}" nodejs "${local_nodejs_source_package}"
+      ;;
+    "${repo_root}/nodejs")
+      link_local_package "${install_root}" core "${local_core_package}"
+      link_local_package "${install_root}" dotnet "${local_dotnet_package}"
+      link_local_package "${install_root}" js "${local_js_source_package}"
+      link_local_package "${install_root}" nodejs "${local_nodejs_source_package}"
+      ;;
+    "${repo_root}/workspaces/scoped-multi-project"|\
+    "${repo_root}/workspaces/unscoped-multi-project")
+      link_local_package "${install_root}" core "${local_core_package}"
+      link_local_package "${install_root}" globals "${local_globals_package}"
+      link_local_package "${install_root}" dotnet "${local_dotnet_package}"
+      ;;
+  esac
+}
+
+overlay_local_first_party_packages() {
+  local workspace_dir="$1"
+
+  for_each_install_root "${workspace_dir}" \
+    overlay_local_first_party_packages_for_root_inner
+}
+
+overlay_local_first_party_packages_for_root_inner() {
+  local install_root="$1"
+  local workspace_dir="${OVERLAY_WORKSPACE_DIR:?}"
+  overlay_local_first_party_packages_for_root "${install_root}" "${workspace_dir}"
+}
+
 ensure_workspace_dependencies() {
   ensure_npm_install "${repo_root}/bcl"
+  OVERLAY_WORKSPACE_DIR="${repo_root}/bcl" overlay_local_first_party_packages "${repo_root}/bcl"
   ensure_npm_install "${repo_root}/aspnetcore"
+  OVERLAY_WORKSPACE_DIR="${repo_root}/aspnetcore" overlay_local_first_party_packages "${repo_root}/aspnetcore"
   ensure_npm_install "${repo_root}/js"
   overlay_local_source_packages "${repo_root}/js"
+  OVERLAY_WORKSPACE_DIR="${repo_root}/js" overlay_local_first_party_packages "${repo_root}/js"
   ensure_npm_install "${repo_root}/nodejs"
   overlay_local_source_packages "${repo_root}/nodejs"
+  OVERLAY_WORKSPACE_DIR="${repo_root}/nodejs" overlay_local_first_party_packages "${repo_root}/nodejs"
   if [[ -f "${repo_root}/workspaces/scoped-multi-project/package.json" ]]; then
     ensure_npm_install "${repo_root}/workspaces/scoped-multi-project"
+    OVERLAY_WORKSPACE_DIR="${repo_root}/workspaces/scoped-multi-project" overlay_local_first_party_packages "${repo_root}/workspaces/scoped-multi-project"
   fi
   if [[ -f "${repo_root}/workspaces/unscoped-multi-project/package.json" ]]; then
     ensure_npm_install "${repo_root}/workspaces/unscoped-multi-project"
+    OVERLAY_WORKSPACE_DIR="${repo_root}/workspaces/unscoped-multi-project" overlay_local_first_party_packages "${repo_root}/workspaces/unscoped-multi-project"
   fi
 }
 
