@@ -3,15 +3,15 @@ set -euo pipefail
 
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 workspace_parent="$(cd "${repo_root}/.." && pwd)"
-local_js_source_package="${workspace_parent}/js/versions/10"
-local_nodejs_source_package="${workspace_parent}/nodejs/versions/10"
-local_core_package="${workspace_parent}/core/versions/10"
-local_globals_package="${workspace_parent}/globals/versions/10"
-local_dotnet_package="${workspace_parent}/dotnet/versions/10"
-local_aspnetcore_package="${workspace_parent}/aspnetcore"
-local_microsoft_extensions_package="${workspace_parent}/microsoft-extensions"
-local_efcore_package="${workspace_parent}/efcore"
-local_efcore_sqlite_package="${workspace_parent}/efcore-sqlite"
+LOCAL_JS_SOURCE_PACKAGE="${workspace_parent}/js/versions/10"
+LOCAL_NODEJS_SOURCE_PACKAGE="${workspace_parent}/nodejs/versions/10"
+LOCAL_CORE_PACKAGE="${workspace_parent}/core/versions/10"
+LOCAL_GLOBALS_PACKAGE="${workspace_parent}/globals/versions/10"
+LOCAL_DOTNET_PACKAGE="${workspace_parent}/dotnet/versions/10"
+LOCAL_ASPNETCORE_PACKAGE="${workspace_parent}/aspnetcore"
+LOCAL_MICROSOFT_EXTENSIONS_PACKAGE="${workspace_parent}/microsoft-extensions"
+LOCAL_EFCORE_PACKAGE="${workspace_parent}/efcore"
+LOCAL_EFCORE_SQLITE_PACKAGE="${workspace_parent}/efcore-sqlite"
 
 if [[ -z "${TSONIC_BIN:-}" ]]; then
   echo "FAIL: TSONIC_BIN is not set. Set it to the tsonic CLI path." >&2
@@ -45,13 +45,13 @@ overlay_local_source_packages() {
       ;;
   esac
 
-  if [[ ! -f "${local_js_source_package}/package.json" ]]; then
-    echo "FAIL: local @tsonic/js source package not found at ${local_js_source_package}" >&2
+  if [[ ! -f "${LOCAL_JS_SOURCE_PACKAGE}/package.json" ]]; then
+    echo "FAIL: local @tsonic/js source package not found at ${LOCAL_JS_SOURCE_PACKAGE}" >&2
     exit 1
   fi
 
-  if [[ ! -f "${local_nodejs_source_package}/package.json" ]]; then
-    echo "FAIL: local @tsonic/nodejs source package not found at ${local_nodejs_source_package}" >&2
+  if [[ ! -f "${LOCAL_NODEJS_SOURCE_PACKAGE}/package.json" ]]; then
+    echo "FAIL: local @tsonic/nodejs source package not found at ${LOCAL_NODEJS_SOURCE_PACKAGE}" >&2
     exit 1
   fi
 
@@ -59,8 +59,8 @@ overlay_local_source_packages() {
   (
     cd "${workspace_dir}" &&
       npm install --no-save --package-lock=false \
-        "${local_js_source_package}" \
-        "${local_nodejs_source_package}"
+        "${LOCAL_JS_SOURCE_PACKAGE}" \
+        "${LOCAL_NODEJS_SOURCE_PACKAGE}"
   )
 }
 
@@ -148,36 +148,36 @@ overlay_local_first_party_packages_for_root() {
 
   case "${workspace_dir}" in
     "${repo_root}/bcl")
-      link_local_package "${install_root}" core "${local_core_package}"
-      link_local_package "${install_root}" globals "${local_globals_package}"
-      link_local_package "${install_root}" dotnet "${local_dotnet_package}"
+      link_local_package "${install_root}" core "${LOCAL_CORE_PACKAGE}"
+      link_local_package "${install_root}" globals "${LOCAL_GLOBALS_PACKAGE}"
+      link_local_package "${install_root}" dotnet "${LOCAL_DOTNET_PACKAGE}"
       ;;
     "${repo_root}/aspnetcore")
-      link_local_package "${install_root}" core "${local_core_package}"
-      link_local_package "${install_root}" globals "${local_globals_package}"
-      link_local_package "${install_root}" dotnet "${local_dotnet_package}"
-      link_local_package "${install_root}" aspnetcore "${local_aspnetcore_package}"
-      link_local_package "${install_root}" microsoft-extensions "${local_microsoft_extensions_package}"
-      link_local_package "${install_root}" efcore "${local_efcore_package}"
-      link_local_package "${install_root}" efcore-sqlite "${local_efcore_sqlite_package}"
+      link_local_package "${install_root}" core "${LOCAL_CORE_PACKAGE}"
+      link_local_package "${install_root}" globals "${LOCAL_GLOBALS_PACKAGE}"
+      link_local_package "${install_root}" dotnet "${LOCAL_DOTNET_PACKAGE}"
+      link_local_package "${install_root}" aspnetcore "${LOCAL_ASPNETCORE_PACKAGE}"
+      link_local_package "${install_root}" microsoft-extensions "${LOCAL_MICROSOFT_EXTENSIONS_PACKAGE}"
+      link_local_package "${install_root}" efcore "${LOCAL_EFCORE_PACKAGE}"
+      link_local_package "${install_root}" efcore-sqlite "${LOCAL_EFCORE_SQLITE_PACKAGE}"
       ;;
     "${repo_root}/js")
-      link_local_package "${install_root}" core "${local_core_package}"
-      link_local_package "${install_root}" dotnet "${local_dotnet_package}"
-      link_local_package "${install_root}" js "${local_js_source_package}"
-      link_local_package "${install_root}" nodejs "${local_nodejs_source_package}"
+      link_local_package "${install_root}" core "${LOCAL_CORE_PACKAGE}"
+      link_local_package "${install_root}" dotnet "${LOCAL_DOTNET_PACKAGE}"
+      link_local_package "${install_root}" js "${LOCAL_JS_SOURCE_PACKAGE}"
+      link_local_package "${install_root}" nodejs "${LOCAL_NODEJS_SOURCE_PACKAGE}"
       ;;
     "${repo_root}/nodejs")
-      link_local_package "${install_root}" core "${local_core_package}"
-      link_local_package "${install_root}" dotnet "${local_dotnet_package}"
-      link_local_package "${install_root}" js "${local_js_source_package}"
-      link_local_package "${install_root}" nodejs "${local_nodejs_source_package}"
+      link_local_package "${install_root}" core "${LOCAL_CORE_PACKAGE}"
+      link_local_package "${install_root}" dotnet "${LOCAL_DOTNET_PACKAGE}"
+      link_local_package "${install_root}" js "${LOCAL_JS_SOURCE_PACKAGE}"
+      link_local_package "${install_root}" nodejs "${LOCAL_NODEJS_SOURCE_PACKAGE}"
       ;;
     "${repo_root}/workspaces/scoped-multi-project"|\
     "${repo_root}/workspaces/unscoped-multi-project")
-      link_local_package "${install_root}" core "${local_core_package}"
-      link_local_package "${install_root}" globals "${local_globals_package}"
-      link_local_package "${install_root}" dotnet "${local_dotnet_package}"
+      link_local_package "${install_root}" core "${LOCAL_CORE_PACKAGE}"
+      link_local_package "${install_root}" globals "${LOCAL_GLOBALS_PACKAGE}"
+      link_local_package "${install_root}" dotnet "${LOCAL_DOTNET_PACKAGE}"
       ;;
   esac
 }
