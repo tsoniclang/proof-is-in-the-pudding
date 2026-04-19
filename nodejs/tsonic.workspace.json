@@ -9,12 +9,6 @@
     ],
     "libraries": [],
     "frameworkReferences": [],
-    "packageReferences": [
-      {
-        "id": "Tsonic.JSRuntime",
-        "version": "0.0.9",
-        "types": "@tsonic/js"
-      }
-    ]
+    "packageReferences": []
   }
 }
