@@ -18,6 +18,81 @@ if [[ -z "${TSONIC_BIN:-}" ]]; then
   exit 1
 fi
 
+if [[ -z "${NUGET_PACKAGES:-}" ]]; then
+  export NUGET_PACKAGES="${PROOF_NUGET_PACKAGES_DIR:-${repo_root}/.tests/nuget/packages}"
+fi
+mkdir -p "${NUGET_PACKAGES}"
+
+keep_artifacts="${PROOF_KEEP_ARTIFACTS:-0}"
+
+workspace_roots=(
+  "${repo_root}/bcl"
+  "${repo_root}/aspnetcore"
+  "${repo_root}/js"
+  "${repo_root}/nodejs"
+  "${repo_root}/workspaces/scoped-multi-project"
+  "${repo_root}/workspaces/unscoped-multi-project"
+)
+
+clean_artifacts_under() {
+  local workspace_root="$1"
+  if [[ "${keep_artifacts}" = "1" || ! -d "${workspace_root}" ]]; then
+    return 0
+  fi
+
+  while IFS= read -r -d '' artifact_dir; do
+    rm -rf "${artifact_dir}"
+  done < <(
+    find "${workspace_root}" \
+      \( -path "*/node_modules" -o -path "*/.git" \) -prune -o \
+      \( -type d \( -name ".tsonic" -o -name "generated" -o -name "out" \) -print0 -prune \)
+  )
+
+  while IFS= read -r -d '' artifact_file; do
+    rm -f "${artifact_file}"
+  done < <(
+    find "${workspace_root}" \
+      \( -path "*/node_modules" -o -path "*/.git" \) -prune -o \
+      -type f \( -name ".tmp-server.log" -o -name "app.db" -o -name "app.db-*" \) -print0
+  )
+}
+
+clean_all_artifacts() {
+  if [[ "${keep_artifacts}" = "1" ]]; then
+    return 0
+  fi
+  for workspace_root in "${workspace_roots[@]}"; do
+    clean_artifacts_under "${workspace_root}"
+  done
+}
+
+clean_project_artifacts() {
+  local project="$1"
+  local project_dir="${repo_root}/${project}"
+  if [[ "${keep_artifacts}" = "1" || ! -d "${project_dir}" ]]; then
+    return 0
+  fi
+  rm -rf \
+    "${project_dir}/.tsonic" \
+    "${project_dir}/generated" \
+    "${project_dir}/out" \
+    "${project_dir}/.tmp-server.log" \
+    "${project_dir}/app.db" \
+    "${project_dir}/app.db-shm" \
+    "${project_dir}/app.db-wal" \
+    "${project_dir}/app.db-journal"
+}
+
+trap clean_all_artifacts EXIT
+
+echo "=== shared NuGet package cache: ${NUGET_PACKAGES} ==="
+if [[ "${keep_artifacts}" = "1" ]]; then
+  echo "=== preserving generated test artifacts (PROOF_KEEP_ARTIFACTS=1) ==="
+else
+  echo "=== cleaning generated test artifacts before and after verification ==="
+fi
+clean_all_artifacts
+
 echo "=== workspace hygiene ==="
 "${repo_root}/scripts/clean-nested-node-modules.sh"
 
@@ -572,6 +647,8 @@ for project in "${projects[@]}"; do
       run_console_app "${project}"
       ;;
   esac
+
+  clean_project_artifacts "${project}"
 done
 
 echo "=== ALL PROJECTS VERIFIED ==="
