@@ -12,7 +12,9 @@ This repository groups example projects by which bindings packages they opt into
 - `aspnetcore/` - Examples using ASP.NET Core via `@tsonic/aspnetcore`
 - `workspaces/` - Examples showing npm workspaces and multi-assembly repos
 
-There is no special compiler "js mode" anymore: everything compiles to .NET. `@tsonic/js` is the ambient JS surface, and `@tsonic/nodejs` is a regular package that contributes `node:*` module bindings.
+All examples compile through Tsonic into .NET outputs. `@tsonic/js` is the
+ambient JS surface, and `@tsonic/nodejs` is a regular package that contributes
+`node:*` module bindings.
 
 ## Import Syntax
 
@@ -111,6 +113,26 @@ Or run the compiled binary:
 ```bash
 ./out/app
 ```
+
+## Full verifier
+
+Run the repository verifier from the repo root:
+
+```bash
+bash scripts/verify-all.sh
+```
+
+The verifier:
+
+- installs dependencies at workspace roots only
+- overlays local sibling `@tsonic/*` package repos when they are checked out
+  beside this repo
+- uses `.tests/nuget/packages` as the shared NuGet package cache
+- removes per-example build artifacts before and after each verification unit
+
+Set `PROOF_KEEP_ARTIFACTS=1` to preserve generated `.tsonic`, `generated`,
+`out`, and `dist` directories for debugging. Set `PROOF_NUGET_PACKAGES_DIR` to
+override the shared NuGet cache directory.
 
 ## Requirements
 
