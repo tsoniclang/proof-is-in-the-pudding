@@ -7,7 +7,7 @@ Example projects demonstrating Tsonic compiler capabilities.
 This repository groups example projects by which bindings packages they opt into:
 
 - `bcl/` - Baseline .NET BCL examples (`@tsonic/dotnet`, `@tsonic/core`, `@tsonic/globals`)
-- `js/` - Examples using the JSRuntime bindings via `@tsonic/js`
+- `js/` - Examples using the JS source package via `@tsonic/js`
 - `nodejs/` - Examples using the JS surface plus the `@tsonic/nodejs` package
 - `aspnetcore/` - Examples using ASP.NET Core via `@tsonic/aspnetcore`
 - `workspaces/` - Examples showing npm workspaces and multi-assembly repos

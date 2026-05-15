@@ -10,7 +10,7 @@ import { Console, Int32 } from "@tsonic/dotnet/System.js";
 import { HttpListener, HttpListenerContext, HttpListenerRequest, HttpListenerResponse } from "@tsonic/dotnet/System.Net.js";
 import { StreamReader, StreamWriter } from "@tsonic/dotnet/System.IO.js";
 import { Encoding } from "@tsonic/dotnet/System.Text.js";
-import { int, out } from "@tsonic/core/types.js";
+import type { int } from "@tsonic/core/types.js";
 import * as TodoStore from "./TodoStore.ts";
 import { serializeTodo, serializeTodos, serializeError, parseTodoCreate, parseTodoUpdate } from "./JsonHelpers.ts";
 
@@ -24,11 +24,10 @@ function extractIdFromPath(path: string): int | undefined {
   }
   const idStr = parts[2];
   if (idStr !== "") {
-    // Use Int32.TryParse pattern - returns result via out parameter
-    let parseResult: int = 0;
-    const success = Int32.TryParse(idStr, parseResult as out<int>);
-    if (success) {
-      return parseResult;
+    try {
+      return Int32.Parse(idStr);
+    } catch (_err) {
+      return undefined;
     }
   }
   return undefined;
