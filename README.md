@@ -73,7 +73,7 @@ Parallel computation using `System.Threading.Tasks.Parallel`.
 
 REST API server using `System.Net.HttpListener`.
 
-- [bcl/todolist-api](./bcl/todolist-api) - Full CRUD API with JSON parsing
+- [bcl/todolist-api](./bcl/todolist-api) - Full CRUD API with typed JSON parsing
 - [js/todolist-api](./js/todolist-api) - Same API using `@tsonic/js` helpers
 
 ### high-performance
@@ -127,8 +127,15 @@ The verifier:
 - installs dependencies at workspace roots only
 - overlays local sibling `@tsonic/*` package repos when they are checked out
   beside this repo
+- overlays regenerated binding repos such as `dotnet`, `aspnetcore`,
+  `microsoft-extensions`, `efcore`, and provider packages before building
+  examples that consume those surfaces
 - uses `.tests/nuget/packages` as the shared NuGet package cache
 - removes per-example build artifacts before and after each verification unit
+
+The examples use closed JSON payload types and generated serialization metadata.
+They do not depend on open-ended `any`, `JsValue`, or reflection-style JSON
+object traversal.
 
 Set `PROOF_KEEP_ARTIFACTS=1` to preserve generated `.tsonic`, `generated`,
 `out`, and `dist` directories for debugging. Set `PROOF_NUGET_PACKAGES_DIR` to
