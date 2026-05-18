@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "kind": "tsonic-source-package",
   "surfaces": [
-    "clr"
+    "core"
   ],
   "source": {
     "namespace": "Acme.Domain",
