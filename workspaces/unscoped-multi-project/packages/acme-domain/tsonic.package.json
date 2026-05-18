@@ -4,6 +4,9 @@
   "surfaces": [
     "core"
   ],
+  "supportedTargets": [
+    "csharp"
+  ],
   "source": {
     "namespace": "Acme.Domain",
     "exports": {
