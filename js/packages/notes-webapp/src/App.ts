@@ -3,7 +3,7 @@ import {
   type IncomingMessage,
   type ServerResponse,
 } from "node:http";
-import type { int } from "@tsonic/core/types.js";
+import type { int } from "@tsonic/csharp/types.js";
 import * as NotesStore from "./NotesStore.ts";
 import {
   parseNoteCreate,

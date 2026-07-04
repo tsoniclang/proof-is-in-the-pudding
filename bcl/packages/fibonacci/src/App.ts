@@ -1,5 +1,5 @@
 import { Console } from "@tsonic/dotnet/System.js";
-import { int } from "@tsonic/core/types.js";
+import { int } from "@tsonic/csharp/types.js";
 
 function fibonacci(n: int): int {
   if (n <= 1) {

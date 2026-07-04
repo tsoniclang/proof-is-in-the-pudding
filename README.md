@@ -7,13 +7,13 @@ Example projects demonstrating Tsonic compiler capabilities.
 This repository groups example projects by which bindings packages they opt into:
 
 - `bcl/` - Baseline .NET BCL examples (`@tsonic/dotnet`, `@tsonic/core`, `@tsonic/globals`)
-- `js/` - Examples using the JS source package via `@tsonic/js`
-- `nodejs/` - Examples using the JS surface plus the `@tsonic/nodejs` package
+- `js/` - Examples using the JS source package via `@tsonic/csharp-js`
+- `nodejs/` - Examples using the JS surface plus the `@tsonic/csharp-nodejs` package
 - `aspnetcore/` - Examples using ASP.NET Core via `@tsonic/aspnetcore`
 - `workspaces/` - Examples showing npm workspaces and multi-assembly repos
 
-All examples compile through Tsonic into .NET outputs. `@tsonic/js` is the
-ambient JS surface, and `@tsonic/nodejs` is a regular package that contributes
+All examples compile through Tsonic into .NET outputs. `@tsonic/csharp-js` is the
+ambient JS surface, and `@tsonic/csharp-nodejs` is a regular package that contributes
 `node:*` module bindings.
 
 ## Import Syntax
@@ -25,8 +25,8 @@ All imports must use the `.js` extension per ESM conventions:
 import { Console } from "@tsonic/dotnet/System.js";
 import { List } from "@tsonic/dotnet/System.Collections.Generic.js";
 
-// Core types
-import { int, long } from "@tsonic/core/types.js";
+// C# target aliases
+import { int, long } from "@tsonic/csharp/types.js";
 
 // JS surface globals
 console.log("hello");
@@ -58,7 +58,7 @@ Simple calculator with add, subtract, multiply, divide operations.
 
 Fibonacci sequence with recursive and iterative implementations.
 
-- [bcl/fibonacci](./bcl/fibonacci) - Uses `int` type from `@tsonic/core`
+- [bcl/fibonacci](./bcl/fibonacci) - Uses `int` type from `@tsonic/csharp`
 - [js/fibonacci](./js/fibonacci)
 
 ### multithreading
@@ -74,7 +74,7 @@ Parallel computation using `System.Threading.Tasks.Parallel`.
 REST API server using `System.Net.HttpListener`.
 
 - [bcl/todolist-api](./bcl/todolist-api) - Full CRUD API with typed JSON parsing
-- [js/todolist-api](./js/todolist-api) - Same API using `@tsonic/js` helpers
+- [js/todolist-api](./js/todolist-api) - Same API using `@tsonic/csharp-js` helpers
 
 ### high-performance
 

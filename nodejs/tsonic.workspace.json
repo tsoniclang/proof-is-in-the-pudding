@@ -1,11 +1,11 @@
 {
   "$schema": "https://tsonic.org/schema/workspace/v1.json",
-  "surface": "@tsonic/js",
+  "surface": "@tsonic/csharp-js",
   "dotnetVersion": "net10.0",
   "dotnet": {
     "typeRoots": [
-      "node_modules/@tsonic/js",
-      "node_modules/@tsonic/nodejs"
+      "node_modules/@tsonic/csharp-js",
+      "node_modules/@tsonic/csharp-nodejs"
     ],
     "libraries": [],
     "frameworkReferences": [],

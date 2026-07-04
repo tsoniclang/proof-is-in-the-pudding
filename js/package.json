@@ -10,10 +10,10 @@
     "typecheck": "npm -ws --if-present run typecheck"
   },
   "devDependencies": {
-    "@tsonic/dotnet": "10.0.41",
-    "@tsonic/js": "10.0.49",
-    "@tsonic/nodejs": "10.0.49",
-    "tsonic": "0.0.76",
-    "typescript": "^5.0.0"
+    "@tsonic/cli": "0.0.1",
+    "@tsonic/target-csharp": "0.0.1",
+    "@tsonic/csharp-runtime": "0.0.1",
+    "@tsonic/csharp-js": "0.0.1",
+    "@tsonic/csharp-nodejs": "0.0.1"
   }
 }

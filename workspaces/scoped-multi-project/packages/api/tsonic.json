@@ -1,17 +1,17 @@
 {
   "$schema": "https://tsonic.org/schema/v1.json",
-  "rootNamespace": "Acme.Api",
-  "entryPoint": "src/App.ts",
-  "sourceRoot": "src",
-  "outputDirectory": "generated",
-  "outputName": "api",
-  "output": {
-    "nativeAot": false,
-    "trimmed": false,
-    "singleFile": false
-  },
-  "buildOptions": {
-    "stripSymbols": true,
-    "invariantGlobalization": true
-  }
+  "entryPoint": "App.ts",
+  "rootDir": "src",
+  "outDir": "out",
+  "targets": [{
+    "id": "csharp",
+    "options": {
+      "namespace": "Acme.Api",
+      "assemblyName": "AcmeApi",
+      "outputType": "Exe",
+      "references": {
+        "projects": ["../domain/out/csharp/AcmeDomain.csproj"]
+      }
+    }
+  }]
 }

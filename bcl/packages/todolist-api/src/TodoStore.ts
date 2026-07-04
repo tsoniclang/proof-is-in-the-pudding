@@ -2,7 +2,7 @@
 import { Console } from "@tsonic/dotnet/System.js";
 import { List, Dictionary } from "@tsonic/dotnet/System.Collections.Generic.js";
 import { defaultof, out } from "@tsonic/core/lang.js";
-import { int } from "@tsonic/core/types.js";
+import { int } from "@tsonic/csharp/types.js";
 import { Todo } from "./Todo.ts";
 
 // Global store state (module-level variables)

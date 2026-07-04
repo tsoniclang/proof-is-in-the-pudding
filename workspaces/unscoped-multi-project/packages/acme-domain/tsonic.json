@@ -1,14 +1,14 @@
 {
   "$schema": "https://tsonic.org/schema/v1.json",
-  "entryPoint": "App.ts",
+  "entryPoint": "index.ts",
   "rootDir": "src",
   "outDir": "out",
   "targets": [{
     "id": "csharp",
     "options": {
-      "namespace": "Proof.Bcl.HighPerformance",
-      "assemblyName": "ProofBclHighPerformance",
-      "outputType": "Exe"
+      "namespace": "Acme.Domain",
+      "assemblyName": "AcmeDomain",
+      "outputType": "Library"
     }
   }]
 }

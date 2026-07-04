@@ -1,4 +1,4 @@
-import { int } from "@tsonic/core/types.js";
+import { int } from "@tsonic/csharp/types.js";
 import { Int32 } from "@tsonic/dotnet/System.js";
 import { StreamReader } from "@tsonic/dotnet/System.IO.js";
 import { Encoding } from "@tsonic/dotnet/System.Text.js";

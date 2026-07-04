@@ -10,7 +10,7 @@ import { Console, Int32 } from "@tsonic/dotnet/System.js";
 import { HttpListener, HttpListenerContext, HttpListenerRequest, HttpListenerResponse } from "@tsonic/dotnet/System.Net.js";
 import { StreamReader, StreamWriter } from "@tsonic/dotnet/System.IO.js";
 import { Encoding } from "@tsonic/dotnet/System.Text.js";
-import type { int } from "@tsonic/core/types.js";
+import type { int } from "@tsonic/csharp/types.js";
 import * as TodoStore from "./TodoStore.ts";
 import { serializeTodo, serializeTodos, serializeError, parseTodoCreate, parseTodoUpdate } from "./JsonHelpers.ts";
 

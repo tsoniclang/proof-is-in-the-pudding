@@ -1,4 +1,4 @@
-import { int } from "@tsonic/core/types.js";
+import { int } from "@tsonic/csharp/types.js";
 import { DateTime } from "@tsonic/dotnet/System.js";
 
 export interface PostEntity {
