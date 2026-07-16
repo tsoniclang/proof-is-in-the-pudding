@@ -1,7 +1,6 @@
 import { Console } from "@tsonic/dotnet/System.js";
 
-import { WebApplication } from "@tsonic/aspnetcore/Microsoft.AspNetCore.Builder.js";
-import type { ExtensionMethods } from "@tsonic/aspnetcore/Microsoft.AspNetCore.Builder.js";
+import { WebApplication } from "@tsonic/dotnet/Microsoft.AspNetCore.Builder.js";
 
 import { DB_PATH } from "./db/options.ts";
 import { ensureCreatedAndSeed } from "./db/seed.ts";
@@ -20,7 +19,7 @@ export function run(): void {
   Console.WriteLine("=================================");
 
   const builder = WebApplication.CreateBuilder();
-  const app = builder.Build() as ExtensionMethods<WebApplication>;
+  const app = builder.Build();
 
   app.MapGet("/", handleIndex);
   app.MapGet("/api/health", handleHealth);

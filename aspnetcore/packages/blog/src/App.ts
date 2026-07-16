@@ -4,9 +4,8 @@ import { Encoding } from "@tsonic/dotnet/System.Text.js";
 import { JsonSerializer } from "@tsonic/dotnet/System.Text.Json.js";
 import { List } from "@tsonic/dotnet/System.Collections.Generic.js";
 import { Task, TaskExtensions } from "@tsonic/dotnet/System.Threading.Tasks.js";
-import { WebApplication } from "@tsonic/aspnetcore/Microsoft.AspNetCore.Builder.js";
-import type { ExtensionMethods } from "@tsonic/aspnetcore/Microsoft.AspNetCore.Builder.js";
-import { HttpContext, HttpResponse, HttpResponseWritingExtensions } from "@tsonic/aspnetcore/Microsoft.AspNetCore.Http.js";
+import { WebApplication } from "@tsonic/dotnet/Microsoft.AspNetCore.Builder.js";
+import { HttpContext, HttpResponse, HttpResponseWritingExtensions } from "@tsonic/dotnet/Microsoft.AspNetCore.Http.js";
 
 export interface Post {
   id: int;
@@ -187,7 +186,7 @@ export function main(): void {
   }
 
   const builder = WebApplication.CreateBuilder();
-  const app = builder.Build() as ExtensionMethods<WebApplication>;
+  const app = builder.Build();
 
   app.MapGet("/", handleIndex);
   app.MapGet("/api/posts", handleListPosts);

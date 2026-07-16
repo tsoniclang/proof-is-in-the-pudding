@@ -13,6 +13,8 @@
     "@tsonic/cli": "0.0.1",
     "@tsonic/target-csharp": "0.0.1",
     "@tsonic/csharp-runtime": "0.0.1",
-    "@tsonic/csharp-js": "0.0.1"
+    "@tsonic/csharp-js": "0.0.1",
+    "@tsonic/efcore": "0.0.1",
+    "@tsonic/efcore-sqlite": "0.0.1"
   }
 }

@@ -9,7 +9,8 @@
     "options": {
       "namespace": "Proof.Js.NotesWebApp",
       "assemblyName": "ProofJsNotesWebApp",
-      "outputType": "Exe"
+      "outputType": "Exe",
+      "typescriptCompatibility": "compat"
     }
   }]
 }

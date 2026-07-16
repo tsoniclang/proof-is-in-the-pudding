@@ -1,13 +1,14 @@
 import { DateTime } from "@tsonic/dotnet/System.js";
 import { JsonSerializer } from "@tsonic/dotnet/System.Text.Json.js";
 import { List } from "@tsonic/dotnet/System.Collections.Generic.js";
-import { Enumerable, Queryable } from "@tsonic/dotnet/System.Linq.js";
+import { Queryable } from "@tsonic/dotnet/System.Linq.js";
 import { Task, TaskExtensions } from "@tsonic/dotnet/System.Threading.Tasks.js";
+import { EntityFrameworkQueryableExtensions } from "@tsonic/efcore/Microsoft.EntityFrameworkCore.js";
 
-import { HttpContext } from "@tsonic/aspnetcore/Microsoft.AspNetCore.Http.js";
+import { HttpContext } from "@tsonic/dotnet/Microsoft.AspNetCore.Http.js";
 
 import type { CommentCreateInput, CommentDto } from "../db/dtos.ts";
-import type { CommentEntity } from "../db/entities.ts";
+import { CommentEntity } from "../db/entities.ts";
 import { BlogDbContext } from "../db/context.ts";
 import { DB_OPTIONS } from "../db/options.ts";
 import { toCommentDto } from "../db/mappers.ts";
@@ -28,7 +29,7 @@ export const handleListComments = (ctx: HttpContext): Task => {
       (c: CommentEntity): DateTime => c.CreatedAt
     );
     const filtered = Queryable.Where(query, (c: CommentEntity) => c.PostId === postId);
-    const list = Enumerable.ToList(filtered).ToArray();
+    const list = EntityFrameworkQueryableExtensions.ToArrayAsync(filtered).Result;
     const dtos = new List<CommentDto>();
     for (let i = 0; i < list.Length; i++) {
       dtos.Add(toCommentDto(list[i]));
@@ -67,13 +68,11 @@ export const handleCreateComment = (ctx: HttpContext): Task => {
       try {
         const post = db.posts.Find(postId);
         if (post !== undefined) {
-          const comment: CommentEntity = {
-            Id: 0,
-            PostId: postId,
-            Author: input.author.Trim() === "" ? "Anonymous" : input.author,
-            Body: input.body,
-            CreatedAt: DateTime.UtcNow,
-          };
+          const comment = new CommentEntity();
+          comment.PostId = postId;
+          comment.Author = input.author.Trim() === "" ? "Anonymous" : input.author;
+          comment.Body = input.body;
+          comment.CreatedAt = DateTime.UtcNow;
           db.comments.Add(comment);
           db.SaveChanges();
           payload = JsonSerializer.Serialize<CommentDto>(toCommentDto(comment));

@@ -5,7 +5,7 @@ import { Encoding } from "@tsonic/dotnet/System.Text.js";
 import { JsonSerializer } from "@tsonic/dotnet/System.Text.Json.js";
 import { Task } from "@tsonic/dotnet/System.Threading.Tasks.js";
 
-import { HttpContext, HttpResponse, HttpResponseWritingExtensions } from "@tsonic/aspnetcore/Microsoft.AspNetCore.Http.js";
+import { HttpContext, HttpResponse, HttpResponseWritingExtensions } from "@tsonic/dotnet/Microsoft.AspNetCore.Http.js";
 
 import type { ErrorResponse } from "../db/dtos.ts";
 

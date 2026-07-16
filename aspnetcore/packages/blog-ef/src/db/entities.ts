@@ -1,19 +1,18 @@
-import { int } from "@tsonic/csharp/types.js";
+import type { int } from "@tsonic/csharp/types.js";
 import { DateTime } from "@tsonic/dotnet/System.js";
 
-export interface PostEntity {
-  Id: int;
-  Title: string;
-  Content: string;
-  CreatedAt: DateTime;
-  UpdatedAt: DateTime;
+export class PostEntity {
+  Id: int = 0;
+  Title = "";
+  Content = "";
+  CreatedAt: DateTime = DateTime.MinValue;
+  UpdatedAt: DateTime = DateTime.MinValue;
 }
 
-export interface CommentEntity {
-  Id: int;
-  PostId: int;
-  Author: string;
-  Body: string;
-  CreatedAt: DateTime;
+export class CommentEntity {
+  Id: int = 0;
+  PostId: int = 0;
+  Author = "";
+  Body = "";
+  CreatedAt: DateTime = DateTime.MinValue;
 }
-

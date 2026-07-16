@@ -1,7 +1,7 @@
 import { JsonSerializer } from "@tsonic/dotnet/System.Text.Json.js";
 import { Task } from "@tsonic/dotnet/System.Threading.Tasks.js";
 
-import { HttpContext } from "@tsonic/aspnetcore/Microsoft.AspNetCore.Http.js";
+import { HttpContext } from "@tsonic/dotnet/Microsoft.AspNetCore.Http.js";
 
 import type { HealthResponse } from "../db/dtos.ts";
 import { writeJson } from "../http/http-helpers.ts";

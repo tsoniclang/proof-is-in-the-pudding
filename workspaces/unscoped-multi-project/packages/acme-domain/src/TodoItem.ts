@@ -1,5 +1,5 @@
 export class TodoItem {
-  readonly id: string;
+  id: string;
   title: string;
   completed: boolean;
 
@@ -18,4 +18,3 @@ export class TodoItem {
     return `${this.id}: ${this.title} (${status})`;
   }
 }
-

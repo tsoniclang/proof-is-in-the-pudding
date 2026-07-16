@@ -8,10 +8,7 @@
     "options": {
       "namespace": "Acme.Api",
       "assemblyName": "AcmeApi",
-      "outputType": "Exe",
-      "references": {
-        "projects": ["../acme-domain/out/csharp/AcmeDomain.csproj"]
-      }
+      "outputType": "Exe"
     }
   }]
 }

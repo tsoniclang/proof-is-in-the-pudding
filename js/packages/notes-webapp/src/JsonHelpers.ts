@@ -5,7 +5,7 @@ export const serializeNote = (note: Note): string => JSON.stringify(note);
 export const serializeNotes = (notes: Note[]): string => JSON.stringify(notes);
 
 export const parseNoteCreate = (json: string): NoteCreateInput | undefined => {
-  const obj = JSON.parse<NoteCreateInput>(json);
+  const obj = JSON.parse(json) as { title?: unknown; content?: unknown };
   if (typeof obj.title !== "string" || typeof obj.content !== "string") {
     return undefined;
   }
@@ -13,7 +13,7 @@ export const parseNoteCreate = (json: string): NoteCreateInput | undefined => {
 };
 
 export const parseNoteUpdate = (json: string): NoteUpdateInput | undefined => {
-  const obj = JSON.parse<NoteUpdateInput>(json);
+  const obj = JSON.parse(json) as { title?: unknown; content?: unknown };
   if (typeof obj.title !== "string" || typeof obj.content !== "string") {
     return undefined;
   }
