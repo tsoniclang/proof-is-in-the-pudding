@@ -7,13 +7,14 @@ import { EntityFrameworkQueryableExtensions } from "@tsonic/efcore/Microsoft.Ent
 
 import { HttpContext } from "@tsonic/dotnet/Microsoft.AspNetCore.Http.js";
 
-import type { CommentDto, PostCreateInput, PostDetailDto, PostDto, PostUpdateInput } from "../db/dtos.ts";
-import { PostEntity } from "../db/entities.ts";
-import type { CommentEntity } from "../db/entities.ts";
-import { BlogDbContext } from "../db/context.ts";
-import { DB_OPTIONS } from "../db/options.ts";
-import { toCommentDto, toPostDto } from "../db/mappers.ts";
-import { parsePostIdRequired, readRequestBodyAsync, serializeError, unwrapInt, writeJson } from "../http/http-helpers.ts";
+import type { CommentDto, PostDetailDto, PostDto } from "../db/dtos.js";
+import { PostEntity } from "../db/entities.js";
+import type { CommentEntity } from "../db/entities.js";
+import { BlogDbContext } from "../db/context.js";
+import { DB_OPTIONS } from "../db/options.js";
+import { toCommentDto, toPostDto } from "../db/mappers.js";
+import { parsePostIdRequired, readRequestBodyAsync, serializeError, unwrapInt, writeJson } from "../http/http-helpers.js";
+import { parsePostInput } from "../http/json-input.js";
 
 export const handleListPosts = (ctx: HttpContext): Task => {
   let payload = "";
@@ -83,7 +84,7 @@ export const handleGetPost = (ctx: HttpContext): Task => {
 export const handleCreatePost = (ctx: HttpContext): Task =>
   TaskExtensions.Unwrap(
     readRequestBodyAsync(ctx).ContinueWith<Task>((t: Task<string>, _state) => {
-      const input = JsonSerializer.Deserialize<PostCreateInput>(t.Result);
+      const input = parsePostInput(t.Result);
       if (input === undefined || typeof input.title !== "string" || typeof input.content !== "string") {
         return writeJson(
           ctx.Response,
@@ -121,7 +122,7 @@ export const handleUpdatePost = (ctx: HttpContext): Task => {
 
   return TaskExtensions.Unwrap(
     readRequestBodyAsync(ctx).ContinueWith<Task>((t: Task<string>, _state) => {
-      const input = JsonSerializer.Deserialize<PostUpdateInput>(t.Result);
+      const input = parsePostInput(t.Result);
       if (input === undefined || typeof input.title !== "string" || typeof input.content !== "string") {
         return writeJson(
           ctx.Response,

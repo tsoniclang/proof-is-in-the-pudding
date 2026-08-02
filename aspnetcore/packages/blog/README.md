@@ -6,10 +6,9 @@ This sample uses `@tsonic/aspnetcore` to build a minimal blog API + HTML page.
 
 ```bash
 npm run build
-./out/app
+dotnet run --project out/csharp/ProofAspNetCoreBlog.csproj --no-build
 ```
 
 Then open:
 
 - `http://localhost:8090/`
-

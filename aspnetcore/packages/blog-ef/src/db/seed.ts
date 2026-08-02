@@ -1,9 +1,9 @@
 import { DateTime } from "@tsonic/dotnet/System.js";
 import { Queryable } from "@tsonic/dotnet/System.Linq.js";
 
-import { BlogDbContext } from "./context.ts";
-import { PostEntity } from "./entities.ts";
-import { DB_OPTIONS } from "./options.ts";
+import { BlogDbContext } from "./context.js";
+import { PostEntity } from "./entities.js";
+import { DB_OPTIONS } from "./options.js";
 
 export const ensureCreatedAndSeed = (): void => {
   const db = new BlogDbContext(DB_OPTIONS);

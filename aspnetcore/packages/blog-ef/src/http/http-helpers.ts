@@ -7,7 +7,7 @@ import { Task } from "@tsonic/dotnet/System.Threading.Tasks.js";
 
 import { HttpContext, HttpResponse, HttpResponseWritingExtensions } from "@tsonic/dotnet/Microsoft.AspNetCore.Http.js";
 
-import type { ErrorResponse } from "../db/dtos.ts";
+import type { ErrorResponse } from "../db/dtos.js";
 
 export const serializeError = (message: string): string =>
   JsonSerializer.Serialize<ErrorResponse>({ error: message });

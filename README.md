@@ -35,7 +35,7 @@ console.log("hello");
 import * as fs from "node:fs";
 
 // Local imports
-import { MyModule } from "./MyModule.ts";
+import { MyModule } from "./MyModule.js";
 ```
 
 ## Examples
@@ -124,22 +124,21 @@ bash scripts/verify-all.sh
 
 The verifier:
 
-- installs dependencies at workspace roots only
-- overlays local sibling `@tsonic/*` package repos when they are checked out
-  beside this repo
-- overlays regenerated binding repos such as `dotnet`, `aspnetcore`,
-  `microsoft-extensions`, `efcore`, and provider packages before building
-  examples that consume those surfaces
+- verifies that every local `@tsonic/*` workspace link targets the active sibling checkout
+- builds the shared compiler, C# target, and provider packages once before project verification
+- inventories every non-temporary `tsonic.json` and requires every project to have exactly one test classification
+- builds independent projects with a bounded parallel worker pool, after building workspace library prerequisites
+- executes finite programs with semantic output assertions and long-running servers with HTTP behavior probes
+- writes per-task diagnostics and one complete consolidated report under `.tests/`
 - uses `.tests/nuget/packages` as the shared NuGet package cache
-- removes per-example build artifacts before and after each verification unit
+- preserves prior test artifacts and writes each run into a new timestamped directory
 
-The examples use closed JSON payload types and generated serialization metadata.
-They do not depend on open-ended `any`, `JsValue`, or reflection-style JSON
-object traversal.
+The examples parse inputs through closed payload schemas and invoke statically
+selected serializers. They do not depend on open-ended `any`, `JsValue`, or
+reflection-style JSON object traversal.
 
-Set `PROOF_KEEP_ARTIFACTS=1` to preserve generated `.tsonic`, `generated`,
-`out`, and `dist` directories for debugging. Set `PROOF_NUGET_PACKAGES_DIR` to
-override the shared NuGet cache directory.
+Set `PROOF_JOBS` to change the bounded project worker count. Set
+`NUGET_PACKAGES` to override the shared NuGet cache directory.
 
 ## Requirements
 

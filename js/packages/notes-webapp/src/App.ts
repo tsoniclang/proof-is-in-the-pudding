@@ -4,14 +4,14 @@ import {
   type ServerResponse,
 } from "node:http";
 import type { int } from "@tsonic/csharp/types.js";
-import * as NotesStore from "./NotesStore.ts";
+import * as NotesStore from "./NotesStore.js";
 import {
   parseNoteCreate,
   parseNoteUpdate,
   serializeError,
   serializeNote,
   serializeNotes,
-} from "./JsonHelpers.ts";
+} from "./JsonHelpers.js";
 
 function getRequestPath(requestUrl: string | null | undefined): string {
   const raw = requestUrl ?? "/";
@@ -180,7 +180,7 @@ function extractNoteIdFromPath(pathname: string): number | undefined {
   }
 
   const parsed = parseInt(idText, 10);
-  if (parsed === undefined || Number.isNaN(parsed)) {
+  if (Number.isNaN(parsed)) {
     return undefined;
   }
 

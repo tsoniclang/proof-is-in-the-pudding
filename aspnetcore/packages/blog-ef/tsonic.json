@@ -8,7 +8,7 @@
     "options": {
       "namespace": "Proof.AspNetCore.BlogEf",
       "assemblyName": "ProofAspNetCoreBlogEf",
-      "outputType": "Library",
+      "outputType": "Exe",
       "references": {
         "frameworks": ["Microsoft.AspNetCore.App"]
       }

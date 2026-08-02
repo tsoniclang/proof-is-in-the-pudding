@@ -11,8 +11,8 @@ import { HttpListener, HttpListenerContext, HttpListenerRequest, HttpListenerRes
 import { StreamReader, StreamWriter } from "@tsonic/dotnet/System.IO.js";
 import { Encoding } from "@tsonic/dotnet/System.Text.js";
 import type { int } from "@tsonic/csharp/types.js";
-import * as TodoStore from "./TodoStore.ts";
-import { serializeTodo, serializeTodos, serializeError, parseTodoCreate, parseTodoUpdate } from "./JsonHelpers.ts";
+import * as TodoStore from "./TodoStore.js";
+import { serializeTodo, serializeTodos, serializeError, parseTodoCreate, parseTodoUpdate } from "./JsonHelpers.js";
 
 // Extract ID from URL path like "/todos/123"
 function extractIdFromPath(path: string): int | undefined {
@@ -26,7 +26,7 @@ function extractIdFromPath(path: string): int | undefined {
   if (idStr !== "") {
     try {
       return Int32.Parse(idStr);
-    } catch (_err) {
+    } catch {
       return undefined;
     }
   }

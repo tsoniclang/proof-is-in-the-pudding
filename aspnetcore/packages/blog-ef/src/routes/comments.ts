@@ -7,12 +7,13 @@ import { EntityFrameworkQueryableExtensions } from "@tsonic/efcore/Microsoft.Ent
 
 import { HttpContext } from "@tsonic/dotnet/Microsoft.AspNetCore.Http.js";
 
-import type { CommentCreateInput, CommentDto } from "../db/dtos.ts";
-import { CommentEntity } from "../db/entities.ts";
-import { BlogDbContext } from "../db/context.ts";
-import { DB_OPTIONS } from "../db/options.ts";
-import { toCommentDto } from "../db/mappers.ts";
-import { parsePostIdRequired, readRequestBodyAsync, serializeError, unwrapInt, writeJson } from "../http/http-helpers.ts";
+import type { CommentDto } from "../db/dtos.js";
+import { CommentEntity } from "../db/entities.js";
+import { BlogDbContext } from "../db/context.js";
+import { DB_OPTIONS } from "../db/options.js";
+import { toCommentDto } from "../db/mappers.js";
+import { parsePostIdRequired, readRequestBodyAsync, serializeError, unwrapInt, writeJson } from "../http/http-helpers.js";
+import { parseCommentCreate } from "../http/json-input.js";
 
 export const handleListComments = (ctx: HttpContext): Task => {
   const postIdRaw = parsePostIdRequired(ctx);
@@ -51,7 +52,7 @@ export const handleCreateComment = (ctx: HttpContext): Task => {
 
   return TaskExtensions.Unwrap(
     readRequestBodyAsync(ctx).ContinueWith<Task>((t: Task<string>, _state) => {
-      const input = JsonSerializer.Deserialize<CommentCreateInput>(t.Result);
+      const input = parseCommentCreate(t.Result);
       if (input === undefined || typeof input.author !== "string" || typeof input.body !== "string") {
         return writeJson(
           ctx.Response,

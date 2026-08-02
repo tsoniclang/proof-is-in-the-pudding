@@ -1,6 +1,6 @@
 import { DbContext, DbContextOptions, DbSet } from "@tsonic/efcore/Microsoft.EntityFrameworkCore.js";
 
-import type { CommentEntity, PostEntity } from "./entities.ts";
+import type { CommentEntity, PostEntity } from "./entities.js";
 
 export class BlogDbContext extends DbContext {
   get posts(): DbSet<PostEntity> {

@@ -1,7 +1,7 @@
 import { int } from "@tsonic/csharp/types.js";
 import { StreamReader } from "@tsonic/dotnet/System.IO.js";
 import { Encoding } from "@tsonic/dotnet/System.Text.js";
-import { JsonSerializer } from "@tsonic/dotnet/System.Text.Json.js";
+import { JsonDocument, JsonException, JsonSerializer, JsonValueKind } from "@tsonic/dotnet/System.Text.Json.js";
 import { List } from "@tsonic/dotnet/System.Collections.Generic.js";
 import { Task, TaskExtensions } from "@tsonic/dotnet/System.Threading.Tasks.js";
 import { WebApplication } from "@tsonic/dotnet/Microsoft.AspNetCore.Builder.js";
@@ -127,6 +127,39 @@ const INDEX_HTML = `<!doctype html>
 const serializeError = (message: string): string =>
   JsonSerializer.Serialize<ErrorResponse>({ error: message });
 
+function tryParseJsonDocument(json: string): JsonDocument | undefined {
+  try {
+    return JsonDocument.Parse(json);
+  } catch (error) {
+    if (!(error instanceof JsonException)) throw error;
+    return undefined;
+  }
+}
+
+function parsePostCreate(json: string): PostCreateInput | undefined {
+  const document = tryParseJsonDocument(json);
+  if (document === undefined) return undefined;
+  try {
+    const root = document.RootElement;
+    if (root.ValueKind !== JsonValueKind.Object) return undefined;
+    let title: string | undefined = undefined;
+    let content: string | undefined = undefined;
+    const properties = root.EnumerateObject().GetEnumerator();
+    while (properties.MoveNext()) {
+      const property = properties.Current;
+      if (property.Name === "title" && property.Value.ValueKind === JsonValueKind.String) {
+        title = property.Value.GetString();
+      } else if (property.Name === "content" && property.Value.ValueKind === JsonValueKind.String) {
+        content = property.Value.GetString();
+      }
+    }
+    if (title === undefined || content === undefined) return undefined;
+    return { title, content };
+  } finally {
+    document.Dispose();
+  }
+}
+
 const readRequestBodyAsync = (ctx: HttpContext): Task<string> => {
   const reader = new StreamReader(ctx.Request.Body, Encoding.UTF8);
   return reader.ReadToEndAsync().ContinueWith<string>((t, _state) => {
@@ -155,7 +188,7 @@ const handleListPosts = (ctx: HttpContext): Task => {
 const handleCreatePost = (ctx: HttpContext): Task => {
   return TaskExtensions.Unwrap(
     readRequestBodyAsync(ctx).ContinueWith<Task>((t, _state) => {
-      const input = JsonSerializer.Deserialize<PostCreateInput>(t.Result);
+      const input = parsePostCreate(t.Result);
       if (input === undefined || typeof input.title !== "string" || typeof input.content !== "string") {
         return writeJson(
           ctx.Response,
@@ -194,3 +227,5 @@ export function main(): void {
 
   app.Run("http://localhost:8090");
 }
+
+main();

@@ -2,12 +2,12 @@ import { Console } from "@tsonic/dotnet/System.js";
 
 import { WebApplication } from "@tsonic/dotnet/Microsoft.AspNetCore.Builder.js";
 
-import { DB_PATH } from "./db/options.ts";
-import { ensureCreatedAndSeed } from "./db/seed.ts";
-import { handleHealth } from "./routes/health.ts";
-import { handleIndex } from "./routes/index.ts";
-import { handleCreateComment, handleListComments } from "./routes/comments.ts";
-import { handleCreatePost, handleDeletePost, handleGetPost, handleListPosts, handleUpdatePost } from "./routes/posts.ts";
+import { DB_PATH } from "./db/options.js";
+import { ensureCreatedAndSeed } from "./db/seed.js";
+import { handleHealth } from "./routes/health.js";
+import { handleIndex } from "./routes/index.js";
+import { handleCreateComment, handleListComments } from "./routes/comments.js";
+import { handleCreatePost, handleDeletePost, handleGetPost, handleListPosts, handleUpdatePost } from "./routes/posts.js";
 
 export function run(): void {
   ensureCreatedAndSeed();
