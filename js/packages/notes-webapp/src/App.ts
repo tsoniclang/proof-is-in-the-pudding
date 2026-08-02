@@ -310,3 +310,5 @@ export function main(): void {
 
   setInterval(() => {}, 60000);
 }
+
+main();

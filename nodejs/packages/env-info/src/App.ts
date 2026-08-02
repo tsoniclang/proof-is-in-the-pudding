@@ -21,3 +21,5 @@ export function main(): void {
   const joined = path.join("home", "user", "docs");
   console.log("Joined path:", joined);
 }
+
+main();

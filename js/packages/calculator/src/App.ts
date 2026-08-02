@@ -37,3 +37,5 @@ export function main(): void {
   console.log("Testing division by zero:");
   divide(x, 0.0);
 }
+
+main();

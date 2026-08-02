@@ -45,3 +45,5 @@ export async function main(): Promise<void> {
   console.log(`Worker 3: ${results[2]}`);
   console.log(`Total: ${results[0] + results[1] + results[2]}`);
 }
+
+await main();

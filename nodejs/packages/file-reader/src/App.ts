@@ -10,3 +10,5 @@ export async function main(): Promise<void> {
   const content = await readFile("./README.md", "utf8");
   console.log(content);
 }
+
+await main();

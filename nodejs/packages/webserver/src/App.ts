@@ -21,3 +21,5 @@ export function main(): void {
 
   timers.setInterval(() => {}, 60000);
 }
+
+main();

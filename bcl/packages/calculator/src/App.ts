@@ -39,3 +39,5 @@ export function main(): void {
   Console.WriteLine("Testing division by zero:");
   divide(x, 0.0);
 }
+
+main();

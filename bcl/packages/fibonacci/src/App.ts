@@ -36,3 +36,5 @@ export function main(): void {
   const largeN: int = 40;
   Console.WriteLine(`  fib(${largeN}) = ${fibonacciIterative(largeN)}`);
 }
+
+main();

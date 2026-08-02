@@ -8,3 +8,5 @@ export function main(): void {
   item.toggle();
   Console.WriteLine(item.toString());
 }
+
+main();

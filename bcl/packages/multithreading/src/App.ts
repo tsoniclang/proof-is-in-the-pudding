@@ -53,3 +53,5 @@ export function main(): void {
   Console.WriteLine(`Worker 3: ${results[2]}`);
   Console.WriteLine(`Total: ${results[0] + results[1] + results[2]}`);
 }
+
+main();

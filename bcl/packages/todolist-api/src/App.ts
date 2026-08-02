@@ -191,3 +191,5 @@ export function main(): void {
     handleRequest(context);
   }
 }
+
+main();
