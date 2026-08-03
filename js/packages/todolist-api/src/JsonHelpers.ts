@@ -1,6 +1,6 @@
 // JSON serialization helpers for Todo API
-// Uses JS JSON.parse/stringify with generics
-import { Todo } from "./Todo.ts";
+// Uses standard JS JSON.parse/stringify with runtime shape checks
+import { Todo } from "./Todo.js";
 
 // Named types for JSON parsing/serialization (exported for C# accessibility)
 export interface TodoCreateInput {
@@ -29,24 +29,32 @@ export function serializeTodos(todos: Todo[]): string {
 // Parse JSON to extract title for creating a todo
 // Expected format: {"title": "some title"}
 export function parseTodoCreate(json: string): TodoCreateInput | undefined {
-  const obj = JSON.parse<TodoCreateInput>(json);
-  if (typeof obj.title !== "string") {
+  try {
+    const obj = JSON.parse(json) as { title?: unknown };
+    if (typeof obj.title !== "string") {
+      return undefined;
+    }
+    return { title: obj.title };
+  } catch {
     return undefined;
   }
-  return { title: obj.title };
 }
 
 // Parse JSON to extract update data
 // Expected format: {"title": "new title", "completed": true}
 export function parseTodoUpdate(json: string): TodoUpdateInput | undefined {
-  const obj = JSON.parse<TodoUpdateInput>(json);
-  if (typeof obj.title !== "string" || typeof obj.completed !== "boolean") {
+  try {
+    const obj = JSON.parse(json) as { title?: unknown; completed?: unknown };
+    if (typeof obj.title !== "string" || typeof obj.completed !== "boolean") {
+      return undefined;
+    }
+    return {
+      title: obj.title,
+      completed: obj.completed
+    };
+  } catch {
     return undefined;
   }
-  return {
-    title: obj.title,
-    completed: obj.completed
-  };
 }
 
 // Create error response JSON

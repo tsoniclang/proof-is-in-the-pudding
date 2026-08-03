@@ -1,13 +1,8 @@
-import { int } from "@tsonic/core/types.js";
+import { int } from "@tsonic/csharp/types.js";
 import { DateTime } from "@tsonic/dotnet/System.js";
 import { List } from "@tsonic/dotnet/System.Collections.Generic.js";
 
-export interface PostCreateInput {
-  title: string;
-  content: string;
-}
-
-export interface PostUpdateInput {
+export interface PostInput {
   title: string;
   content: string;
 }
@@ -44,4 +39,3 @@ export interface CommentDto {
 export interface PostDetailDto extends PostDto {
   comments: List<CommentDto>;
 }
-

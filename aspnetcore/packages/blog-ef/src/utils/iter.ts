@@ -1,4 +1,4 @@
-import { int } from "@tsonic/core/types.js";
+import { int } from "@tsonic/csharp/types.js";
 
 export function* range(start: int, count: int): Generator<int> {
   for (let i = 0; i < count; i++) {

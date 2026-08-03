@@ -1,5 +1,5 @@
 // Todo data model
-import { int } from "@tsonic/core/types.js";
+import { int } from "@tsonic/csharp/types.js";
 
 export interface Todo {
   id: int;

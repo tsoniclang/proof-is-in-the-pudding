@@ -10,7 +10,7 @@ Full-featured blog demo using:
 ```bash
 npm install
 npm run build
-./out/app
+dotnet run --project out/csharp/ProofAspNetCoreBlogEf.csproj --no-build
 ```
 
 Then open `http://localhost:8091/` or use the JSON API:
@@ -22,4 +22,3 @@ Then open `http://localhost:8091/` or use the JSON API:
 - `DELETE /api/posts/{id}`
 - `GET /api/posts/{id}/comments`
 - `POST /api/posts/{id}/comments`
-

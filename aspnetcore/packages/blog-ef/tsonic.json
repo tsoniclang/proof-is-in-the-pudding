@@ -1,18 +1,17 @@
 {
   "$schema": "https://tsonic.org/schema/v1.json",
-  "rootNamespace": "AspNetCoreBlogEf",
-  "entryPoint": "src/App.ts",
-  "sourceRoot": "src",
-  "outputDirectory": "generated",
-  "outputName": "app",
-  "optimize": "speed",
-  "output": {
-    "nativeAot": false,
-    "trimmed": false,
-    "singleFile": false
-  },
-  "buildOptions": {
-    "stripSymbols": true,
-    "invariantGlobalization": true
-  }
+  "entryPoint": "App.ts",
+  "rootDir": "src",
+  "outDir": "out",
+  "targets": [{
+    "id": "csharp",
+    "options": {
+      "namespace": "Proof.AspNetCore.BlogEf",
+      "assemblyName": "ProofAspNetCoreBlogEf",
+      "outputType": "Exe",
+      "references": {
+        "frameworks": ["Microsoft.AspNetCore.App"]
+      }
+    }
+  }]
 }

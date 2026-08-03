@@ -10,9 +10,9 @@ import { Console, Int32 } from "@tsonic/dotnet/System.js";
 import { HttpListener, HttpListenerContext, HttpListenerRequest, HttpListenerResponse } from "@tsonic/dotnet/System.Net.js";
 import { StreamReader, StreamWriter } from "@tsonic/dotnet/System.IO.js";
 import { Encoding } from "@tsonic/dotnet/System.Text.js";
-import type { int } from "@tsonic/core/types.js";
-import * as TodoStore from "./TodoStore.ts";
-import { serializeTodo, serializeTodos, serializeError, parseTodoCreate, parseTodoUpdate } from "./JsonHelpers.ts";
+import type { int } from "@tsonic/csharp/types.js";
+import * as TodoStore from "./TodoStore.js";
+import { serializeTodo, serializeTodos, serializeError, parseTodoCreate, parseTodoUpdate } from "./JsonHelpers.js";
 
 // Extract ID from URL path like "/todos/123"
 function extractIdFromPath(path: string): int | undefined {
@@ -26,7 +26,7 @@ function extractIdFromPath(path: string): int | undefined {
   if (idStr !== "") {
     try {
       return Int32.Parse(idStr);
-    } catch (_err) {
+    } catch {
       return undefined;
     }
   }
@@ -191,3 +191,5 @@ export function main(): void {
     handleRequest(context);
   }
 }
+
+main();

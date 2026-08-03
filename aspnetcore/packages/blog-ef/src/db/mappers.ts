@@ -1,5 +1,5 @@
-import type { CommentEntity, PostEntity } from "./entities.ts";
-import type { CommentDto, PostDto } from "./dtos.ts";
+import type { CommentEntity, PostEntity } from "./entities.js";
+import type { CommentDto, PostDto } from "./dtos.js";
 
 export const toPostDto = (p: PostEntity): PostDto => ({
   id: p.Id,
@@ -16,4 +16,3 @@ export const toCommentDto = (c: CommentEntity): CommentDto => ({
   body: c.Body,
   createdAt: c.CreatedAt,
 });
-

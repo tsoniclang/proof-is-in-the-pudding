@@ -33,3 +33,5 @@ export function main(): void {
   const largeN = 40;
   console.log(`  fib(${largeN}) = ${fibonacciIterative(largeN)}`);
 }
+
+main();

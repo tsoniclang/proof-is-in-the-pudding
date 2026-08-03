@@ -1,13 +1,14 @@
 {
   "$schema": "https://tsonic.org/schema/v1.json",
-  "rootNamespace": "MyApp",
-  "entryPoint": "src/App.ts",
-  "sourceRoot": "src",
-  "outputDirectory": "generated",
-  "outputName": "app",
-  "optimize": "speed",
-  "buildOptions": {
-    "stripSymbols": true,
-    "invariantGlobalization": true
-  }
+  "entryPoint": "App.ts",
+  "rootDir": "src",
+  "outDir": "out",
+  "targets": [{
+    "id": "csharp",
+    "options": {
+      "namespace": "Proof.Bcl.Multithreading",
+      "assemblyName": "ProofBclMultithreading",
+      "outputType": "Exe"
+    }
+  }]
 }

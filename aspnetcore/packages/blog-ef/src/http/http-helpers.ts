@@ -1,13 +1,13 @@
-import { int } from "@tsonic/core/types.js";
+import { int } from "@tsonic/csharp/types.js";
 import { Int32 } from "@tsonic/dotnet/System.js";
 import { StreamReader } from "@tsonic/dotnet/System.IO.js";
 import { Encoding } from "@tsonic/dotnet/System.Text.js";
 import { JsonSerializer } from "@tsonic/dotnet/System.Text.Json.js";
 import { Task } from "@tsonic/dotnet/System.Threading.Tasks.js";
 
-import { HttpContext, HttpResponse, HttpResponseWritingExtensions } from "@tsonic/aspnetcore/Microsoft.AspNetCore.Http.js";
+import { HttpContext, HttpResponse, HttpResponseWritingExtensions } from "@tsonic/dotnet/Microsoft.AspNetCore.Http.js";
 
-import type { ErrorResponse } from "../db/dtos.ts";
+import type { ErrorResponse } from "../db/dtos.js";
 
 export const serializeError = (message: string): string =>
   JsonSerializer.Serialize<ErrorResponse>({ error: message });

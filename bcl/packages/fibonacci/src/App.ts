@@ -1,5 +1,5 @@
 import { Console } from "@tsonic/dotnet/System.js";
-import { int } from "@tsonic/core/types.js";
+import { int } from "@tsonic/csharp/types.js";
 
 function fibonacci(n: int): int {
   if (n <= 1) {
@@ -36,3 +36,5 @@ export function main(): void {
   const largeN: int = 40;
   Console.WriteLine(`  fib(${largeN}) = ${fibonacciIterative(largeN)}`);
 }
+
+main();

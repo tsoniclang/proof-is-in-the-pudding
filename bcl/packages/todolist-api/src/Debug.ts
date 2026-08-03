@@ -2,7 +2,7 @@
 import { Console } from "@tsonic/dotnet/System.js";
 import { List } from "@tsonic/dotnet/System.Collections.Generic.js";
 import { HttpListener } from "@tsonic/dotnet/System.Net.js";
-import { int } from "@tsonic/core/types.js";
+import { int } from "@tsonic/csharp/types.js";
 
 export function main(): void {
   // Case 1: Direct instantiation - this works

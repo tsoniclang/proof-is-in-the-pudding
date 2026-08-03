@@ -1,25 +1,27 @@
 import { DateTime } from "@tsonic/dotnet/System.js";
 import { JsonSerializer } from "@tsonic/dotnet/System.Text.Json.js";
 import { List } from "@tsonic/dotnet/System.Collections.Generic.js";
-import { Enumerable, Queryable } from "@tsonic/dotnet/System.Linq.js";
+import { Queryable } from "@tsonic/dotnet/System.Linq.js";
 import { Task, TaskExtensions } from "@tsonic/dotnet/System.Threading.Tasks.js";
+import { EntityFrameworkQueryableExtensions } from "@tsonic/efcore/Microsoft.EntityFrameworkCore.js";
 
-import { HttpContext } from "@tsonic/aspnetcore/Microsoft.AspNetCore.Http.js";
+import { HttpContext } from "@tsonic/dotnet/Microsoft.AspNetCore.Http.js";
 
-import type { CommentDto, PostCreateInput, PostDetailDto, PostDto, PostUpdateInput } from "../db/dtos.ts";
-import type { CommentEntity, PostEntity } from "../db/entities.ts";
-import { BlogDbContext } from "../db/context.ts";
-import { DB_OPTIONS } from "../db/options.ts";
-import { toCommentDto, toPostDto } from "../db/mappers.ts";
-import { parsePostIdRequired, readRequestBodyAsync, serializeError, unwrapInt, writeJson } from "../http/http-helpers.ts";
+import type { CommentDto, PostDetailDto, PostDto } from "../db/dtos.js";
+import { PostEntity } from "../db/entities.js";
+import type { CommentEntity } from "../db/entities.js";
+import { BlogDbContext } from "../db/context.js";
+import { DB_OPTIONS } from "../db/options.js";
+import { toCommentDto, toPostDto } from "../db/mappers.js";
+import { parsePostIdRequired, readRequestBodyAsync, serializeError, unwrapInt, writeJson } from "../http/http-helpers.js";
+import { parsePostInput } from "../http/json-input.js";
 
 export const handleListPosts = (ctx: HttpContext): Task => {
   let payload = "";
   const db = new BlogDbContext(DB_OPTIONS);
   try {
     const query = Queryable.OrderByDescending(db.posts.AsQueryable(), (p) => p.CreatedAt);
-    const list = Enumerable.ToList(query);
-    const posts = list.ToArray();
+    const posts = EntityFrameworkQueryableExtensions.ToArrayAsync(query).Result;
 
     const result = new List<PostDto>();
     for (let i = 0; i < posts.Length; i++) {
@@ -50,7 +52,7 @@ export const handleGetPost = (ctx: HttpContext): Task => {
         (c: CommentEntity): DateTime => c.CreatedAt
       );
       const commentsForPost = Queryable.Where(commentsQuery, (c: CommentEntity) => c.PostId === postId);
-      const comments = Enumerable.ToList(commentsForPost).ToArray();
+      const comments = EntityFrameworkQueryableExtensions.ToArrayAsync(commentsForPost).Result;
 
       const commentDtos = new List<CommentDto>();
       for (let i = 0; i < comments.Length; i++) {
@@ -82,7 +84,7 @@ export const handleGetPost = (ctx: HttpContext): Task => {
 export const handleCreatePost = (ctx: HttpContext): Task =>
   TaskExtensions.Unwrap(
     readRequestBodyAsync(ctx).ContinueWith<Task>((t: Task<string>, _state) => {
-      const input = JsonSerializer.Deserialize<PostCreateInput>(t.Result);
+      const input = parsePostInput(t.Result);
       if (input === undefined || typeof input.title !== "string" || typeof input.content !== "string") {
         return writeJson(
           ctx.Response,
@@ -95,13 +97,11 @@ export const handleCreatePost = (ctx: HttpContext): Task =>
       const db = new BlogDbContext(DB_OPTIONS);
       try {
         const now = DateTime.UtcNow;
-        const post: PostEntity = {
-          Id: 0,
-          Title: input.title,
-          Content: input.content,
-          CreatedAt: now,
-          UpdatedAt: now,
-        };
+        const post = new PostEntity();
+        post.Title = input.title;
+        post.Content = input.content;
+        post.CreatedAt = now;
+        post.UpdatedAt = now;
         db.posts.Add(post);
         db.SaveChanges();
         payload = JsonSerializer.Serialize<PostDto>(toPostDto(post));
@@ -122,7 +122,7 @@ export const handleUpdatePost = (ctx: HttpContext): Task => {
 
   return TaskExtensions.Unwrap(
     readRequestBodyAsync(ctx).ContinueWith<Task>((t: Task<string>, _state) => {
-      const input = JsonSerializer.Deserialize<PostUpdateInput>(t.Result);
+      const input = parsePostInput(t.Result);
       if (input === undefined || typeof input.title !== "string" || typeof input.content !== "string") {
         return writeJson(
           ctx.Response,

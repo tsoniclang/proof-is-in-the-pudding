@@ -3,16 +3,13 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "typecheck": "tsonic generate",
-    "build": "tsonic build",
-    "generate": "tsonic generate",
-    "dev": "tsonic run"
+    "typecheck": "tsonic build --project tsonic.json",
+    "build": "tsonic build --project tsonic.json"
   },
   "devDependencies": {
-    "@tsonic/core": "10.0.41",
-    "@tsonic/dotnet": "10.0.41",
-    "@tsonic/globals": "10.0.42",
-    "tsonic": "0.0.76",
-    "typescript": "^5.0.0"
+    "@tsonic/cli": "0.0.1",
+    "@tsonic/target-csharp": "0.0.1",
+    "@tsonic/csharp-runtime": "0.0.1",
+    "@tsonic/csharp-js": "0.0.1"
   }
 }

@@ -12,15 +12,15 @@ import {
   type IncomingMessage,
   type ServerResponse,
 } from "node:http";
-import type { int } from "@tsonic/core/types.js";
-import * as TodoStore from "./TodoStore.ts";
+import type { int } from "@tsonic/csharp/types.js";
+import * as TodoStore from "./TodoStore.js";
 import {
   parseTodoCreate,
   parseTodoUpdate,
   serializeError,
   serializeTodo,
   serializeTodos,
-} from "./JsonHelpers.ts";
+} from "./JsonHelpers.js";
 
 function getRequestPath(requestUrl: string | null | undefined): string {
   const raw = requestUrl ?? "/";
@@ -45,7 +45,7 @@ function extractIdFromPath(pathname: string): number | undefined {
   }
 
   const parsed = parseInt(idText, 10);
-  if (parsed === undefined || Number.isNaN(parsed)) {
+  if (Number.isNaN(parsed)) {
     return undefined;
   }
 
@@ -194,3 +194,5 @@ export function main(): void {
 
   setInterval(() => {}, 60000);
 }
+
+main();

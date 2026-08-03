@@ -1,4 +1,4 @@
-import type { Note, NoteCreateInput, NoteUpdateInput } from "./Models.ts";
+import type { Note, NoteCreateInput, NoteUpdateInput } from "./Models.js";
 
 const notes: Note[] = [];
 let nextId = 1;
