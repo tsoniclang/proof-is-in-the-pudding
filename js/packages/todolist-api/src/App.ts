@@ -183,15 +183,24 @@ async function handleRequest(
   sendJsonResponse(response, 405, serializeError("Method not allowed"));
 }
 
+async function handleRequestSafely(
+  request: IncomingMessage,
+  response: ServerResponse
+): Promise<void> {
+  try {
+    await handleRequest(request, response);
+  } catch {
+    console.error("Unhandled request error");
+    sendJsonResponse(response, 500, serializeError("Internal server error"));
+  }
+}
+
 export function main(): void {
   TodoStore.initSampleData();
   const port = readPort(8080);
 
   const server = createServer((request: IncomingMessage, response: ServerResponse) => {
-    handleRequest(request, response).catch((error: unknown) => {
-      console.error(error);
-      sendJsonResponse(response, 500, serializeError("Internal server error"));
-    });
+    void handleRequestSafely(request, response);
   });
 
   server.listen(port, () => {

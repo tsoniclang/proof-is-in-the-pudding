@@ -309,15 +309,24 @@ async function handleRequest(request: IncomingMessage, response: ServerResponse)
   sendTextResponse(response, 404, "text/plain; charset=utf-8", "Not found");
 }
 
+async function handleRequestSafely(
+  request: IncomingMessage,
+  response: ServerResponse
+): Promise<void> {
+  try {
+    await handleRequest(request, response);
+  } catch {
+    console.error("Unhandled request error");
+    sendJsonResponse(response, 500, serializeError("Internal server error"));
+  }
+}
+
 export function main(): void {
   NotesStore.seed();
   const port = readPort(8081);
 
   const server = createServer((request: IncomingMessage, response: ServerResponse) => {
-    handleRequest(request, response).catch((error: unknown) => {
-      console.error(error);
-      sendJsonResponse(response, 500, serializeError("Internal server error"));
-    });
+    void handleRequestSafely(request, response);
   });
 
   server.listen(port, () => {

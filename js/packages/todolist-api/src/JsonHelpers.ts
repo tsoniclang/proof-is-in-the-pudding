@@ -1,5 +1,4 @@
-// JSON serialization helpers for Todo API
-// Uses standard JS JSON.parse/stringify with runtime shape checks
+import { JsonSerializer } from "@tsonic/dotnet/System.Text.Json.js";
 import type { Todo } from "./Todo.js";
 
 // Named types for JSON parsing/serialization (exported for C# accessibility)
@@ -30,11 +29,7 @@ export function serializeTodos(todos: Todo[]): string {
 // Expected format: {"title": "some title"}
 export function parseTodoCreate(json: string): TodoCreateInput | undefined {
   try {
-    const obj = JSON.parse(json) as { title?: unknown };
-    if (typeof obj.title !== "string") {
-      return undefined;
-    }
-    return { title: obj.title };
+    return JsonSerializer.Deserialize<TodoCreateInput>(json);
   } catch {
     return undefined;
   }
@@ -44,14 +39,7 @@ export function parseTodoCreate(json: string): TodoCreateInput | undefined {
 // Expected format: {"title": "new title", "completed": true}
 export function parseTodoUpdate(json: string): TodoUpdateInput | undefined {
   try {
-    const obj = JSON.parse(json) as { title?: unknown; completed?: unknown };
-    if (typeof obj.title !== "string" || typeof obj.completed !== "boolean") {
-      return undefined;
-    }
-    return {
-      title: obj.title,
-      completed: obj.completed
-    };
+    return JsonSerializer.Deserialize<TodoUpdateInput>(json);
   } catch {
     return undefined;
   }
