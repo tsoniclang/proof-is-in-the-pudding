@@ -98,6 +98,14 @@ export const projectSpecs = Object.freeze([
 export const workerLimit = positiveInteger(process.env.PROOF_JOBS, Math.min(8, availableParallelism()));
 export const memoryBudgetMiB = positiveInteger(process.env.PROOF_MEMORY_MIB, 11_264);
 
+export const dotnetIsolationEnvironment = Object.freeze({
+  DOTNET_CLI_TELEMETRY_OPTOUT: "1",
+  DOTNET_CLI_USE_MSBUILD_SERVER: "0",
+  DOTNET_NOLOGO: "1",
+  MSBUILDDISABLENODEREUSE: "1",
+  UseSharedCompilation: "false",
+});
+
 function workspace(path, needsNodeCapability, buildScript = "npm -ws --if-present run build") {
   return Object.freeze({ path, needsNodeCapability, buildScript });
 }

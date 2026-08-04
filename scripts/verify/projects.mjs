@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { constants } from "node:fs";
 import { access, mkdir, readFile, readdir, stat } from "node:fs/promises";
 import { resolve } from "node:path";
+import { dotnetIsolationEnvironment } from "./config.mjs";
 import { assertFiniteOutput, probeServer, serverEnvironment } from "./probes.mjs";
 import { runCommand, startServer } from "./runner.mjs";
 
@@ -19,8 +20,7 @@ const bannedGeneratedRuntimeSemantics = [
 export async function executeProject(context, task, project, serverPorts) {
   const projectDirectory = resolve(context.stageRoot, project.path);
   const commonEnvironment = {
-    DOTNET_CLI_TELEMETRY_OPTOUT: "1",
-    DOTNET_NOLOGO: "1",
+    ...dotnetIsolationEnvironment,
     LANG: "C.UTF-8",
     LC_ALL: "C.UTF-8",
     NUGET_PACKAGES: context.nugetPackages,

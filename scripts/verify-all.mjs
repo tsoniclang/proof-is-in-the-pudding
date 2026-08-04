@@ -19,6 +19,7 @@ import { allocateServerPorts } from "./verify/probes.mjs";
 import {
   cleanupTransientUnits,
   createRunContext,
+  recoverOrphanedProofUnits,
   recordEvidence,
   runLoggedTask,
   runTaskGraph,
@@ -27,6 +28,7 @@ import {
 } from "./verify/runner.mjs";
 
 const context = await createRunContext(repoRoot, workerLimit, memoryBudgetMiB);
+recoverOrphanedProofUnits(context);
 const progressTimer = startProgressTimer(context);
 let signalHandling = false;
 let fatalError;

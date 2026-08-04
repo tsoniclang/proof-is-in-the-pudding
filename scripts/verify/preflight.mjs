@@ -5,6 +5,7 @@ import { createReadStream } from "node:fs";
 import { cp, lstat, mkdir, readFile, readdir, realpath } from "node:fs/promises";
 import { relative, resolve } from "node:path";
 import {
+  dotnetIsolationEnvironment,
   localRepositories,
   packageSpecs,
   projectSpecs,
@@ -150,7 +151,10 @@ export async function verifyRepositoryInputs(context) {
 }
 
 export async function buildPrerequisites(context) {
-  const commonEnvironment = { NUGET_PACKAGES: context.nugetPackages };
+  const commonEnvironment = {
+    ...dotnetIsolationEnvironment,
+    NUGET_PACKAGES: context.nugetPackages,
+  };
   const steps = [
     {
       id: "build-tsonic",

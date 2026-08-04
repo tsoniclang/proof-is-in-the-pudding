@@ -5,6 +5,7 @@ import { resolve } from "node:path";
 
 const commandOutputLimit = 64 * 1024 * 1024;
 const metricPrefix = "PROOF_TIME|";
+const unitPrefix = "proof-pudding-";
 
 export async function createRunContext(repoRoot, workerLimit, memoryBudgetMiB) {
   const stamp = new Date().toISOString().replaceAll(/[:.]/gu, "-");
@@ -53,6 +54,23 @@ export function startProgressTimer(context) {
   }, 180_000);
   timer.unref();
   return timer;
+}
+
+export function recoverOrphanedProofUnits(context) {
+  for (const unit of listProofUnits()) {
+    const ownerPid = proofUnitOwnerPid(unit);
+    if (ownerPid !== process.pid) {
+      assert.equal(
+        processExists(ownerPid),
+        false,
+        `Another Proof Pudding verifier owns active unit ${unit}.`,
+      );
+    }
+    stopUnit(unit);
+    resetUnit(unit);
+    recordEvidence(context, `RECOVERED_ORPHAN_UNIT ${unit}`);
+  }
+  assert.deepEqual(listProofUnits(), [], "Orphaned Proof Pudding units survived recovery.");
 }
 
 export async function runLoggedTask(context, id, action) {
@@ -241,6 +259,16 @@ export async function runTaskGraph(context, items, execute) {
 export async function cleanupTransientUnits(context) {
   for (const unit of [...context.activeUnits]) stopUnit(unit);
   context.activeUnits.clear();
+  for (const unit of listProofUnits()) {
+    if (proofUnitOwnerPid(unit) !== process.pid) continue;
+    stopUnit(unit);
+    resetUnit(unit);
+  }
+  assert.deepEqual(
+    listProofUnits().filter((unit) => proofUnitOwnerPid(unit) === process.pid),
+    [],
+    "Current-run Proof Pudding units survived cleanup.",
+  );
 }
 
 export async function writeConsolidatedReport(context, expectedProjectCount) {
@@ -393,7 +421,7 @@ function parseMetrics(stderr) {
 
 function nextUnitName(context, id) {
   context.commandSequence += 1;
-  return `proof-pudding-${process.pid}-${context.commandSequence}-${safeName(id)}`.slice(0, 80);
+  return `${unitPrefix}${process.pid}-${context.commandSequence}-${safeName(id)}`.slice(0, 80);
 }
 
 function safeName(value) {
@@ -406,6 +434,38 @@ function stopUnit(unit) {
 
 function resetUnit(unit) {
   spawnSync("systemctl", ["--user", "reset-failed", `${unit}.scope`], { encoding: "utf8" });
+}
+
+function listProofUnits() {
+  const result = spawnSync(
+    "systemctl",
+    ["--user", "list-units", "--all", "--no-legend", "--plain", `${unitPrefix}*.scope`],
+    { encoding: "utf8" },
+  );
+  assert.equal(result.status, 0, `Unable to inventory Proof Pudding units: ${result.stderr}`);
+  return result.stdout
+    .split(/\r?\n/u)
+    .map((line) => line.trim().split(/\s+/u)[0])
+    .filter((unit) => unit?.endsWith(".scope"))
+    .map((unit) => unit.slice(0, -".scope".length))
+    .sort();
+}
+
+function proofUnitOwnerPid(unit) {
+  const match = /^proof-pudding-([1-9][0-9]*)-/u.exec(unit);
+  assert.notEqual(match, null, `Proof Pudding unit has no owner PID: ${unit}.`);
+  return Number.parseInt(match[1], 10);
+}
+
+function processExists(pid) {
+  try {
+    process.kill(pid, 0);
+    return true;
+  } catch (error) {
+    if (error?.code === "ESRCH") return false;
+    if (error?.code === "EPERM") return true;
+    throw error;
+  }
 }
 
 function readUnitMetrics(unit, started) {
