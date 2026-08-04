@@ -1,4 +1,4 @@
-# My Tsonic Project
+# JavaScript Concurrency Proof
 
 This is a sample Tsonic project that demonstrates .NET interop.
 

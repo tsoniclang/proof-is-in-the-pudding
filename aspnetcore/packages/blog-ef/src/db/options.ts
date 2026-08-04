@@ -1,8 +1,10 @@
 import { Environment } from "@tsonic/dotnet/System.js";
 
-import { DbContextOptions, DbContextOptionsBuilder } from "@tsonic/efcore/Microsoft.EntityFrameworkCore.js";
-import "@tsonic/efcore/Microsoft.EntityFrameworkCore.Infrastructure.js";
-import { SqliteDbContextOptionsBuilderExtensions } from "@tsonic/efcore-sqlite/Microsoft.EntityFrameworkCore.js";
+import {
+  DbContextOptionsBuilder,
+  SqliteDbContextOptionsBuilderExtensions,
+  type DbContextOptions,
+} from "@tsonic/dotnet/Microsoft.EntityFrameworkCore.js";
 
 export const DB_PATH = Environment.GetEnvironmentVariable("TS_PUDDING_DB") ?? "app.db";
 

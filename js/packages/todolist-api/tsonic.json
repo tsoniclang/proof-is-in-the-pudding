@@ -6,11 +6,10 @@
   "targets": [{
     "id": "csharp",
     "surfaces": ["js"],
-    "options": {
-      "namespace": "Proof.Js.TodoList",
-      "assemblyName": "ProofJsTodoList",
-      "outputType": "Exe",
-      "typescriptCompatibility": "compat"
-    }
+      "options": {
+        "namespace": "Proof.Js.TodoList",
+        "assemblyName": "ProofJsTodoList",
+        "outputType": "Exe"
+      }
   }]
 }

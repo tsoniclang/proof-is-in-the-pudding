@@ -1,6 +1,6 @@
-import { int } from "@tsonic/csharp/types.js";
-import { DateTime } from "@tsonic/dotnet/System.js";
-import { List } from "@tsonic/dotnet/System.Collections.Generic.js";
+import type { int } from "@tsonic/csharp/types.js";
+import type { DateTime } from "@tsonic/dotnet/System.js";
+import type { List } from "@tsonic/dotnet/System.Collections.Generic.js";
 
 export interface PostInput {
   title: string;

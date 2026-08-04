@@ -3,6 +3,8 @@ import {
   type IncomingMessage,
   type ServerResponse,
 } from "node:http";
+import { env } from "node:process";
+import { InvalidOperationException } from "@tsonic/dotnet/System.js";
 import type { int } from "@tsonic/csharp/types.js";
 import * as NotesStore from "./NotesStore.js";
 import {
@@ -48,7 +50,7 @@ const INDEX_HTML = `<!doctype html>
   <body>
     <header>
       <h1>Tsonic Notes</h1>
-      <span class="muted">HTML + JSON API, compiled TS → C# → NativeAOT</span>
+      <span class="muted">HTML + JSON API, compiled from TypeScript to C#</span>
     </header>
 
     <section class="card">
@@ -170,7 +172,12 @@ async function readRequestBody(request: IncomingMessage): Promise<string> {
 
 function extractNoteIdFromPath(pathname: string): number | undefined {
   const parts = pathname.split("/");
-  if (parts.length < 4) {
+  if (
+    parts.length !== 4 ||
+    parts[0] !== "" ||
+    parts[1] !== "api" ||
+    parts[2] !== "notes"
+  ) {
     return undefined;
   }
 
@@ -179,12 +186,22 @@ function extractNoteIdFromPath(pathname: string): number | undefined {
     return undefined;
   }
 
-  const parsed = parseInt(idText, 10);
-  if (Number.isNaN(parsed)) {
+  const parsed = Number(idText);
+  if (!Number.isInteger(parsed) || parsed < 0) {
     return undefined;
   }
 
   return parsed;
+}
+
+function readPort(defaultPort: number): number {
+  const configured = env["PROOF_PORT"];
+  if (configured === undefined) return defaultPort;
+  const port = Number(configured);
+  if (!Number.isInteger(port) || port < 1 || port > 65535) {
+    throw new InvalidOperationException("PROOF_PORT must be an integer from 1 through 65535.");
+  }
+  return port;
 }
 
 async function handleApi(request: IncomingMessage, response: ServerResponse): Promise<void> {
@@ -294,21 +311,24 @@ async function handleRequest(request: IncomingMessage, response: ServerResponse)
 
 export function main(): void {
   NotesStore.seed();
+  const port = readPort(8081);
 
   const server = createServer((request: IncomingMessage, response: ServerResponse) => {
-    void handleRequest(request, response);
+    handleRequest(request, response).catch((error: unknown) => {
+      console.error(error);
+      sendJsonResponse(response, 500, serializeError("Internal server error"));
+    });
   });
 
-  server.listen(8081, () => {
+  server.listen(port, () => {
     console.log("");
     console.log("=================================");
     console.log("  Notes WebApp (JS surface + node:http)");
-    console.log("  http://localhost:8081");
+    console.log(`  http://localhost:${port}`);
     console.log("=================================");
     console.log("");
   });
 
-  setInterval(() => {}, 60000);
 }
 
 main();

@@ -2,7 +2,7 @@
 // Uses idiomatic System.Text.Json.JsonSerializer
 import { JsonDocument, JsonException, JsonSerializer, JsonValueKind } from "@tsonic/dotnet/System.Text.Json.js";
 import { List } from "@tsonic/dotnet/System.Collections.Generic.js";
-import { Todo } from "./Todo.js";
+import type { Todo } from "./Todo.js";
 
 // Named types for JSON parsing (exported for C# type generation)
 export interface TodoCreateInput {

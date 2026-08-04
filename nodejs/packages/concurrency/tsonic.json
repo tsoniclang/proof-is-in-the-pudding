@@ -7,8 +7,8 @@
     "id": "csharp",
     "surfaces": ["js"],
     "options": {
-      "namespace": "Proof.Js.Multithreading",
-      "assemblyName": "ProofJsMultithreading",
+        "namespace": "Proof.Node.Concurrency",
+        "assemblyName": "ProofNodeConcurrency",
       "outputType": "Exe"
     }
   }]

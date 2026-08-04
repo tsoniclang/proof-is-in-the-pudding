@@ -1,6 +1,6 @@
 // JSON serialization helpers for Todo API
 // Uses standard JS JSON.parse/stringify with runtime shape checks
-import { Todo } from "./Todo.js";
+import type { Todo } from "./Todo.js";
 
 // Named types for JSON parsing/serialization (exported for C# accessibility)
 export interface TodoCreateInput {
