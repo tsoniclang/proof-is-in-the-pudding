@@ -1,147 +1,131 @@
-# proof-is-in-the-pudding
+# Proof Is in the Pudding
 
-Example projects demonstrating Tsonic compiler capabilities.
+This repository is the executable downstream proof for Tsonic’s C# target. Every project is real TypeScript input, is checked through the selected source contract, emits C#, builds with the .NET SDK, and either runs to an exact finite result or passes an HTTP behavior contract.
 
-## Structure
+## Source Contracts
 
-This repository groups example projects by which bindings packages they opt into:
+Pure C# projects use the target’s default C#/.NET source profile:
 
-- `bcl/` - Baseline .NET BCL examples (`@tsonic/dotnet`, `@tsonic/core`, `@tsonic/globals`)
-- `js/` - Examples using the JS source package via `@tsonic/csharp-js`
-- `nodejs/` - Examples using the JS surface plus the `@tsonic/csharp-nodejs` package
-- `aspnetcore/` - Examples using ASP.NET Core via `@tsonic/aspnetcore`
-- `workspaces/` - Examples showing npm workspaces and multi-assembly repos
-
-All examples compile through Tsonic into .NET outputs. `@tsonic/csharp-js` is the
-ambient JS surface, and `@tsonic/csharp-nodejs` is a regular package that contributes
-`node:*` module bindings.
-
-## Import Syntax
-
-All imports must use the `.js` extension per ESM conventions:
-
-```typescript
-// .NET imports
+```ts
 import { Console } from "@tsonic/dotnet/System.js";
 import { List } from "@tsonic/dotnet/System.Collections.Generic.js";
+import type { int } from "@tsonic/csharp/types.js";
 
-// C# target aliases
-import { int, long } from "@tsonic/csharp/types.js";
-
-// JS surface globals
-console.log("hello");
-
-// Node.js APIs
-import * as fs from "node:fs";
-
-// Local imports
-import { MyModule } from "./MyModule.js";
+const values = new List<int>();
+values.Add(42);
+Console.WriteLine(values.Count);
 ```
 
-## Examples
+`@tsonic/dotnet/*`, `@tsonic/csharp/types.js`, and `@tsonic/core/lang.js` are compiler-owned virtual source modules. They are not npm dependencies.
 
-### hello-world
+Projects that intentionally use JavaScript source APIs select the `js` surface in `tsonic.json`:
 
-Basic "Hello World" example.
-
-- [bcl/hello-world](./bcl/hello-world) - Uses `Console.WriteLine` from `@tsonic/dotnet/System.js`
-- [js/hello-world](./js/hello-world) - Uses standard `console.log`
-
-### calculator
-
-Simple calculator with add, subtract, multiply, divide operations.
-
-- [bcl/calculator](./bcl/calculator)
-- [js/calculator](./js/calculator)
-
-### fibonacci
-
-Fibonacci sequence with recursive and iterative implementations.
-
-- [bcl/fibonacci](./bcl/fibonacci) - Uses `int` type from `@tsonic/csharp`
-- [js/fibonacci](./js/fibonacci)
-
-### multithreading
-
-Parallel computation using `System.Threading.Tasks.Parallel`.
-
-- [bcl/multithreading](./bcl/multithreading)
-- [js/multithreading](./js/multithreading)
-- [nodejs/multithreading](./nodejs/multithreading)
-
-### todolist-api
-
-REST API server using `System.Net.HttpListener`.
-
-- [bcl/todolist-api](./bcl/todolist-api) - Full CRUD API with typed JSON parsing
-- [js/todolist-api](./js/todolist-api) - Same API using `@tsonic/csharp-js` helpers
-
-### high-performance
-
-High-performance examples using `Span<T>`, `ReadOnlySpan<T>`, and `Memory<T>`.
-
-- [bcl/high-performance](./bcl/high-performance)
-
-### aspnetcore-blog
-
-Simple ASP.NET Core blog app.
-
-- [aspnetcore/blog](./aspnetcore/blog)
-- [aspnetcore/blog-ef](./aspnetcore/blog-ef) - EF Core + SQLite backend
-
-### Node.js Examples
-
-- [nodejs/webserver](./nodejs/webserver) - HTTP server using `node:http`
-- [nodejs/file-reader](./nodejs/file-reader) - File system operations using `node:fs`
-- [nodejs/env-info](./nodejs/env-info) - Environment information using Node.js APIs
-
-## Building
-
-Important: install dependencies **only at the workspace root** (e.g. `bcl/`, `js/`, `aspnetcore/`), not inside individual packages under `packages/*`.
-
-Accidentally running `npm install` inside a workspace package can create nested `node_modules/` trees (multiple copies of `@tsonic/*` types), which can break TypeScript type identity and cause confusing errors.
-
-Each example can be built individually:
-
-```bash
-cd bcl/hello-world  # or js/hello-world, nodejs/webserver, aspnetcore/blog
-npx tsonic build src/App.ts
+```json
+{
+  "targets": [{
+    "id": "csharp",
+    "surfaces": ["js"]
+  }]
+}
 ```
 
-Or run the compiled binary:
-
-```bash
-./out/app
+```ts
+const parts = "/todos/42".split("/");
+console.log(parts.length);
 ```
 
-## Full verifier
+Node is a capability package, not a source surface. A project importing `node:*` declares `@tsonic/csharp-nodejs` directly:
 
-Run the repository verifier from the repo root:
+```ts
+import { readFile } from "node:fs/promises";
+```
 
-```bash
+Installing the Node capability does not select JavaScript globals. `nodejs/packages/env-info` proves this by using `node:path` and `node:process` under the pure C# source profile while printing through `System.Console`.
+
+## npm Ownership
+
+Each workspace is installed once at its workspace root. Each project directly declares only:
+
+- `@tsonic/cli`;
+- `@tsonic/target-csharp`;
+- `@tsonic/csharp-nodejs` when that project imports `node:*`.
+
+The C# target owns its runtime dependencies transitively. There are no direct proof dependencies on `@tsonic/csharp-runtime`, `@tsonic/csharp-js`, generated binding packages, or retired EF packages.
+
+## Project Inventory
+
+| Group | Proofs |
+| --- | --- |
+| `bcl` | Hello World, calculator, Fibonacci, `Span<T>`/`Memory<T>`, CLR parallel execution, `HttpListener` todo API |
+| `js` | Hello World, calculator, Fibonacci, Promise-based concurrency, notes API, todo API |
+| `nodejs` | Pure-C# Node isolation, file I/O, Promise-based Node concurrency, HTTP server |
+| `aspnetcore` | Minimal API blog and EF Core/SQLite blog using dynamic `@tsonic/dotnet/*` provider declarations |
+| `workspaces` | Scoped and unscoped source-package consumption, each with a library and executable |
+
+The inventory contains 22 `tsonic.json` projects. `node scripts/check-architecture.mjs` derives that count from the filesystem and fails if a project is missing from the verifier model.
+
+## Building One Workspace
+
+Install from a workspace root, never from a child under `packages/*`:
+
+```sh
+cd bcl
+npm install
+npm run build
+```
+
+For a generated target project:
+
+```sh
+dotnet run --project packages/calculator/out/csharp/ProofBclCalculator.csproj
+```
+
+## User-Owned .NET Projects
+
+Advanced .NET configuration stays in user-owned `.csproj` files:
+
+- `bcl/packages/hello-world/ProofBclHelloWorld.csproj` owns NativeAOT publication;
+- `aspnetcore/packages/blog/ProofAspNetCoreBlog.csproj` owns the ASP.NET framework reference;
+- `aspnetcore/packages/blog-ef/ProofAspNetCoreBlogEf.csproj` owns NuGet versions, the NuGet lock, framework references, and the deterministic package-reference set used by provider reflection.
+
+Tsonic writes only `out/csharp/**/*.cs` in this mode. The user project explicitly includes that generated source; Tsonic does not rewrite the project file.
+
+For the EF proof:
+
+```sh
+cd aspnetcore
+npm install
+npm run -w aspnetcore-blog-ef build
+dotnet run --project packages/blog-ef/ProofAspNetCoreBlogEf.csproj
+```
+
+The package build first restores the locked NuGet graph and materializes its deterministic managed package-reference closure, then runs Tsonic.
+
+## Complete Verification
+
+```sh
 bash scripts/verify-all.sh
 ```
 
-The verifier:
+The verifier follows one bounded model:
 
-- verifies that every local `@tsonic/*` workspace link targets the active sibling checkout
-- builds the shared compiler, C# target, and provider packages once before project verification
-- inventories every non-temporary `tsonic.json` and requires every project to have exactly one test classification
-- builds independent projects with a bounded parallel worker pool, after building workspace library prerequisites
-- executes finite programs with semantic output assertions and long-running servers with HTTP behavior probes
-- writes per-task diagnostics and one complete consolidated report under `.tests/`
-- uses `.tests/nuget/packages` as the shared NuGet package cache
-- preserves prior test artifacts and writes each run into a new timestamped directory
+1. inspect the exact clean sibling repository heads;
+2. build Tsonic, the C# target, and the Node capability once;
+3. pack exact local npm artifacts and record their SHA-256 hashes;
+4. copy proof inputs into a fresh run directory, excluding all prior installs and outputs;
+5. install the packed artifacts into each staged workspace without persistent sibling symlinks;
+6. run the 22 project lifecycles through a dependency-aware dynamic queue;
+7. constrain every command with a systemd memory scope and finite timeout;
+8. assert complete finite output or complete HTTP behavior, scan emitted C# for forbidden reflection/dynamic semantics, and verify NativeAOT execution;
+9. consolidate every task log and resource measurement into one report.
 
-The examples parse inputs through closed payload schemas and invoke statically
-selected serializers. They do not depend on open-ended `any`, `JsValue`, or
-reflection-style JSON object traversal.
+The default queue has at most eight workers and reserves at most 11,264 MiB across concurrent project tasks. Override those finite bounds with `PROOF_JOBS` and `PROOF_MEMORY_MIB`.
 
-Set `PROOF_JOBS` to change the bounded project worker count. Set
-`NUGET_PACKAGES` to override the shared NuGet cache directory.
+Every run uses a new `.tests/verify-*` directory. It never consumes an existing `node_modules`, generated C# tree, binary, provider cache, or prior report as semantic input. An OS file lock prevents two full verifiers from sharing state. The final report contains exact task counts, zero implicit skips/todos, package hashes, repository heads, elapsed time, CPU use, and peak memory for each command.
 
 ## Requirements
 
-- Node.js 22+
-- .NET 10 SDK
-- Tsonic CLI (`npm install tsonic`)
+- Node.js 22 or newer;
+- .NET 10 SDK;
+- Linux systemd user scopes for the complete bounded verifier;
+- a NativeAOT-capable toolchain for the current OS/architecture.

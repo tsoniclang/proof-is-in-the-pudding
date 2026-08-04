@@ -1,24 +1,8 @@
-# Node.js Concurrency Proof
+# Node Capability + JavaScript Concurrency
 
-This is a sample Tsonic project that demonstrates .NET interop.
+This proof combines import-addressable `node:os` and `node:timers` with the explicitly selected JS surface’s `Promise` APIs. It is cooperative event-loop concurrency, not worker-thread parallelism.
 
-## Getting Started
-
-Build and run the project:
-
-```bash
+```sh
 npm run build
-./app
+dotnet run --project out/csharp/ProofNodeConcurrency.csproj
 ```
-
-Or run directly:
-
-```bash
-npm run dev
-```
-
-## Project Structure
-
-- `src/main.ts` - Entry point
-- `tsonic.json` - Project configuration
-- `generated/` - Generated C# code (gitignored)

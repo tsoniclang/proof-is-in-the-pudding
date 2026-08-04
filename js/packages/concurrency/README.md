@@ -1,24 +1,8 @@
-# JavaScript Concurrency Proof
+# JavaScript Concurrency
 
-This is a sample Tsonic project that demonstrates .NET interop.
+This proof uses `Promise`, `Promise.all`, `async`/`await`, and timers from the explicit JS source surface. It demonstrates cooperative concurrency; it does not claim worker threads or CLR parallel execution.
 
-## Getting Started
-
-Build and run the project:
-
-```bash
+```sh
 npm run build
-./app
+dotnet run --project out/csharp/ProofJsConcurrency.csproj
 ```
-
-Or run directly:
-
-```bash
-npm run dev
-```
-
-## Project Structure
-
-- `src/main.ts` - Entry point
-- `tsonic.json` - Project configuration
-- `generated/` - Generated C# code (gitignored)

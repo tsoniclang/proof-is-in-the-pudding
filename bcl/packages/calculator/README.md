@@ -1,24 +1,8 @@
-# My Tsonic Project
+# CLR Calculator
 
-This is a sample Tsonic project that demonstrates .NET interop.
+Pure C#/.NET source-profile proof for arithmetic, branching, string interpolation, and `System.Console`.
 
-## Getting Started
-
-Build and run the project:
-
-```bash
+```sh
 npm run build
-./app
+dotnet run --project out/csharp/ProofBclCalculator.csproj
 ```
-
-Or run directly:
-
-```bash
-npm run dev
-```
-
-## Project Structure
-
-- `src/main.ts` - Entry point
-- `tsonic.json` - Project configuration
-- `generated/` - Generated C# code (gitignored)

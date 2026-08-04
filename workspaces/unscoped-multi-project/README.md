@@ -1,15 +1,9 @@
-# Unscoped Multi-Project Workspace (npm workspaces)
+# Unscoped Source-Package Workspace
 
-Same as `workspaces/scoped-multi-project/`, but using unscoped package names:
+`acme-domain` exports TypeScript source through standard ESM package exports. `acme-api` consumes `acme-domain/index.js` directly. This is the unscoped counterpart to the `@acme/domain` proof.
 
-- `acme-domain` (source package)
-- `acme-api` (executable consuming the source package)
-
-This validates direct source-package consumption for both scoped and unscoped packages.
-
-## How to build
-
-```bash
+```sh
 npm install
 npm run build
+dotnet run --project packages/acme-api/out/csharp/AcmeApi.csproj
 ```

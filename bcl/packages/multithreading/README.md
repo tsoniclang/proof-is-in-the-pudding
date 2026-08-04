@@ -1,24 +1,8 @@
-# My Tsonic Project
+# CLR Parallel Execution
 
-This is a sample Tsonic project that demonstrates .NET interop.
+This is the one proof that intentionally uses real CLR parallelism. Three closed callbacks run through `System.Threading.Tasks.Parallel.Invoke`, then deterministic result slots are verified.
 
-## Getting Started
-
-Build and run the project:
-
-```bash
+```sh
 npm run build
-./app
+dotnet run --project out/csharp/ProofBclMultithreading.csproj
 ```
-
-Or run directly:
-
-```bash
-npm run dev
-```
-
-## Project Structure
-
-- `src/main.ts` - Entry point
-- `tsonic.json` - Project configuration
-- `generated/` - Generated C# code (gitignored)

@@ -1,24 +1,8 @@
-# My Tsonic Project
+# Node File Reader
 
-This is a sample Tsonic project that demonstrates .NET interop.
+Import-addressable `node:fs/promises` proof. The program enumerates its working directory and reads the tracked `fixture.txt`; verification never depends on a repository README or another ambient file.
 
-## Getting Started
-
-Build and run the project:
-
-```bash
+```sh
 npm run build
-./app
+dotnet run --project out/csharp/ProofNodeFileReader.csproj
 ```
-
-Or run directly:
-
-```bash
-npm run dev
-```
-
-## Project Structure
-
-- `src/main.ts` - Entry point
-- `tsonic.json` - Project configuration
-- `generated/` - Generated C# code (gitignored)

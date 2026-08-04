@@ -4,7 +4,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "tsonic build --project tsonic.json"
+    "prepare:provider": "dotnet restore ProofAspNetCoreBlogEf.csproj --locked-mode --nologo -nodeReuse:false && dotnet msbuild ProofAspNetCoreBlogEf.csproj -target:PrepareTsonicProviderReferences -property:RestoreLockedMode=true -nodeReuse:false -nologo -verbosity:minimal",
+    "build": "npm run prepare:provider && tsonic build --project tsonic.json"
   },
   "devDependencies": {
     "@tsonic/cli": "0.0.1",
