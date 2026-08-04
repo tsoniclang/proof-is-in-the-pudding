@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { createReadStream } from "node:fs";
-import { cp, lstat, readFile, readdir, realpath } from "node:fs/promises";
+import { cp, lstat, mkdir, readFile, readdir, realpath } from "node:fs/promises";
 import { relative, resolve } from "node:path";
 import {
   localRepositories,
@@ -202,26 +202,28 @@ export async function packExactPackages(context) {
       const result = await runCommand(context, task, {
         id: `npm-pack-${spec.id}`,
         executable: "npm",
-        args: ["pack", packageDirectory, "--pack-destination", context.packageRoot, "--json"],
+        args: ["pack", packageDirectory, "--pack-destination", context.packageRoot, "--silent"],
         cwd: spec.repository,
         memoryMiB: 1_024,
         timeoutMinutes: 5,
         environment: {},
       });
-      const packed = JSON.parse(result.stdout);
-      assert.equal(packed.length, 1, `${spec.id} produced an unexpected npm pack result.`);
-      const artifactPath = resolve(context.packageRoot, packed[0].filename);
+      const filename = result.stdout.trim().split(/\r?\n/u).at(-1);
+      assert.notEqual(filename, undefined, `${spec.id} produced no npm artifact filename.`);
+      assert.equal(filename.endsWith(".tgz"), true, `${spec.id} produced an invalid npm artifact filename.`);
+      const artifactPath = resolve(context.packageRoot, filename);
+      const packageManifest = await readJson(resolve(packageDirectory, "package.json"));
       const artifact = {
         ...spec,
-        name: packed[0].name,
-        version: packed[0].version,
+        name: packageManifest.name,
+        version: packageManifest.version,
         path: artifactPath,
         sha256: await sha256(artifactPath),
       };
       artifacts.set(spec.id, artifact);
       recordEvidence(
         context,
-        `PACKAGE ${artifact.name}@${artifact.version} file=${packed[0].filename} sha256=${artifact.sha256}`,
+        `PACKAGE ${artifact.name}@${artifact.version} file=${filename} sha256=${artifact.sha256}`,
       );
     });
   }
@@ -230,17 +232,22 @@ export async function packExactPackages(context) {
 }
 
 export async function createFreshStage(context) {
-  await cp(repoRoot, context.stageRoot, {
-    recursive: true,
-    filter(source) {
-      const path = relative(repoRoot, source);
-      if (path === "") return true;
-      const parts = path.split("/");
-      if (parts.some((part) => ignoredDirectoryNames.has(part))) return false;
-      if (path.endsWith(".log")) return false;
-      return true;
-    },
-  });
+  await mkdir(context.stageRoot, { recursive: true });
+  for (const entry of await readdir(repoRoot, { withFileTypes: true })) {
+    if (entry.isDirectory() && ignoredDirectoryNames.has(entry.name)) continue;
+    if (entry.name.endsWith(".log")) continue;
+    const source = resolve(repoRoot, entry.name);
+    await cp(source, resolve(context.stageRoot, entry.name), {
+      recursive: true,
+      filter(candidate) {
+        const path = relative(repoRoot, candidate);
+        const parts = path.split("/");
+        if (parts.some((part) => ignoredDirectoryNames.has(part))) return false;
+        if (path.endsWith(".log")) return false;
+        return true;
+      },
+    });
+  }
   recordEvidence(context, `STAGED_SOURCE ${context.stageRoot}`);
 }
 
