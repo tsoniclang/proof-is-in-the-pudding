@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import {
   memoryBudgetMiB,
   projectSpecs,
+  providerMaterializationAuditWorkspaces,
   repoRoot,
   workerLimit,
 } from "./verify/config.mjs";
@@ -16,6 +17,7 @@ import {
   verifySystemdBoundary,
 } from "./verify/preflight.mjs";
 import { allocateServerPorts } from "./verify/probes.mjs";
+import { verifyIncrementalProviderCaches } from "./verify/provider-materialization.mjs";
 import {
   cleanupTransientUnits,
   createRunContext,
@@ -77,6 +79,12 @@ try {
     projectSpecs,
     (task, project) => executeProject(context, task, project, serverPorts),
   );
+  const providerMaterialization = await runLoggedTask(
+    context,
+    "provider-materialization-contract",
+    () => verifyIncrementalProviderCaches(context, providerMaterializationAuditWorkspaces),
+  );
+  assert.equal(providerMaterialization.status, "passed", "Provider materialization contract failed.");
 } catch (error) {
   fatalError = error instanceof Error ? error.stack ?? error.message : String(error);
   recordEvidence(context, `FATAL ${fatalError.replaceAll("\n", " | ")}`);

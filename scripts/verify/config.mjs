@@ -22,6 +22,10 @@ export const workspaceSpecs = Object.freeze([
   workspace("workspaces/unscoped-multi-project", false, "npm run -w acme-domain build && npm run -w acme-api build"),
 ]);
 
+export const providerMaterializationAuditWorkspaces = Object.freeze([
+  "aspnetcore",
+]);
+
 export const packageSpecs = Object.freeze([
   packageSpec("tsts", localRepositories.tsonic, "packages/tsts"),
   packageSpec("source-core", localRepositories.tsonic, "packages/source-core"),
