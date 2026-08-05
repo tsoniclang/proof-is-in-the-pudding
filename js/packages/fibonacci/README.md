@@ -1,24 +1,8 @@
-# My Tsonic Project
+# JavaScript-Surface Fibonacci
 
-This is a sample Tsonic project that demonstrates .NET interop.
+Explicit JS-surface proof for recursion, loops, JavaScript numbers, and `console.log`.
 
-## Getting Started
-
-Build and run the project:
-
-```bash
+```sh
 npm run build
-./app
+dotnet run --project out/csharp/ProofJsFibonacci.csproj
 ```
-
-Or run directly:
-
-```bash
-npm run dev
-```
-
-## Project Structure
-
-- `src/main.ts` - Entry point
-- `tsonic.json` - Project configuration
-- `generated/` - Generated C# code (gitignored)

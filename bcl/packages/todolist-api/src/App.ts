@@ -6,10 +6,11 @@
 //   PUT    /todos/:id   - Update a todo
 //   DELETE /todos/:id   - Delete a todo
 
-import { Console, Int32 } from "@tsonic/dotnet/System.js";
+import { Console, Environment, Int32, InvalidOperationException } from "@tsonic/dotnet/System.js";
 import { HttpListener, HttpListenerContext, HttpListenerRequest, HttpListenerResponse } from "@tsonic/dotnet/System.Net.js";
 import { StreamReader, StreamWriter } from "@tsonic/dotnet/System.IO.js";
 import { Encoding } from "@tsonic/dotnet/System.Text.js";
+import { out } from "@tsonic/core/lang.js";
 import type { int } from "@tsonic/csharp/types.js";
 import * as TodoStore from "./TodoStore.js";
 import { serializeTodo, serializeTodos, serializeError, parseTodoCreate, parseTodoUpdate } from "./JsonHelpers.js";
@@ -17,28 +18,39 @@ import { serializeTodo, serializeTodos, serializeError, parseTodoCreate, parseTo
 // Extract ID from URL path like "/todos/123"
 function extractIdFromPath(path: string): int | undefined {
   const parts = path.Split("/");
-  // Expected: ["", "todos", "123"]
-  // Check array bounds before accessing (C# arrays throw on out-of-bounds)
-  if (parts.Length < 3) {
+  if (parts.Length !== 3 || parts[0] !== "" || parts[1] !== "todos") {
     return undefined;
   }
   const idStr = parts[2];
-  if (idStr !== "") {
-    try {
-      return Int32.Parse(idStr);
-    } catch {
-      return undefined;
-    }
+  if (idStr === "") {
+    return undefined;
   }
-  return undefined;
+  let id: int = 0;
+  return Int32.TryParse(idStr, out(id)) ? id : undefined;
+}
+
+function isTodoCollectionPath(path: string): boolean {
+  return path === "/todos" || path === "/todos/";
+}
+
+function readPort(): int {
+  const configured = Environment.GetEnvironmentVariable("PROOF_PORT");
+  if (configured === undefined) return 8080;
+  let port: int = 0;
+  if (!Int32.TryParse(configured, out(port)) || port < 1 || port > 65535) {
+    throw new InvalidOperationException("PROOF_PORT must be an integer from 1 through 65535.");
+  }
+  return port;
 }
 
 // Read request body as string
 function readRequestBody(request: HttpListenerRequest): string {
   const reader = new StreamReader(request.InputStream, Encoding.UTF8);
-  const body = reader.ReadToEnd();
-  reader.Close();
-  return body;
+  try {
+    return reader.ReadToEnd();
+  } finally {
+    reader.Close();
+  }
 }
 
 // Send JSON response
@@ -129,23 +141,21 @@ function handleRequest(context: HttpListenerContext): void {
 
   Console.WriteLine(method + " " + path);
 
-  // Check if path starts with /todos
-  if (!path.StartsWith("/todos")) {
+  const collectionPath = isTodoCollectionPath(path);
+  const id = extractIdFromPath(path);
+  if (!collectionPath && id === undefined) {
     sendJsonResponse(response, 404, serializeError("Not found"));
     return;
   }
 
-  // Extract ID if present
-  const id = extractIdFromPath(path);
-
   // Route based on method and path
-  if (method === "GET" && id === undefined) {
+  if (method === "GET" && collectionPath) {
     // GET /todos
     handleGetAll(response);
   } else if (method === "GET" && id !== undefined) {
     // GET /todos/:id
     handleGetOne(response, id);
-  } else if (method === "POST" && id === undefined) {
+  } else if (method === "POST" && collectionPath) {
     // POST /todos
     handleCreate(request, response);
   } else if (method === "PUT" && id !== undefined) {
@@ -165,14 +175,15 @@ export function main(): void {
   TodoStore.initSampleData();
 
   // Create and start HTTP listener
+  const port = readPort();
   const listener = new HttpListener();
-  listener.Prefixes.Add("http://localhost:8080/");
+  listener.Prefixes.Add("http://localhost:" + port + "/");
   listener.Start();
 
   Console.WriteLine("");
   Console.WriteLine("=================================");
   Console.WriteLine("  Todo List API Server");
-  Console.WriteLine("  Running on http://localhost:8080");
+  Console.WriteLine("  Running on http://localhost:" + port);
   Console.WriteLine("=================================");
   Console.WriteLine("");
   Console.WriteLine("Endpoints:");

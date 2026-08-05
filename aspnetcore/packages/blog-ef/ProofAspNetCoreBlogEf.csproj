@@ -1,0 +1,38 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <OutputType>Exe</OutputType>
+    <AssemblyName>ProofAspNetCoreBlogEf</AssemblyName>
+    <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
+    <TsonicCsharpRuntimeAssembly Condition="'$(TsonicCsharpRuntimeAssembly)' == ''">$(MSBuildThisFileDirectory)../../node_modules/@tsonic/csharp-runtime/runtimes/net10.0/Tsonic.CSharp.Runtime.dll</TsonicCsharpRuntimeAssembly>
+    <TsonicProviderReferenceDirectory>$(MSBuildThisFileDirectory).tests/provider-references</TsonicProviderReferenceDirectory>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="out/csharp/**/*.cs" />
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.9" />
+    <PackageReference Include="SQLitePCLRaw.lib.e_sqlite3" Version="2.1.12" />
+    <Reference Include="Tsonic.CSharp.Runtime" HintPath="$(TsonicCsharpRuntimeAssembly)" />
+  </ItemGroup>
+  <Target Name="ValidateTsonicRuntime" BeforeTargets="ResolveReferences">
+    <Error Condition="!Exists('$(TsonicCsharpRuntimeAssembly)')" Text="Tsonic.CSharp.Runtime.dll was not found at '$(TsonicCsharpRuntimeAssembly)'." />
+  </Target>
+  <Target Name="PrepareTsonicProviderReferences" DependsOnTargets="ResolveReferences">
+    <ItemGroup>
+      <TsonicProviderReference
+        Include="@(ReferencePath)"
+        Condition="
+          '%(ReferencePath.Extension)' == '.dll' and
+          '%(ReferencePath.NuGetPackageId)' != '' and
+          '%(ReferencePath.FrameworkReferenceName)' == ''
+        "
+      />
+    </ItemGroup>
+    <RemoveDir Directories="$(TsonicProviderReferenceDirectory)" />
+    <MakeDir Directories="$(TsonicProviderReferenceDirectory)" />
+    <Copy SourceFiles="@(TsonicProviderReference)" DestinationFolder="$(TsonicProviderReferenceDirectory)" />
+  </Target>
+</Project>

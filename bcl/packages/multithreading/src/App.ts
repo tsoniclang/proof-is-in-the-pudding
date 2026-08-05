@@ -1,6 +1,6 @@
 import { Console, Environment } from "@tsonic/dotnet/System.js";
 import { Parallel } from "@tsonic/dotnet/System.Threading.Tasks.js";
-import { int, long } from "@tsonic/csharp/types.js";
+import type { int, long } from "@tsonic/csharp/types.js";
 
 export function main(): void {
   Console.WriteLine("=== Parallel Computation Test (BCL) ===");

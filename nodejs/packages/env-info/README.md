@@ -1,24 +1,10 @@
-# My Tsonic Project
+# Pure-C# Node Capability Isolation
 
-This is a sample Tsonic project that demonstrates .NET interop.
+This project deliberately does **not** select the JS surface. It imports `node:path` and `node:process`, then prints through `System.Console` from the C#/.NET source profile.
 
-## Getting Started
-
-Build and run the project:
-
-```bash
+```sh
 npm run build
-./app
+dotnet run --project out/csharp/ProofNodeEnvInfo.csproj
 ```
 
-Or run directly:
-
-```bash
-npm run dev
-```
-
-## Project Structure
-
-- `src/main.ts` - Entry point
-- `tsonic.json` - Project configuration
-- `generated/` - Generated C# code (gitignored)
+Its purpose is to prove that installing and importing the Node capability does not make JavaScript globals available.

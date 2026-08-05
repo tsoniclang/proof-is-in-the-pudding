@@ -1,24 +1,8 @@
-# My Tsonic Project
+# JavaScript-Surface Hello World
 
-This is a sample Tsonic project that demonstrates .NET interop.
+The selected JS source profile supplies Tsonic-owned `console` declarations. No bundled TypeScript default library defines the API.
 
-## Getting Started
-
-Build and run the project:
-
-```bash
+```sh
 npm run build
-./app
+dotnet run --project out/csharp/ProofJsHelloWorld.csproj
 ```
-
-Or run directly:
-
-```bash
-npm run dev
-```
-
-## Project Structure
-
-- `src/main.ts` - Entry point
-- `tsonic.json` - Project configuration
-- `generated/` - Generated C# code (gitignored)

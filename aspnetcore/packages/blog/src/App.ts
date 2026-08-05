@@ -1,4 +1,5 @@
-import { int } from "@tsonic/csharp/types.js";
+import type { int } from "@tsonic/csharp/types.js";
+import { Environment } from "@tsonic/dotnet/System.js";
 import { StreamReader } from "@tsonic/dotnet/System.IO.js";
 import { Encoding } from "@tsonic/dotnet/System.Text.js";
 import { JsonDocument, JsonException, JsonSerializer, JsonValueKind } from "@tsonic/dotnet/System.Text.Json.js";
@@ -47,7 +48,7 @@ const INDEX_HTML = `<!doctype html>
   <body>
     <header>
       <h1>Tsonic Blog</h1>
-      <span class="muted">ASP.NET Core minimal API, compiled TS → C# → NativeAOT</span>
+      <span class="muted">ASP.NET Core minimal API, compiled from TypeScript to C#</span>
     </header>
 
     <section class="card">
@@ -163,8 +164,11 @@ function parsePostCreate(json: string): PostCreateInput | undefined {
 const readRequestBodyAsync = (ctx: HttpContext): Task<string> => {
   const reader = new StreamReader(ctx.Request.Body, Encoding.UTF8);
   return reader.ReadToEndAsync().ContinueWith<string>((t, _state) => {
-    reader.Close();
-    return t.Result;
+    try {
+      return t.Result;
+    } finally {
+      reader.Close();
+    }
   }, undefined);
 };
 
@@ -189,7 +193,7 @@ const handleCreatePost = (ctx: HttpContext): Task => {
   return TaskExtensions.Unwrap(
     readRequestBodyAsync(ctx).ContinueWith<Task>((t, _state) => {
       const input = parsePostCreate(t.Result);
-      if (input === undefined || typeof input.title !== "string" || typeof input.content !== "string") {
+      if (input === undefined) {
         return writeJson(
           ctx.Response,
           400,
@@ -225,7 +229,8 @@ export function main(): void {
   app.MapGet("/api/posts", handleListPosts);
   app.MapPost("/api/posts", handleCreatePost);
 
-  app.Run("http://localhost:8090");
+  const serverUrl = Environment.GetEnvironmentVariable("PROOF_URL") ?? "http://localhost:8090";
+  app.Run(serverUrl);
 }
 
 main();

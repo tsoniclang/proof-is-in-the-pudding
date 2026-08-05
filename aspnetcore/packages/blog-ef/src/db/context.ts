@@ -1,4 +1,8 @@
-import { DbContext, DbContextOptions, DbSet } from "@tsonic/efcore/Microsoft.EntityFrameworkCore.js";
+import {
+  DbContext,
+  type DbContextOptions,
+  type DbSet,
+} from "@tsonic/dotnet/Microsoft.EntityFrameworkCore.js";
 
 import type { CommentEntity, PostEntity } from "./entities.js";
 

@@ -1,28 +1,15 @@
-# Scoped Multi-Project Workspace (npm workspaces)
+# Scoped Source-Package Workspace
 
-This example demonstrates a single repo with a source package dependency:
-
-- `@acme/domain` is a **Tsonic source package**
-- `@acme/api` is a **Tsonic executable** that imports the domain package directly
-
-The API package consumes the domain package through source-package exports:
+`@acme/domain` exports TypeScript source through standard ESM package exports. `@acme/api` imports that source directly:
 
 ```ts
 import { TodoItem } from "@acme/domain/index.js";
 ```
 
-## How to build (from this directory)
+No generated binding package or `tsonic.package.json` is involved. The workspace build preserves the source dependency order:
 
-```bash
+```sh
 npm install
 npm run build
+dotnet run --project packages/api/out/csharp/AcmeApi.csproj
 ```
-
-This runs (in order):
-1) `tsonic build` for `@acme/domain`
-2) `tsonic build` for `@acme/api` (resolves `@acme/domain` as a source package)
-
-## Notes
-
-- The domain package declares source metadata in `tsonic.package.json`.
-- No generated CLR binding package or direct DLL reference is involved.

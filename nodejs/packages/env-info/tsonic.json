@@ -5,7 +5,6 @@
   "outDir": "out",
   "targets": [{
     "id": "csharp",
-    "surfaces": ["js"],
     "options": {
       "namespace": "Proof.Node.EnvInfo",
       "assemblyName": "ProofNodeEnvInfo",

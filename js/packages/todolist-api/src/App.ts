@@ -12,6 +12,8 @@ import {
   type IncomingMessage,
   type ServerResponse,
 } from "node:http";
+import { env } from "node:process";
+import { InvalidOperationException } from "@tsonic/dotnet/System.js";
 import type { int } from "@tsonic/csharp/types.js";
 import * as TodoStore from "./TodoStore.js";
 import {
@@ -35,7 +37,7 @@ function getRequestPath(requestUrl: string | null | undefined): string {
 
 function extractIdFromPath(pathname: string): number | undefined {
   const parts = pathname.split("/");
-  if (parts.length < 3) {
+  if (parts.length !== 3 || parts[0] !== "" || parts[1] !== "todos") {
     return undefined;
   }
 
@@ -44,12 +46,26 @@ function extractIdFromPath(pathname: string): number | undefined {
     return undefined;
   }
 
-  const parsed = parseInt(idText, 10);
-  if (Number.isNaN(parsed)) {
+  const parsed = Number(idText);
+  if (!Number.isInteger(parsed) || parsed < 0) {
     return undefined;
   }
 
   return parsed;
+}
+
+function isTodoCollectionPath(pathname: string): boolean {
+  return pathname === "/todos" || pathname === "/todos/";
+}
+
+function readPort(defaultPort: number): number {
+  const configured = env["PROOF_PORT"];
+  if (configured === undefined) return defaultPort;
+  const port = Number(configured);
+  if (!Number.isInteger(port) || port < 1 || port > 65535) {
+    throw new InvalidOperationException("PROOF_PORT must be an integer from 1 through 65535.");
+  }
+  return port;
 }
 
 async function readRequestBody(request: IncomingMessage): Promise<string> {
@@ -132,14 +148,14 @@ async function handleRequest(
 
   console.log(`${method} ${path}`);
 
-  if (!path.startsWith("/todos")) {
+  const collectionPath = isTodoCollectionPath(path);
+  const id = extractIdFromPath(path);
+  if (!collectionPath && id === undefined) {
     sendJsonResponse(response, 404, serializeError("Not found"));
     return;
   }
 
-  const id = extractIdFromPath(path);
-
-  if (method === "GET" && id === undefined) {
+  if (method === "GET" && collectionPath) {
     handleGetAll(response);
     return;
   }
@@ -149,7 +165,7 @@ async function handleRequest(
     return;
   }
 
-  if (method === "POST" && id === undefined) {
+  if (method === "POST" && collectionPath) {
     await handleCreate(request, response);
     return;
   }
@@ -167,18 +183,31 @@ async function handleRequest(
   sendJsonResponse(response, 405, serializeError("Method not allowed"));
 }
 
+async function handleRequestSafely(
+  request: IncomingMessage,
+  response: ServerResponse
+): Promise<void> {
+  try {
+    await handleRequest(request, response);
+  } catch {
+    console.error("Unhandled request error");
+    sendJsonResponse(response, 500, serializeError("Internal server error"));
+  }
+}
+
 export function main(): void {
   TodoStore.initSampleData();
+  const port = readPort(8080);
 
   const server = createServer((request: IncomingMessage, response: ServerResponse) => {
-    void handleRequest(request, response);
+    void handleRequestSafely(request, response);
   });
 
-  server.listen(8080, () => {
+  server.listen(port, () => {
     console.log("");
     console.log("=================================");
     console.log("  Todo List API Server (JS surface + node:http)");
-    console.log("  Running on http://localhost:8080");
+    console.log(`  Running on http://localhost:${port}`);
     console.log("=================================");
     console.log("");
     console.log("Endpoints:");
@@ -192,7 +221,6 @@ export function main(): void {
     console.log("");
   });
 
-  setInterval(() => {}, 60000);
 }
 
 main();

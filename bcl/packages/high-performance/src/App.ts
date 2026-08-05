@@ -1,7 +1,7 @@
 // High-performance examples using Span<T>, ReadOnlySpan<T>, and Memory<T>
 import { Console } from "@tsonic/dotnet/System.js";
-import { Span, ReadOnlySpan, Memory } from "@tsonic/dotnet/System.js";
-import { int } from "@tsonic/csharp/types.js";
+import { Span, Memory } from "@tsonic/dotnet/System.js";
+import type { int } from "@tsonic/csharp/types.js";
 
 // Example 1: Fill an array efficiently using Span
 function fillArray(data: Span<int>, value: int): void {

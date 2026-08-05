@@ -1,24 +1,21 @@
-# ASP.NET Core Blog (EF Core + SQLite)
+# ASP.NET Core + EF Core + SQLite Blog
 
-Full-featured blog demo using:
+This proof combines ASP.NET Core and EF Core declarations from the dynamic `@tsonic/dotnet/*` provider. It does not consume generated EF binding packages.
 
-- ASP.NET Core Minimal APIs (`@tsonic/aspnetcore`)
-- EF Core + SQLite (`@tsonic/efcore`, `@tsonic/efcore-sqlite`)
+`ProofAspNetCoreBlogEf.csproj` owns:
 
-## Run
+- the `Microsoft.AspNetCore.App` framework reference;
+- exact EF Core and SQLite NuGet versions;
+- `packages.lock.json`;
+- the deterministic managed NuGet compile-reference closure used for source-provider reflection;
+- inclusion of only `out/csharp/**/*.cs`.
 
-```bash
+From `aspnetcore/`:
+
+```sh
 npm install
-npm run build
-dotnet run --project out/csharp/ProofAspNetCoreBlogEf.csproj --no-build
+npm run -w aspnetcore-blog-ef build
+dotnet run --project packages/blog-ef/ProofAspNetCoreBlogEf.csproj
 ```
 
-Then open `http://localhost:8091/` or use the JSON API:
-
-- `GET /api/posts`
-- `POST /api/posts`
-- `GET /api/posts/{id}`
-- `PUT /api/posts/{id}`
-- `DELETE /api/posts/{id}`
-- `GET /api/posts/{id}/comments`
-- `POST /api/posts/{id}/comments`
+Set `PROOF_URL` to override `http://localhost:8091`. Set `TS_PUDDING_DB` to select the SQLite database path.

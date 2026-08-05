@@ -1,24 +1,10 @@
-# My Tsonic Project
+# CLR Hello World + NativeAOT
 
-This is a sample Tsonic project that demonstrates .NET interop.
+The TypeScript source calls `System.Console.WriteLine`. `ProofBclHelloWorld.csproj` is user-owned and enables `PublishAot`; Tsonic emits only C# source into `out/csharp`.
 
-## Getting Started
-
-Build and run the project:
-
-```bash
+```sh
 npm run build
-./app
+dotnet publish ProofBclHelloWorld.csproj -c Release -r linux-x64 --self-contained true
 ```
 
-Or run directly:
-
-```bash
-npm run dev
-```
-
-## Project Structure
-
-- `src/main.ts` - Entry point
-- `tsonic.json` - Project configuration
-- `generated/` - Generated C# code (gitignored)
+Use the .NET runtime identifier for the current platform when publishing outside Linux x64.

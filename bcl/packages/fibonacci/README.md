@@ -1,24 +1,8 @@
-# My Tsonic Project
+# CLR Fibonacci
 
-This is a sample Tsonic project that demonstrates .NET interop.
+Pure C#/.NET source-profile proof for the `int` source alias, recursion, loops, and closed integer arithmetic.
 
-## Getting Started
-
-Build and run the project:
-
-```bash
+```sh
 npm run build
-./app
+dotnet run --project out/csharp/ProofBclFibonacci.csproj
 ```
-
-Or run directly:
-
-```bash
-npm run dev
-```
-
-## Project Structure
-
-- `src/main.ts` - Entry point
-- `tsonic.json` - Project configuration
-- `generated/` - Generated C# code (gitignored)

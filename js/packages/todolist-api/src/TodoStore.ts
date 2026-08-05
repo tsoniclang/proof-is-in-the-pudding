@@ -1,6 +1,6 @@
 // In-memory Todo storage with CRUD operations
 // Uses JS Array semantics (push, find, splice, etc.)
-import { Todo } from "./Todo.js";
+import type { Todo } from "./Todo.js";
 
 // Global store state (module-level variables)
 const todos: Todo[] = [];

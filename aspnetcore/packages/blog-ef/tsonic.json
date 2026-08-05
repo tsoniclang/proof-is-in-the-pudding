@@ -6,10 +6,14 @@
   "targets": [{
     "id": "csharp",
     "options": {
-      "namespace": "Proof.AspNetCore.BlogEf",
-      "assemblyName": "ProofAspNetCoreBlogEf",
-      "outputType": "Exe",
-      "references": {
+        "namespace": "Proof.AspNetCore.BlogEf",
+        "assemblyName": "ProofAspNetCoreBlogEf",
+        "outputType": "Exe",
+        "projectFile": "ProofAspNetCoreBlogEf.csproj",
+        "providerReferences": {
+          "directories": [".tests/provider-references"]
+        },
+        "references": {
         "frameworks": ["Microsoft.AspNetCore.App"]
       }
     }

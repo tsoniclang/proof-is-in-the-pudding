@@ -6,13 +6,6 @@
     "packages/*"
   ],
   "scripts": {
-    "build": "npm -ws --if-present run build",
-    "typecheck": "npm -ws --if-present run typecheck"
-  },
-  "devDependencies": {
-    "@tsonic/cli": "0.0.1",
-    "@tsonic/target-csharp": "0.0.1",
-    "@tsonic/csharp-runtime": "0.0.1",
-    "@tsonic/csharp-js": "0.0.1"
+    "build": "npm -ws --if-present run build"
   }
 }

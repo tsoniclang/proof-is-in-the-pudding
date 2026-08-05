@@ -6,10 +6,11 @@
   "targets": [{
     "id": "csharp",
     "options": {
-      "namespace": "Proof.AspNetCore.Blog",
-      "assemblyName": "ProofAspNetCoreBlog",
-      "outputType": "Exe",
-      "references": {
+        "namespace": "Proof.AspNetCore.Blog",
+        "assemblyName": "ProofAspNetCoreBlog",
+        "outputType": "Exe",
+        "projectFile": "ProofAspNetCoreBlog.csproj",
+        "references": {
         "frameworks": ["Microsoft.AspNetCore.App"]
       }
     }

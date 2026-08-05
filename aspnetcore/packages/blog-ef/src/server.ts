@@ -1,4 +1,4 @@
-import { Console } from "@tsonic/dotnet/System.js";
+import { Console, Environment } from "@tsonic/dotnet/System.js";
 
 import { WebApplication } from "@tsonic/dotnet/Microsoft.AspNetCore.Builder.js";
 
@@ -11,10 +11,11 @@ import { handleCreatePost, handleDeletePost, handleGetPost, handleListPosts, han
 
 export function run(): void {
   ensureCreatedAndSeed();
+  const serverUrl = Environment.GetEnvironmentVariable("PROOF_URL") ?? "http://localhost:8091";
 
   Console.WriteLine("=================================");
   Console.WriteLine("  Tsonic Blog (EF Core + SQLite)");
-  Console.WriteLine("  http://localhost:8091");
+  Console.WriteLine("  " + serverUrl);
   Console.WriteLine("  DB: " + DB_PATH);
   Console.WriteLine("=================================");
 
@@ -33,5 +34,5 @@ export function run(): void {
   app.MapGet("/api/posts/{id:int}/comments", handleListComments);
   app.MapPost("/api/posts/{id:int}/comments", handleCreateComment);
 
-  app.Run("http://localhost:8091");
+  app.Run(serverUrl);
 }

@@ -2,10 +2,10 @@ import { DateTime } from "@tsonic/dotnet/System.js";
 import { JsonSerializer } from "@tsonic/dotnet/System.Text.Json.js";
 import { List } from "@tsonic/dotnet/System.Collections.Generic.js";
 import { Queryable } from "@tsonic/dotnet/System.Linq.js";
-import { Task, TaskExtensions } from "@tsonic/dotnet/System.Threading.Tasks.js";
-import { EntityFrameworkQueryableExtensions } from "@tsonic/efcore/Microsoft.EntityFrameworkCore.js";
+import { TaskExtensions, type Task } from "@tsonic/dotnet/System.Threading.Tasks.js";
+import { EntityFrameworkQueryableExtensions } from "@tsonic/dotnet/Microsoft.EntityFrameworkCore.js";
 
-import { HttpContext } from "@tsonic/dotnet/Microsoft.AspNetCore.Http.js";
+import type { HttpContext } from "@tsonic/dotnet/Microsoft.AspNetCore.Http.js";
 
 import type { CommentDto, PostDetailDto, PostDto } from "../db/dtos.js";
 import { PostEntity } from "../db/entities.js";
@@ -13,26 +13,31 @@ import type { CommentEntity } from "../db/entities.js";
 import { BlogDbContext } from "../db/context.js";
 import { DB_OPTIONS } from "../db/options.js";
 import { toCommentDto, toPostDto } from "../db/mappers.js";
-import { parsePostIdRequired, readRequestBodyAsync, serializeError, unwrapInt, writeJson } from "../http/http-helpers.js";
+import { parsePostIdRequired, readRequestBodyAsync, serializeError, writeJson } from "../http/http-helpers.js";
 import { parsePostInput } from "../http/json-input.js";
 
 export const handleListPosts = (ctx: HttpContext): Task => {
-  let payload = "";
   const db = new BlogDbContext(DB_OPTIONS);
   try {
     const query = Queryable.OrderByDescending(db.posts.AsQueryable(), (p) => p.CreatedAt);
-    const posts = EntityFrameworkQueryableExtensions.ToArrayAsync(query).Result;
-
-    const result = new List<PostDto>();
-    for (let i = 0; i < posts.Length; i++) {
-      result.Add(toPostDto(posts[i]));
-    }
-    payload = JsonSerializer.Serialize<List<PostDto>>(result);
-  } finally {
+    return TaskExtensions.Unwrap(
+      EntityFrameworkQueryableExtensions.ToArrayAsync(query).ContinueWith<Task>((t, _state) => {
+        try {
+          const posts = t.Result;
+          const result = new List<PostDto>();
+          for (let i = 0; i < posts.Length; i++) {
+            result.Add(toPostDto(posts[i]));
+          }
+          return writeJson(ctx.Response, 200, JsonSerializer.Serialize<List<PostDto>>(result));
+        } finally {
+          db.Dispose();
+        }
+      }, undefined)
+    );
+  } catch (error) {
     db.Dispose();
+    throw error;
   }
-
-  return writeJson(ctx.Response, 200, payload);
 };
 
 export const handleGetPost = (ctx: HttpContext): Task => {
@@ -40,52 +45,53 @@ export const handleGetPost = (ctx: HttpContext): Task => {
   if (postIdRaw === undefined) {
     return writeJson(ctx.Response, 400, serializeError("Missing post id"));
   }
-  const postId = unwrapInt(postIdRaw);
+  const postId = postIdRaw;
 
-  let payload: string | undefined = undefined;
   const db = new BlogDbContext(DB_OPTIONS);
   try {
     const post = db.posts.Find(postId);
-    if (post !== undefined) {
-      const commentsQuery = Queryable.OrderByDescending<CommentEntity, DateTime>(
-        db.comments.AsQueryable(),
-        (c: CommentEntity): DateTime => c.CreatedAt
-      );
-      const commentsForPost = Queryable.Where(commentsQuery, (c: CommentEntity) => c.PostId === postId);
-      const comments = EntityFrameworkQueryableExtensions.ToArrayAsync(commentsForPost).Result;
-
-      const commentDtos = new List<CommentDto>();
-      for (let i = 0; i < comments.Length; i++) {
-        commentDtos.Add(toCommentDto(comments[i]));
-      }
-
-      const dto: PostDetailDto = {
-        id: post.Id,
-        title: post.Title,
-        content: post.Content,
-        createdAt: post.CreatedAt,
-        updatedAt: post.UpdatedAt,
-        comments: commentDtos,
-      };
-
-      payload = JsonSerializer.Serialize<PostDetailDto>(dto);
+    if (post === undefined) {
+      db.Dispose();
+      return writeJson(ctx.Response, 404, serializeError("Post not found"));
     }
-  } finally {
+    const commentsQuery = Queryable.OrderByDescending<CommentEntity, DateTime>(
+      db.comments.AsQueryable(),
+      (c: CommentEntity): DateTime => c.CreatedAt
+    );
+    const commentsForPost = Queryable.Where(commentsQuery, (c: CommentEntity) => c.PostId === postId);
+    return TaskExtensions.Unwrap(
+      EntityFrameworkQueryableExtensions.ToArrayAsync(commentsForPost).ContinueWith<Task>((t, _state) => {
+        try {
+          const comments = t.Result;
+          const commentDtos = new List<CommentDto>();
+          for (let i = 0; i < comments.Length; i++) {
+            commentDtos.Add(toCommentDto(comments[i]));
+          }
+          const dto: PostDetailDto = {
+            id: post.Id,
+            title: post.Title,
+            content: post.Content,
+            createdAt: post.CreatedAt,
+            updatedAt: post.UpdatedAt,
+            comments: commentDtos,
+          };
+          return writeJson(ctx.Response, 200, JsonSerializer.Serialize<PostDetailDto>(dto));
+        } finally {
+          db.Dispose();
+        }
+      }, undefined)
+    );
+  } catch (error) {
     db.Dispose();
+    throw error;
   }
-
-  if (payload === undefined) {
-    return writeJson(ctx.Response, 404, serializeError("Post not found"));
-  }
-
-  return writeJson(ctx.Response, 200, payload);
 };
 
 export const handleCreatePost = (ctx: HttpContext): Task =>
   TaskExtensions.Unwrap(
     readRequestBodyAsync(ctx).ContinueWith<Task>((t: Task<string>, _state) => {
       const input = parsePostInput(t.Result);
-      if (input === undefined || typeof input.title !== "string" || typeof input.content !== "string") {
+      if (input === undefined) {
         return writeJson(
           ctx.Response,
           400,
@@ -118,12 +124,12 @@ export const handleUpdatePost = (ctx: HttpContext): Task => {
   if (postIdRaw === undefined) {
     return writeJson(ctx.Response, 400, serializeError("Missing post id"));
   }
-  const postId = unwrapInt(postIdRaw);
+  const postId = postIdRaw;
 
   return TaskExtensions.Unwrap(
     readRequestBodyAsync(ctx).ContinueWith<Task>((t: Task<string>, _state) => {
       const input = parsePostInput(t.Result);
-      if (input === undefined || typeof input.title !== "string" || typeof input.content !== "string") {
+      if (input === undefined) {
         return writeJson(
           ctx.Response,
           400,
@@ -160,7 +166,7 @@ export const handleDeletePost = (ctx: HttpContext): Task => {
   if (postIdRaw === undefined) {
     return writeJson(ctx.Response, 400, serializeError("Missing post id"));
   }
-  const postId = unwrapInt(postIdRaw);
+  const postId = postIdRaw;
 
   let ok = false;
   const db = new BlogDbContext(DB_OPTIONS);

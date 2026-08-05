@@ -1,6 +1,6 @@
-import { Task } from "@tsonic/dotnet/System.Threading.Tasks.js";
+import type { Task } from "@tsonic/dotnet/System.Threading.Tasks.js";
 
-import { HttpContext } from "@tsonic/dotnet/Microsoft.AspNetCore.Http.js";
+import type { HttpContext } from "@tsonic/dotnet/Microsoft.AspNetCore.Http.js";
 
 import { writeText } from "../http/http-helpers.js";
 import { INDEX_HTML } from "../ui/index-html.js";

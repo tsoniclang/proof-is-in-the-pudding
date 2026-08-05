@@ -1,15 +1,13 @@
 {
   "name": "bcl-fibonacci",
   "version": "1.0.0",
+  "private": true,
   "type": "module",
   "scripts": {
-    "typecheck": "tsonic build --project tsonic.json",
     "build": "tsonic build --project tsonic.json"
   },
   "devDependencies": {
     "@tsonic/cli": "0.0.1",
-    "@tsonic/target-csharp": "0.0.1",
-    "@tsonic/csharp-runtime": "0.0.1",
-    "@tsonic/csharp-js": "0.0.1"
+    "@tsonic/target-csharp": "0.0.1"
   }
 }

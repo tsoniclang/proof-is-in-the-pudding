@@ -2,8 +2,8 @@
 import { Console } from "@tsonic/dotnet/System.js";
 import { List, Dictionary } from "@tsonic/dotnet/System.Collections.Generic.js";
 import { defaultof, out } from "@tsonic/core/lang.js";
-import { int } from "@tsonic/csharp/types.js";
-import { Todo } from "./Todo.js";
+import type { int } from "@tsonic/csharp/types.js";
+import type { Todo } from "./Todo.js";
 
 // Global store state (module-level variables)
 const todos = new Dictionary<int, Todo>();

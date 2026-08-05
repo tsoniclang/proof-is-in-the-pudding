@@ -61,12 +61,12 @@ export function seed(): void {
   create({
     title: "Welcome to Tsonic Notes",
     content:
-      "This is a tiny full-stack webapp: HTML UI + JSON API, compiled TS -> C# -> NativeAOT.",
+      "This is a tiny full-stack webapp: HTML UI + JSON API, compiled from TypeScript to C#.",
   });
 
   create({
     title: "Try it",
     content:
-      "Open http://localhost:8080 and create/update/delete notes in your browser.",
+      "Use the configured server URL to create, update, and delete notes.",
   });
 }
