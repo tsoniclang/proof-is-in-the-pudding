@@ -358,6 +358,38 @@ function assertSourceImportPolicy(path, source) {
   for (const [, clause] of csharpTypeImports) {
     assert.equal(clause.trimStart().startsWith("type "), true, `${path} imports erased C# aliases as runtime values.`);
   }
+  assertNoRetiredNeutralAliases(
+    path,
+    source,
+    "lang",
+    new Set(["out", "ref", "inref", "borrow", "borrowMut", "defaultof"]),
+  );
+  assertNoRetiredNeutralAliases(
+    path,
+    source,
+    "types",
+    new Set(["ptr", "fnptr"]),
+  );
+}
+
+function assertNoRetiredNeutralAliases(path, source, subpath, forbidden) {
+  const pattern = new RegExp(
+    `(?:import|export)\\s+(?:type\\s+)?\\{([\\s\\S]*?)\\}\\s+from\\s+["']@tsonic/core/${subpath}\\.js["']`,
+    "gu",
+  );
+  for (const match of source.matchAll(pattern)) {
+    for (const binding of match[1].split(",")) {
+      const importedName = binding
+        .trim()
+        .replace(/^type\s+/u, "")
+        .split(/\s+as\s+/u)[0];
+      assert.equal(
+        forbidden.has(importedName),
+        false,
+        `${path} imports target-flavoured alias '${importedName}' from neutral @tsonic/core/${subpath}.js.`,
+      );
+    }
+  }
 }
 
 async function readProjectSource(projectDirectory) {
