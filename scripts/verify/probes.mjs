@@ -47,6 +47,7 @@ export async function probeServer(task, project, server, port) {
 export function assertFiniteOutput(project, output, projectDirectory) {
   const normalized = normalizeOutput(output);
   const validators = {
+    "bcl-typed-locations": assertBclTypedLocations,
     calculator: assertCalculator,
     fibonacci: assertFibonacci,
     hello: assertHello,
@@ -65,6 +66,10 @@ export function assertFiniteOutput(project, output, projectDirectory) {
 }
 
 function assertHello(output) {
+  assert.equal(output, "Hello from Tsonic!");
+}
+
+function assertBclTypedLocations(output) {
   assert.equal(output, [
     "Pointers: 2, 41, 10, 4",
     "Hello from Tsonic!",
