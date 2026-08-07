@@ -1,6 +1,9 @@
-# CLR Hello World + NativeAOT
+# CLR Hello World + Typed Locations + NativeAOT
 
-The TypeScript source calls `System.Console.WriteLine`. `ProofBclHelloWorld.csproj` is user-owned and enables `PublishAot`; Tsonic emits only C# source into `out/csharp`.
+The TypeScript source calls `System.Console.WriteLine` and proves neutral typed
+locations through local aliasing, fresh allocation, pointer parameter/return
+flow, and array-element mutation. `ProofBclHelloWorld.csproj` is user-owned and
+enables `PublishAot`; Tsonic emits only C# source into `out/csharp`.
 
 ```sh
 npm run build

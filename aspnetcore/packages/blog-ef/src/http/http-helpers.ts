@@ -4,7 +4,7 @@ import { StreamReader } from "@tsonic/dotnet/System.IO.js";
 import { Encoding } from "@tsonic/dotnet/System.Text.js";
 import { JsonSerializer } from "@tsonic/dotnet/System.Text.Json.js";
 import { Task } from "@tsonic/dotnet/System.Threading.Tasks.js";
-import { out } from "@tsonic/core/lang.js";
+import { out } from "@tsonic/csharp/lang.js";
 
 import {
   HttpResponseWritingExtensions,

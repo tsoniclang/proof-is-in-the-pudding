@@ -52,7 +52,7 @@ export const projectSpecs = Object.freeze([
   }),
   project("bcl-calculator", "bcl/packages/calculator", "bcl", "ProofBclCalculator", "finite", "calculator"),
   project("bcl-fibonacci", "bcl/packages/fibonacci", "bcl", "ProofBclFibonacci", "finite", "fibonacci"),
-  project("bcl-hello", "bcl/packages/hello-world", "bcl", "ProofBclHelloWorld", "finite", "hello", {
+  project("bcl-hello", "bcl/packages/hello-world", "bcl", "ProofBclHelloWorld", "finite", "bcl-typed-locations", {
     memoryMiB: 6_144,
     projectFile: "ProofBclHelloWorld.csproj",
     nativeAot: true,

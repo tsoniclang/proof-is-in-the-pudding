@@ -10,7 +10,7 @@ import { Console, Environment, Int32, InvalidOperationException } from "@tsonic/
 import { HttpListener, HttpListenerContext, HttpListenerRequest, HttpListenerResponse } from "@tsonic/dotnet/System.Net.js";
 import { StreamReader, StreamWriter } from "@tsonic/dotnet/System.IO.js";
 import { Encoding } from "@tsonic/dotnet/System.Text.js";
-import { out } from "@tsonic/core/lang.js";
+import { out } from "@tsonic/csharp/lang.js";
 import type { int } from "@tsonic/csharp/types.js";
 import * as TodoStore from "./TodoStore.js";
 import { serializeTodo, serializeTodos, serializeError, parseTodoCreate, parseTodoUpdate } from "./JsonHelpers.js";
