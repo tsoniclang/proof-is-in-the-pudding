@@ -130,12 +130,39 @@ export async function verifyArchitecture(root = repoRoot) {
   ]) {
     assert.equal(completeSource.includes(marker), false, `Product proof source contains retired marker '${marker}'.`);
   }
+  assert.deepEqual(
+    retiredNeutralMarkerImports(completeSource),
+    [],
+    "Product proof source imports retired neutral marker spellings.",
+  );
 
   return {
     files: files.length,
     projects: projectSpecs.length,
     workspaces: workspaceSpecs.length,
   };
+}
+
+function retiredNeutralMarkerImports(source) {
+  const retiredByModule = new Map([
+    ["@tsonic/core/lang.js", new Set(["borrow", "borrowMut", "defaultof", "fnptr", "inref", "out", "ptr", "ref"])],
+    ["@tsonic/core/types.js", new Set(["fnptr", "ptr"])],
+  ]);
+  const failures = [];
+  const pattern = /\b(?:import|export)\s+(?:type\s+)?\{([^}]*)\}\s+from\s+["'](@tsonic\/core\/(?:lang|types)\.js)["']/gu;
+  for (const match of source.matchAll(pattern)) {
+    const retiredExports = retiredByModule.get(match[2]);
+    const importedNames = match[1]
+      .split(",")
+      .map((specifier) => specifier.trim().replace(/^type\s+/u, "").split(/\s+as\s+/u)[0])
+      .filter((name) => name.length > 0);
+    for (const importedName of importedNames) {
+      if (retiredExports?.has(importedName) === true) {
+        failures.push(`${match[2]}:${importedName}`);
+      }
+    }
+  }
+  return failures;
 }
 
 export async function verifyRepositoryInputs(context) {
