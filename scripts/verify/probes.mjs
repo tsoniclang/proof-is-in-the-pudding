@@ -65,7 +65,10 @@ export function assertFiniteOutput(project, output, projectDirectory) {
 }
 
 function assertHello(output) {
-  assert.equal(output, "Hello from Tsonic!");
+  assert.equal(output, [
+    "Pointers: 2, 41, 10, 4",
+    "Hello from Tsonic!",
+  ].join("\n"));
 }
 
 function assertCalculator(output) {
