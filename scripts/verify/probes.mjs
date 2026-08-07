@@ -72,6 +72,8 @@ function assertHello(output) {
 function assertBclTypedLocations(output) {
   assert.equal(output, [
     "Pointers: 2, 41, 10, 4",
+    "Pointer identity: True, False, True, True, False",
+    "Pointer value field: 3",
     "Hello from Tsonic!",
   ].join("\n"));
 }
