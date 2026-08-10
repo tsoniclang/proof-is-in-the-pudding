@@ -50,6 +50,7 @@ export function assertFiniteOutput(project, output, projectDirectory) {
     "bcl-typed-locations": assertBclTypedLocations,
     calculator: assertCalculator,
     fibonacci: assertFibonacci,
+    "generators-resources": assertGeneratorsResources,
     hello: assertHello,
     "high-performance": assertHighPerformance,
     "bcl-parallel": assertBclParallel,
@@ -102,6 +103,21 @@ function assertFibonacci(output) {
   }
   expected.push("", "Iterative fibonacci (faster for large n):", "  fib(40) = 102334155");
   assert.equal(output, expected.join("\n"));
+}
+
+function assertGeneratorsResources(output) {
+  assert.equal(output, [
+    "sync:1,5,done:9",
+    "return:stopped:R",
+    "throw:RT",
+    "delegate:2,inner:5",
+    "async:10,12,async-done",
+    "for-await:10",
+    "suppressed:An error was suppressed during resource disposal.:RT21UVFOPXYD",
+    "resources-before-async-exit:RT21UVFOPXYD",
+    "resources-final:RT21UVFOPXYDA",
+    "top-level-disposed:RT21UVFOPXYDA",
+  ].join("\n"));
 }
 
 function assertHighPerformance(output) {
