@@ -52,6 +52,7 @@ export const projectSpecs = Object.freeze([
   }),
   project("bcl-calculator", "bcl/packages/calculator", "bcl", "ProofBclCalculator", "finite", "calculator"),
   project("bcl-fibonacci", "bcl/packages/fibonacci", "bcl", "ProofBclFibonacci", "finite", "fibonacci"),
+  project("bcl-generators-resources", "bcl/packages/generators-resources", "bcl", "ProofBclGeneratorsResources", "finite", "generators-resources"),
   project("bcl-hello", "bcl/packages/hello-world", "bcl", "ProofBclHelloWorld", "finite", "bcl-typed-locations", {
     memoryMiB: 6_144,
     projectFile: "ProofBclHelloWorld.csproj",
