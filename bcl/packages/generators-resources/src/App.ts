@@ -146,8 +146,10 @@ async function main(): Promise<void> {
   await useSelectedResource(new SyncResource("U"));
   await useSelectedResource(new AsyncResource("V"));
 
-  for (using loopResource = new SyncResource("F"); false;) {
+  let enterClassicLoop = false;
+  for (using loopResource = new SyncResource("F"); enterClassicLoop;) {
     void loopResource;
+    enterClassicLoop = false;
   }
 
   for (using resource of [
