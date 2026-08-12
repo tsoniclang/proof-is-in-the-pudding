@@ -53,6 +53,7 @@ export function assertFiniteOutput(project, output, projectDirectory) {
     "generators-resources": assertGeneratorsResources,
     hello: assertHello,
     "high-performance": assertHighPerformance,
+    "native-pointers": assertNativePointers,
     "bcl-parallel": assertBclParallel,
     "js-concurrency": assertJsConcurrency,
     "node-concurrency": assertNodeConcurrency,
@@ -68,6 +69,10 @@ export function assertFiniteOutput(project, output, projectDirectory) {
 
 function assertHello(output) {
   assert.equal(output, "Hello from Tsonic!");
+}
+
+function assertNativePointers(output) {
+  assert.equal(output, "Native pointers: 41, 41");
 }
 
 function assertBclTypedLocations(output) {

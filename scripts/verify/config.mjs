@@ -59,6 +59,9 @@ export const projectSpecs = Object.freeze([
     nativeAot: true,
   }),
   project("bcl-high-performance", "bcl/packages/high-performance", "bcl", "ProofBclHighPerformance", "finite", "high-performance"),
+  project("bcl-native-pointers", "bcl/packages/native-pointers", "bcl", "ProofBclNativePointers", "finite", "native-pointers", {
+    projectFile: "ProofBclNativePointers.csproj",
+  }),
   project("bcl-parallel", "bcl/packages/multithreading", "bcl", "ProofBclMultithreading", "finite", "bcl-parallel", {
     memoryMiB: 4_096,
   }),
@@ -106,6 +109,7 @@ export const memoryBudgetMiB = positiveInteger(process.env.PROOF_MEMORY_MIB, 11_
 export const dotnetIsolationEnvironment = Object.freeze({
   DOTNET_CLI_TELEMETRY_OPTOUT: "1",
   DOTNET_CLI_USE_MSBUILD_SERVER: "0",
+  DOTNET_HOSTBUILDER__RELOADCONFIGONCHANGE: "false",
   DOTNET_NOLOGO: "1",
   MSBUILDDISABLENODEREUSE: "1",
   UseSharedCompilation: "false",

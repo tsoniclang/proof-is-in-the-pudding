@@ -1,0 +1,15 @@
+{
+  "$schema": "https://tsonic.org/schema/v1.json",
+  "entryPoint": "App.ts",
+  "rootDir": "src",
+  "outDir": "out",
+  "targets": [{
+    "id": "csharp",
+    "options": {
+      "namespace": "Proof.Bcl.NativePointers",
+      "assemblyName": "ProofBclNativePointers",
+      "outputType": "Exe",
+      "projectFile": "ProofBclNativePointers.csproj"
+    }
+  }]
+}
