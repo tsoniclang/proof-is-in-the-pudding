@@ -59,6 +59,9 @@ export const projectSpecs = Object.freeze([
     nativeAot: true,
   }),
   project("bcl-high-performance", "bcl/packages/high-performance", "bcl", "ProofBclHighPerformance", "finite", "high-performance"),
+  project("bcl-native-pointers", "bcl/packages/native-pointers", "bcl", "ProofBclNativePointers", "finite", "native-pointers", {
+    projectFile: "ProofBclNativePointers.csproj",
+  }),
   project("bcl-parallel", "bcl/packages/multithreading", "bcl", "ProofBclMultithreading", "finite", "bcl-parallel", {
     memoryMiB: 4_096,
   }),
