@@ -109,6 +109,7 @@ export const memoryBudgetMiB = positiveInteger(process.env.PROOF_MEMORY_MIB, 11_
 export const dotnetIsolationEnvironment = Object.freeze({
   DOTNET_CLI_TELEMETRY_OPTOUT: "1",
   DOTNET_CLI_USE_MSBUILD_SERVER: "0",
+  DOTNET_HOSTBUILDER__RELOADCONFIGONCHANGE: "false",
   DOTNET_NOLOGO: "1",
   MSBUILDDISABLENODEREUSE: "1",
   UseSharedCompilation: "false",
