@@ -148,6 +148,7 @@ vite.config.ts.timestamp-*
 **/out/
 *.cs
 !*.d.cs
+!bcl/packages/native-pointers/NativePointerHarness.cs
 *.db
 *.db-shm
 *.db-wal
