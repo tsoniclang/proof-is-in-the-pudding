@@ -6,6 +6,7 @@
     <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
     <OutputType>Exe</OutputType>
     <AssemblyName>ProofBclNativePointers</AssemblyName>
+    <StartupObject>Proof.Bcl.NativePointers.NativePointerHarness</StartupObject>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <LangVersion>14.0</LangVersion>
   </PropertyGroup>
