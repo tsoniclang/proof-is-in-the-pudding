@@ -13,13 +13,13 @@ export function main(): void {
   Console.WriteLine("");
 
   // Results array to capture values from parallel workers (long for large sums)
-  const results: long[] = [0, 0, 0];
+  const results: long[] = [0n, 0n, 0n];
 
   // Run all three computations in parallel using Parallel.invoke
   Parallel.Invoke(
     () => {
       Console.WriteLine("Worker 1 starting on thread...");
-      let sum: long = 0;
+      let sum: long = 0n;
       for (let i: int = 0; i < iterations; i++) {
         sum += i;
       }
@@ -28,7 +28,7 @@ export function main(): void {
     },
     () => {
       Console.WriteLine("Worker 2 starting on thread...");
-      let sum: long = 0;
+      let sum: long = 0n;
       for (let i: int = 0; i < iterations; i++) {
         sum += i;
       }
@@ -37,7 +37,7 @@ export function main(): void {
     },
     () => {
       Console.WriteLine("Worker 3 starting on thread...");
-      let sum: long = 0;
+      let sum: long = 0n;
       for (let i: int = 0; i < iterations; i++) {
         sum += i;
       }
