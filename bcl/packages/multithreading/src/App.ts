@@ -1,6 +1,6 @@
 import { Console, Environment } from "@tsonic/dotnet/System.js";
 import { Parallel } from "@tsonic/dotnet/System.Threading.Tasks.js";
-import type { int, long } from "@tsonic/csharp/types.js";
+import type { long } from "@tsonic/csharp/types.js";
 
 export function main(): void {
   Console.WriteLine("=== Parallel Computation Test (BCL) ===");
@@ -8,19 +8,19 @@ export function main(): void {
   Console.WriteLine(`Processors: ${Environment.ProcessorCount}`);
   Console.WriteLine("");
 
-  const iterations: int = 100000;
+  const iterations: long = 100000n;
   Console.WriteLine(`Running 3 workers in PARALLEL with ${iterations} iterations each...`);
   Console.WriteLine("");
 
   // Results array to capture values from parallel workers (long for large sums)
-  const results: long[] = [0, 0, 0];
+  const results: long[] = [0n, 0n, 0n];
 
   // Run all three computations in parallel using Parallel.invoke
   Parallel.Invoke(
     () => {
       Console.WriteLine("Worker 1 starting on thread...");
-      let sum: long = 0;
-      for (let i: int = 0; i < iterations; i++) {
+      let sum: long = 0n;
+      for (let i: long = 0n; i < iterations; i++) {
         sum += i;
       }
       Console.WriteLine(`Worker 1 done. Sum: ${sum}`);
@@ -28,8 +28,8 @@ export function main(): void {
     },
     () => {
       Console.WriteLine("Worker 2 starting on thread...");
-      let sum: long = 0;
-      for (let i: int = 0; i < iterations; i++) {
+      let sum: long = 0n;
+      for (let i: long = 0n; i < iterations; i++) {
         sum += i;
       }
       Console.WriteLine(`Worker 2 done. Sum: ${sum}`);
@@ -37,8 +37,8 @@ export function main(): void {
     },
     () => {
       Console.WriteLine("Worker 3 starting on thread...");
-      let sum: long = 0;
-      for (let i: int = 0; i < iterations; i++) {
+      let sum: long = 0n;
+      for (let i: long = 0n; i < iterations; i++) {
         sum += i;
       }
       Console.WriteLine(`Worker 3 done. Sum: ${sum}`);

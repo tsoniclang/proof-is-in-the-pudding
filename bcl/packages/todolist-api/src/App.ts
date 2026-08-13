@@ -6,7 +6,7 @@
 //   PUT    /todos/:id   - Update a todo
 //   DELETE /todos/:id   - Delete a todo
 
-import { Console, Environment, Int32, InvalidOperationException } from "@tsonic/dotnet/System.js";
+import { Console, Convert, Environment, Int32, InvalidOperationException } from "@tsonic/dotnet/System.js";
 import { HttpListener, HttpListenerContext, HttpListenerRequest, HttpListenerResponse } from "@tsonic/dotnet/System.Net.js";
 import { StreamReader, StreamWriter } from "@tsonic/dotnet/System.IO.js";
 import { Encoding } from "@tsonic/dotnet/System.Text.js";
@@ -60,7 +60,7 @@ function sendJsonResponse(response: HttpListenerResponse, statusCode: int, json:
 
   const buffer = Encoding.UTF8.GetBytes(json);
   const bufferLength = buffer.Length;
-  response.ContentLength64 = bufferLength;
+  response.ContentLength64 = Convert.ToInt64(bufferLength);
 
   const output = response.OutputStream;
   output.Write(buffer, 0, bufferLength);
