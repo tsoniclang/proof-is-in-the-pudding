@@ -14,7 +14,7 @@
   <ItemGroup>
     <Compile Include="out/csharp/**/*.cs" />
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.9" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.11" />
     <PackageReference Include="SQLitePCLRaw.lib.e_sqlite3" Version="2.1.12" />
     <Reference Include="Tsonic.CSharp.Runtime" HintPath="$(TsonicCsharpRuntimeAssembly)" />
     <Reference Include="Tsonic.CSharp.Js" HintPath="$(TsonicCsharpJsAssembly)" />
