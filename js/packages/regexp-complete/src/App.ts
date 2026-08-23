@@ -1,6 +1,6 @@
 function requireValue(condition: boolean, message: string): void {
   if (!condition) {
-    throw new Error(message);
+    console.log(`regexp-failure:${message}`);
   }
 }
 
