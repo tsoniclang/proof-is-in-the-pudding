@@ -29,6 +29,7 @@ export const providerMaterializationAuditWorkspaces = Object.freeze([
 export const packageSpecs = Object.freeze([
   packageSpec("tsts", localRepositories.tsonic, "packages/tsts"),
   packageSpec("source-core", localRepositories.tsonic, "packages/source-core"),
+  packageSpec("js-source-profile", localRepositories.tsonic, "packages/js-source-profile"),
   packageSpec("target-api", localRepositories.tsonic, "packages/target-api"),
   packageSpec("host", localRepositories.tsonic, "packages/host"),
   packageSpec("cli", localRepositories.tsonic, "packages/cli"),
@@ -73,6 +74,10 @@ export const projectSpecs = Object.freeze([
   project("js-concurrency", "js/packages/concurrency", "js", "ProofJsConcurrency", "finite", "js-concurrency", { jsSurface: true }),
   project("js-fibonacci", "js/packages/fibonacci", "js", "ProofJsFibonacci", "finite", "fibonacci", { jsSurface: true }),
   project("js-hello", "js/packages/hello-world", "js", "ProofJsHelloWorld", "finite", "hello", { jsSurface: true }),
+  project("js-regexp-complete", "js/packages/regexp-complete", "js", "ProofJsRegExpComplete", "finite", "regexp-complete", {
+    jsSurface: true,
+    nativeAot: true,
+  }),
   project("js-notes", "js/packages/notes-webapp", "js", "ProofJsNotesWebApp", "server", "js-notes", {
     memoryMiB: 4_096,
     timeoutMinutes: 15,
