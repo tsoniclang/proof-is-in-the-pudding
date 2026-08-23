@@ -6,8 +6,13 @@ function requireValue(condition: boolean, message: string): void {
 
 export function main(): void {
   const original = /a/g;
-  requireValue(RegExp(original) === original, "RegExp call identity");
-  requireValue(new RegExp(original) !== original, "RegExp construction identity");
+  original.lastIndex = 2;
+  const called = RegExp(original);
+  called.lastIndex = 3;
+  requireValue(original.lastIndex === 3, "RegExp call identity");
+  const constructed = new RegExp(original);
+  constructed.lastIndex = 1;
+  requireValue(original.lastIndex === 3 && constructed.lastIndex === 1, "RegExp construction identity");
   requireValue(new RegExp("", "ygimsd").flags === "dgimsy", "canonical flags");
 
   requireValue(new RegExp("a+?").exec("aaa")?.[0] === "a", "lazy quantifier");
@@ -22,13 +27,13 @@ export function main(): void {
   const executed = expression.exec("ab12");
   requireValue(executed?.[0] === "ab12", "exec whole match");
   requireValue(executed?.groups?.word === "ab", "named group");
-  requireValue(executed?.indices?.[0]?.[0] === 0, "match index start");
-  requireValue(executed?.indices?.[0]?.[1] === 4, "match index end");
+  requireValue((executed?.indices?.[0]?.[0] ?? -1) === 0, "match index start");
+  requireValue((executed?.indices?.[0]?.[1] ?? -1) === 4, "match index end");
   requireValue(expression.lastIndex === 4, "global lastIndex");
   requireValue(expression.exec("ab12") === null && expression.lastIndex === 0, "failed global reset");
 
-  requireValue("😀".match(/./g)?.length === 2, "legacy UTF-16 code-unit matching");
-  requireValue("😀".match(/./gu)?.length === 1, "Unicode code-point matching");
+  requireValue(("😀".match(/./g)?.length ?? -1) === 2, "legacy UTF-16 code-unit matching");
+  requireValue(("😀".match(/./gu)?.length ?? -1) === 1, "Unicode code-point matching");
 
   const all: string[] = [];
   for (const item of "a1 b22".matchAll(/(?<letter>[a-z])(\d+)/dg)) {
