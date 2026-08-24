@@ -56,6 +56,7 @@ export function assertFiniteOutput(project, output, projectDirectory) {
     "native-pointers": assertNativePointers,
     "bcl-parallel": assertBclParallel,
     "js-concurrency": assertJsConcurrency,
+    "regexp-complete": (value) => assert.equal(value, "regexp-complete"),
     "node-concurrency": assertNodeConcurrency,
     "env-info": (value) => assertEnvironmentInfo(value, projectDirectory),
     "file-reader": assertFileReader,
