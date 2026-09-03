@@ -78,9 +78,9 @@ export async function verifyArchitecture(root = repoRoot) {
     const source = await readProjectSource(projectDirectory);
     const usesNodeModules = /(?:from\s+|import\s*)["']node:/u.test(source);
     const expectedDevDependencies = {
-      "@tsonic/cli": "0.0.1",
-      "@tsonic/target-csharp": "0.0.1",
-      ...(usesNodeModules ? { "@tsonic/csharp-nodejs": "0.0.1" } : {}),
+      "@tsonic/cli": "0.1.0",
+      "@tsonic/target-csharp": "0.1.0",
+      ...(usesNodeModules ? { "@tsonic/csharp-nodejs": "0.1.0" } : {}),
     };
     assert.equal(manifest.private, true, `${project.path} must be private.`);
     assert.equal(manifest.type, "module", `${project.path} must be ESM.`);
