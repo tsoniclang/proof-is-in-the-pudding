@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import {
   memoryBudgetMiB,
   projectSpecs,
-  providerMaterializationAuditWorkspaces,
+  providerMaterializationAuditProjects,
   repoRoot,
   workerLimit,
 } from "./verify/config.mjs";
@@ -82,7 +82,7 @@ try {
   const providerMaterialization = await runLoggedTask(
     context,
     "provider-materialization-contract",
-    () => verifyIncrementalProviderCaches(context, providerMaterializationAuditWorkspaces),
+    () => verifyIncrementalProviderCaches(context, providerMaterializationAuditProjects),
   );
   assert.equal(providerMaterialization.status, "passed", "Provider materialization contract failed.");
 } catch (error) {

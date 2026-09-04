@@ -143,6 +143,7 @@ vite.config.ts.timestamp-*
 
 # Tsonic build artifacts
 .tests/
+.analysis/
 **/.tsonic/
 **/generated/
 **/out/
