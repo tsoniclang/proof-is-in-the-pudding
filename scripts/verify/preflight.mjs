@@ -4,6 +4,7 @@ import { createHash } from "node:crypto";
 import { createReadStream } from "node:fs";
 import { cp, lstat, mkdir, readFile, readdir, realpath } from "node:fs/promises";
 import { relative, resolve } from "node:path";
+import { pathToFileURL } from "node:url";
 import {
   dotnetIsolationEnvironment,
   localRepositories,
@@ -13,6 +14,10 @@ import {
   workspaceSpecs,
 } from "./config.mjs";
 import { recordEvidence, runCommand, runLoggedTask } from "./runner.mjs";
+
+const { bindPackedWorkspaceDependencies, verifyPackedWorkspaceDependencies } = await import(
+  pathToFileURL(resolve(localRepositories.tsonic, "test/scripts/packed-workspace.mjs")).href
+);
 
 const ignoredDirectoryNames = new Set([
   ".git",
@@ -291,6 +296,12 @@ export async function installStagedWorkspaces(context, artifacts) {
       const result = await runLoggedTask(context, `install-${workspace.path}`, async (task) => {
         const selected = [...artifacts.values()].filter((artifact) => !artifact.nodeOnly || workspace.needsNodeCapability);
         const workspaceDirectory = resolve(context.stageRoot, workspace.path);
+        const manifests = [
+          resolve(workspaceDirectory, "package.json"),
+          ...projectSpecs.filter((project) => project.workspacePath === workspace.path)
+            .map((project) => resolve(context.stageRoot, project.path, "package.json")),
+        ];
+        const bindings = bindPackedWorkspaceDependencies(workspaceDirectory, manifests, selected);
         await runCommand(context, task, {
           id: `npm-install-${workspace.path}`,
           executable: "npm",
@@ -311,6 +322,7 @@ export async function installStagedWorkspaces(context, artifacts) {
           environment: {},
         });
         await verifyInstalledWorkspace(workspaceDirectory, workspace, selected);
+        verifyPackedWorkspaceDependencies(workspaceDirectory, bindings);
       });
       results.push(result);
     }
