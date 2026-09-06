@@ -8,6 +8,7 @@
   },
   "devDependencies": {
     "@tsonic/cli": "0.1.0",
-    "@tsonic/target-csharp": "0.1.0"
+    "@tsonic/target-csharp": "0.1.0",
+    "@proof/csharp-memory-abi": "file:../memory-abi"
   }
 }

@@ -1,0 +1,9 @@
+{
+  "name": "@proof/csharp-memory-abi",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "exports": { ".": "./index.mjs", "./package.json": "./package.json" },
+  "tsonic": { "kind": "plugin", "contractVersion": 1, "entry": "." },
+  "peerDependencies": { "@tsonic/source-core": "0.1.1" }
+}

@@ -86,6 +86,7 @@ export async function verifyArchitecture(root = repoRoot) {
       "@tsonic/cli": "0.1.0",
       "@tsonic/target-csharp": "0.1.0",
       ...(usesNodeModules ? { "@tsonic/csharp-nodejs": "0.1.0" } : {}),
+      ...project.capabilityDependencies,
     };
     assert.equal(manifest.private, true, `${project.path} must be private.`);
     assert.equal(manifest.type, "module", `${project.path} must be ESM.`);

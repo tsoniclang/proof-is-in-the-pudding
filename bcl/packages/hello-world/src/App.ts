@@ -1,5 +1,6 @@
 import { Console, InvalidOperationException } from "@tsonic/dotnet/System.js";
 import { verifyPointerViews } from "./pointer-views.js";
+import { verifyNativeMemory } from "./native-memory.js";
 import {
   addressOf,
   allocatePointer,
@@ -36,6 +37,7 @@ function updatePair(): int32 {
 
 export function main(): void {
   if (!verifyPointerViews()) throw new InvalidOperationException("pointer view contract failed");
+  if (!verifyNativeMemory()) throw new InvalidOperationException("native memory contract failed");
   let local: int32 = 1;
   const alias = addressOf(local);
   increment(alias);
