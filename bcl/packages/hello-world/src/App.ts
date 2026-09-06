@@ -1,4 +1,5 @@
-import { Console } from "@tsonic/dotnet/System.js";
+import { Console, InvalidOperationException } from "@tsonic/dotnet/System.js";
+import { verifyPointerViews } from "./pointer-views.js";
 import {
   addressOf,
   allocatePointer,
@@ -34,6 +35,7 @@ function updatePair(): int32 {
 }
 
 export function main(): void {
+  if (!verifyPointerViews()) throw new InvalidOperationException("pointer view contract failed");
   let local: int32 = 1;
   const alias = addressOf(local);
   increment(alias);
