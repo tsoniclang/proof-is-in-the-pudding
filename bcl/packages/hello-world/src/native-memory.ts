@@ -11,6 +11,17 @@ function create(): Pointer<uint32> { return allocatePointer<uint32>(41); }
 interface PointerHolder { pointer: Pointer<uint32> }
 interface RawHolder { pointer: RawPointer | undefined }
 function createRaw(): RawPointer | undefined { return toRawPointer(allocatePointer<uint32>(51), word); }
+function inferredRead(raw: RawPointer | undefined) {
+  unsafeContext();
+  return reinterpretRawPointer(raw, word);
+}
+function inferredOptional(flag: boolean) {
+  if (flag) return allocatePointer<uint32>(81);
+}
+function annotatedOptional(flag: boolean): Pointer<uint32> | undefined {
+  if (flag) return allocatePointer<uint32>(82);
+}
+function sameWord(actual: uint32, expected: uint32): boolean { return actual === expected; }
 export function parameterRoundTrip(value: uint32 = 71): Pointer<uint32> {
   unsafeContext();
   const original = addressOf(value);
@@ -66,9 +77,16 @@ export function verifyNativeMemory(): boolean {
   const parameter = parameterRoundTrip(incoming);
   if (incoming !== 71 || loadPointer(parameter) !== 73) return false;
   if (loadPointer(parameterRoundTrip()) !== 73) return false;
+  const inferred = inferredRead(raw);
+  if (inferred === undefined || !equalPointer(inferred, original)) return false;
+  storePointer(inferred, 84);
+  if (!sameWord(value, 84)) return false;
+  const optional = inferredOptional(true);
+  if (optional === undefined || loadPointer(optional) !== 81 || inferredOptional(false) !== undefined) return false;
+  const annotated = annotatedOptional(true);
+  if (annotated === undefined || loadPointer(annotated) !== 82 || annotatedOptional(false) !== undefined) return false;
   const nil = toRawPointer<uint32>(undefined, word);
   if (!equalRawPointer(nil, undefined) || reinterpretRawPointer(nil, word) !== undefined) return false;
   keepAlive(raw);
   return equalRawPointer(toRawPointer(restored, word), raw);
 }
-
