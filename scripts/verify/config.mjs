@@ -58,6 +58,7 @@ export const projectSpecs = Object.freeze([
     memoryMiB: 6_144,
     projectFile: "ProofBclHelloWorld.csproj",
     nativeAot: true,
+    capabilityDependencies: { "@proof/csharp-memory-abi": "file:../memory-abi" },
   }),
   project("bcl-high-performance", "bcl/packages/high-performance", "bcl", "ProofBclHighPerformance", "finite", "high-performance"),
   project("bcl-native-pointers", "bcl/packages/native-pointers", "bcl", "ProofBclNativePointers", "finite", "native-pointers", {
@@ -137,6 +138,7 @@ function project(id, path, workspacePath, assembly, kind, contract, options = {}
     kind,
     contract,
     dependencies: Object.freeze(options.dependencies ?? []),
+    capabilityDependencies: Object.freeze(options.capabilityDependencies ?? {}),
     memoryMiB: options.memoryMiB ?? 3_072,
     timeoutMinutes: options.timeoutMinutes ?? 10,
     projectFile: options.projectFile,
