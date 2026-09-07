@@ -1,4 +1,5 @@
 import { abi } from "test:abi";
+import { verifyNativeStorage } from "./native-storage.js";
 import { memoryLayout, allocatePointer, addressOf, loadPointer, storePointer,
   toRawPointer, reinterpretRawPointer, equalPointer, equalRawPointer, hashPointer,
   offsetRawPointer, unsafeContext, keepAlive } from "@tsonic/core/lang.js";
@@ -107,7 +108,7 @@ export function verifyNativeMemory(): boolean {
   if (optional === undefined || loadPointer(optional) !== 81 || inferredOptional(false) !== undefined) return false;
   const annotated = annotatedOptional(true);
   if (annotated === undefined || loadPointer(annotated) !== 82 || annotatedOptional(false) !== undefined) return false;
-  if (!callableReturns()) return false;
+  if (!callableReturns() || !verifyNativeStorage()) return false;
   const nil = toRawPointer<uint32>(undefined, word);
   if (!equalRawPointer(nil, undefined) || reinterpretRawPointer(nil, word) !== undefined) return false;
   keepAlive(raw);
