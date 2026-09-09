@@ -14,6 +14,7 @@ import {
   workspaceSpecs,
 } from "./config.mjs";
 import { recordEvidence, runCommand, runLoggedTask } from "./runner.mjs";
+import { loadScenarios } from "./scenarios.mjs";
 
 const { bindPackedWorkspaceDependencies, verifyPackedWorkspaceDependencies } = await import(
   pathToFileURL(resolve(localRepositories.tsonic, "test/scripts/packed-workspace.mjs")).href
@@ -146,6 +147,7 @@ export async function verifyArchitecture(root = repoRoot) {
     files: files.length,
     projects: projectSpecs.length,
     workspaces: workspaceSpecs.length,
+    scenarios: await loadScenarios(root, configs),
   };
 }
 

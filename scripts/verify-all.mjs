@@ -18,6 +18,7 @@ import {
 } from "./verify/preflight.mjs";
 import { allocateServerPorts } from "./verify/probes.mjs";
 import { verifyIncrementalProviderCaches } from "./verify/provider-materialization.mjs";
+import { inspectScenarioArguments, inspectScenarios } from "./verify/scenarios.mjs";
 import {
   cleanupTransientUnits,
   createRunContext,
@@ -28,6 +29,8 @@ import {
   startProgressTimer,
   writeConsolidatedReport,
 } from "./verify/runner.mjs";
+
+if (await inspectScenarioArguments(process.argv.slice(2), inspectScenarios)) process.exit(0);
 
 const context = await createRunContext(repoRoot, workerLimit, memoryBudgetMiB);
 recoverOrphanedProofUnits(context);
@@ -49,6 +52,7 @@ for (const signal of ["SIGINT", "SIGTERM"]) {
 try {
   const architecture = await runLoggedTask(context, "architecture-contract", async () => {
     const counts = await verifyArchitecture();
+    context.scenarios = counts.scenarios;
     recordEvidence(
       context,
       `ARCHITECTURE files=${counts.files} workspaces=${counts.workspaces} projects=${counts.projects}`,
