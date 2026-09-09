@@ -1,0 +1,676 @@
+{
+  "schemaVersion": 1,
+  "suite": "csharp",
+  "scenarios": [
+    {
+      "id": "arithmetic/add-10-3",
+      "classification": "paired",
+      "contract": "Adding 10 and 3 returns 13.",
+      "proofs": [
+        {
+          "project": "bcl-calculator",
+          "level": "runtime",
+          "sources": ["bcl/packages/calculator/src/App.ts"],
+          "assertions": [
+            {"file":"scripts/verify/probes.mjs","contains":"\"add(x, y) = 13\""}
+          ],
+          "outcome": "Exact calculator stdout includes add(x, y) = 13."
+        },
+        {
+          "project": "js-calculator",
+          "level": "runtime",
+          "sources": ["js/packages/calculator/src/App.ts"],
+          "assertions": [
+            {"file":"scripts/verify/probes.mjs","contains":"\"add(x, y) = 13\""}
+          ],
+          "outcome": "Exact calculator stdout includes add(x, y) = 13."
+        }
+      ]
+    },
+    {
+      "id": "arithmetic/fractional-demo-and-zero-message",
+      "classification": "unpaired",
+      "contract": "For 10 and 3, subtraction is 7, multiplication is 30 and division is 3.3333333333333335; a zero divisor prints an error.",
+      "reason": "Rust native division uses 10/2 and throws for zero; Rust JS calculator tests Math/Number instead.",
+      "proofs": [
+        {
+          "project": "bcl-calculator",
+          "level": "runtime",
+          "sources": ["bcl/packages/calculator/src/App.ts"],
+          "assertions": [
+            {"file":"scripts/verify/probes.mjs","contains":"\"subtract(x, y) = 7\""},
+            {"file":"scripts/verify/probes.mjs","contains":"\"multiply(x, y) = 30\""},
+            {"file":"scripts/verify/probes.mjs","contains":"\"divide(x, y) = 3.3333333333333335\""},
+            {"file":"scripts/verify/probes.mjs","contains":"\"Error: Division by zero!\""}
+          ],
+          "outcome": "The entire demo output is compared, including the zero-divisor message; its return value is not asserted."
+        },
+        {
+          "project": "js-calculator",
+          "level": "runtime",
+          "sources": ["js/packages/calculator/src/App.ts"],
+          "assertions": [
+            {"file":"scripts/verify/probes.mjs","contains":"\"subtract(x, y) = 7\""},
+            {"file":"scripts/verify/probes.mjs","contains":"\"multiply(x, y) = 30\""},
+            {"file":"scripts/verify/probes.mjs","contains":"\"divide(x, y) = 3.3333333333333335\""},
+            {"file":"scripts/verify/probes.mjs","contains":"\"Error: Division by zero!\""}
+          ],
+          "outcome": "The entire demo output is compared, including the zero-divisor message; its return value is not asserted."
+        }
+      ]
+    },
+    {
+      "id": "fibonacci/recursive-0-through-5",
+      "classification": "paired",
+      "contract": "Recursive Fibonacci at inputs 0 through 5 returns 0, 1, 1, 2, 3, 5.",
+      "proofs": [
+        {
+          "project": "bcl-fibonacci",
+          "level": "runtime",
+          "sources": ["bcl/packages/fibonacci/src/App.ts"],
+          "assertions": [
+            {"file":"scripts/verify/probes.mjs","contains":"const values = [0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55];"},
+            {"file":"scripts/verify/probes.mjs","contains":"assert.equal(output, expected.join(\"\\n\"));"}
+          ],
+          "outcome": "Exact output includes each recursive result for inputs 0..5."
+        },
+        {
+          "project": "js-fibonacci",
+          "level": "runtime",
+          "sources": ["js/packages/fibonacci/src/App.ts"],
+          "assertions": [
+            {"file":"scripts/verify/probes.mjs","contains":"const values = [0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55];"},
+            {"file":"scripts/verify/probes.mjs","contains":"assert.equal(output, expected.join(\"\\n\"));"}
+          ],
+          "outcome": "Exact output includes each recursive result for inputs 0..5."
+        }
+      ]
+    },
+    {
+      "id": "fibonacci/extended-recursion-and-iteration",
+      "classification": "unpaired",
+      "contract": "Recursive Fibonacci at 6..10 gives 8,13,21,34,55 and iterative Fibonacci at 40 gives 102334155.",
+      "reason": "Rust native additionally checks recursive input 6, but neither Rust proof checks 7..10 or iterative input 40.",
+      "proofs": [
+        {
+          "project": "bcl-fibonacci",
+          "level": "runtime",
+          "sources": ["bcl/packages/fibonacci/src/App.ts"],
+          "assertions": [
+            {"file":"scripts/verify/probes.mjs","contains":"const values = [0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55];"},
+            {"file":"scripts/verify/probes.mjs","contains":"\"  fib(40) = 102334155\""}
+          ],
+          "outcome": "Full recursive table and fib(40) output are enforced."
+        },
+        {
+          "project": "js-fibonacci",
+          "level": "runtime",
+          "sources": ["js/packages/fibonacci/src/App.ts"],
+          "assertions": [
+            {"file":"scripts/verify/probes.mjs","contains":"const values = [0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55];"},
+            {"file":"scripts/verify/probes.mjs","contains":"\"  fib(40) = 102334155\""}
+          ],
+          "outcome": "Full recursive table and fib(40) output are enforced."
+        }
+      ]
+    },
+    {
+      "id": "generators/send-delegate-and-finally",
+      "classification": "paired",
+      "contract": "Generator next inputs determine yielded/returned values; yield-star forwards the inner result; return and throw execute finally cleanup.",
+      "proofs": [
+        {
+          "project": "bcl-generators-resources",
+          "level": "runtime",
+          "sources": ["bcl/packages/generators-resources/src/App.ts"],
+          "assertions": [
+            {"file":"scripts/verify/probes.mjs","contains":"\"sync:1,5,done:9\""},
+            {"file":"scripts/verify/probes.mjs","contains":"\"delegate:2,inner:5\""},
+            {"file":"scripts/verify/probes.mjs","contains":"\"return:stopped:R\""},
+            {"file":"scripts/verify/probes.mjs","contains":"\"throw:RT\""}
+          ],
+          "outcome": "sync:1,5,done:9; delegate:2,inner:5; return:stopped:R; throw:RT. Completion flags and caught-error identity are not asserted."
+        }
+      ]
+    },
+    {
+      "id": "generators/async-next-and-iteration",
+      "classification": "paired",
+      "contract": "Queued async-generator next inputs retain request order and for-await consumes the yielded values.",
+      "proofs": [
+        {
+          "project": "bcl-generators-resources",
+          "level": "runtime",
+          "sources": ["bcl/packages/generators-resources/src/App.ts"],
+          "assertions": [
+            {"file":"scripts/verify/probes.mjs","contains":"\"async:10,12,async-done\""},
+            {"file":"scripts/verify/probes.mjs","contains":"\"for-await:10\""}
+          ],
+          "outcome": "Queued next requests produce 10,12,async-done; for-await sums 3 and 7 to 10."
+        }
+      ]
+    },
+    {
+      "id": "resources/sync-and-async-disposal",
+      "classification": "paired",
+      "contract": "Leaving using and await-using scopes invokes the respective disposal method.",
+      "proofs": [
+        {
+          "project": "bcl-generators-resources",
+          "level": "runtime",
+          "sources": ["bcl/packages/generators-resources/src/App.ts"],
+          "assertions": [
+            {"file":"scripts/verify/probes.mjs","contains":"\"resources-before-async-exit:RT21UVFOPXYD\""},
+            {"file":"scripts/verify/probes.mjs","contains":"\"resources-final:RT21UVFOPXYDA\""}
+          ],
+          "outcome": "Synchronous disposal contributes 21 to the log; awaited asynchronous disposal adds A before final output."
+        }
+      ]
+    },
+    {
+      "id": "resources/loops-suppression-and-top-level",
+      "classification": "unpaired",
+      "contract": "Resource selection, loop scopes, body-plus-disposal failure and top-level using preserve the expected cleanup log.",
+      "reason": "Rust resource proof checks two local disposal counters, not these loop, suppression or top-level cases.",
+      "proofs": [
+        {
+          "project": "bcl-generators-resources",
+          "level": "runtime",
+          "sources": ["bcl/packages/generators-resources/src/App.ts"],
+          "assertions": [
+            {"file":"scripts/verify/probes.mjs","contains":"\"suppressed:An error was suppressed during resource disposal.:RT21UVFOPXYD\""},
+            {"file":"scripts/verify/probes.mjs","contains":"\"top-level-disposed:RT21UVFOPXYDA\""}
+          ],
+          "outcome": "UVFOPXYD and final A appear in order; the suppression message and top-level disposal output are exact."
+        }
+      ]
+    },
+    {
+      "id": "memory/typed-pointer-views",
+      "classification": "paired",
+      "contract": "Bound/projected pointers preserve identity and hash, defer callbacks, handle absent views and share writes across numeric and boolean projections.",
+      "proofs": [
+        {
+          "project": "bcl-hello",
+          "level": "runtime",
+          "sources": ["bcl/packages/hello-world/src/App.ts","bcl/packages/hello-world/src/pointer-views.ts"],
+          "assertions": [
+            {"file":"bcl/packages/hello-world/src/App.ts","contains":"if (!verifyPointerViews()) throw new InvalidOperationException(\"pointer view contract failed\");"},
+            {"file":"bcl/packages/hello-world/src/pointer-views.ts","contains":"if (!same(value, 9) || !same(reads, 1) || !same(writes, 1) || loadPointer(alias) !== 9) return false;"},
+            {"file":"bcl/packages/hello-world/src/pointer-views.ts","contains":"if (!same(value, 0) || loadPointer(flag)) return false;"}
+          ],
+          "outcome": "The reached boolean verifier rejects eager callbacks, identity/hash drift or incorrect writes."
+        }
+      ]
+    },
+    {
+      "id": "memory/native-roundtrips-and-retention",
+      "classification": "paired",
+      "contract": "An explicit little-endian 64-bit ABI preserves typed/raw pointer identity, alias writes, byte views, retained owners, optional returns and parameter value isolation.",
+      "proofs": [
+        {
+          "project": "bcl-hello",
+          "level": "runtime",
+          "sources": ["bcl/packages/hello-world/src/App.ts","bcl/packages/hello-world/src/native-memory.ts","bcl/packages/memory-abi/index.mjs"],
+          "assertions": [
+            {"file":"bcl/packages/hello-world/src/App.ts","contains":"if (!verifyNativeMemory()) throw new InvalidOperationException(\"native memory contract failed\");"},
+            {"file":"bcl/packages/hello-world/src/native-memory.ts","contains":"if (!equalPointer(original, restored) || hashPointer(original) !== hashPointer(restored)) return false;"},
+            {"file":"bcl/packages/hello-world/src/native-memory.ts","contains":"if (incoming !== 71 || loadPointer(parameter) !== 73) return false;"},
+            {"file":"bcl/packages/hello-world/src/native-memory.ts","contains":"if (!equalRawPointer(nil, undefined) || reinterpretRawPointer(nil, word) !== undefined) return false;"}
+          ],
+          "outcome": "Reached verifier checks writes 9/17/33, retained allocation and field/array replacements, parameter 71/73, optional returns and null raw pointers."
+        }
+      ]
+    },
+    {
+      "id": "memory/native-storage-aliasing",
+      "classification": "paired",
+      "contract": "Array-element and field pointers retain their original aliased backing after owner rebinding; explicit stride and raw roundtrips preserve writes.",
+      "proofs": [
+        {
+          "project": "bcl-hello",
+          "level": "runtime",
+          "sources": ["bcl/packages/hello-world/src/App.ts","bcl/packages/hello-world/src/native-memory.ts","bcl/packages/hello-world/src/native-storage.ts"],
+          "assertions": [
+            {"file":"bcl/packages/hello-world/src/App.ts","contains":"if (!verifyNativeMemory()) throw new InvalidOperationException(\"native memory contract failed\");"},
+            {"file":"bcl/packages/hello-world/src/native-memory.ts","contains":"if (!callableReturns() || !verifyNativeStorage()) return false;"},
+            {"file":"bcl/packages/hello-world/src/native-storage.ts","contains":"if (neighbor === undefined || loadPointer(neighbor) !== 8) throw new Error(\"array stride\");"},
+            {"file":"bcl/packages/hello-world/src/native-storage.ts","contains":"return loadPointer(element) === 21 && loadPointer(field) === 22;"}
+          ],
+          "outcome": "Stride 8 selects neighbor 8; retained element/field writes end at 21 and 22."
+        }
+      ]
+    },
+    {
+      "id": "memory/allocated-pointer-write-40-to-41",
+      "classification": "paired",
+      "contract": "Writing through a pointer allocated with 40 makes a subsequent load return 41.",
+      "proofs": [
+        {
+          "project": "bcl-hello",
+          "level": "runtime",
+          "sources": ["bcl/packages/hello-world/src/App.ts"],
+          "assertions": [
+            {"file":"scripts/verify/probes.mjs","contains":"\"Pointers: 2, 41, 10, 4\""}
+          ],
+          "outcome": "Pointers output contains allocated value 41."
+        }
+      ]
+    },
+    {
+      "id": "memory/local-element-and-value-field-identities",
+      "classification": "unpaired",
+      "contract": "Local, independent allocation, absent, array-element and value-struct field pointer identities yield the exact expected values.",
+      "reason": "Rust has different local/class-field/transitive-forwarding assertions; the value-struct and absent/independent identity outputs are not paired.",
+      "proofs": [
+        {
+          "project": "bcl-hello",
+          "level": "runtime",
+          "sources": ["bcl/packages/hello-world/src/App.ts"],
+          "assertions": [
+            {"file":"scripts/verify/probes.mjs","contains":"\"Pointers: 2, 41, 10, 4\""},
+            {"file":"scripts/verify/probes.mjs","contains":"\"Pointer identity: True, False, True, True, False\""},
+            {"file":"scripts/verify/probes.mjs","contains":"\"Pointer value field: 3\""}
+          ],
+          "outcome": "Pointers 2,41,10,4; identities True,False,True,True,False; value field 3."
+        }
+      ]
+    },
+    {
+      "id": "native-pointer/copy-offset-zero",
+      "classification": "unpaired",
+      "contract": "A native pointer copy with element offset zero returns 41 and stores 41 into the destination.",
+      "reason": "Rust native-pointer functions are library-only with no runtime harness; Cargo-provider byte reads are a different assertion.",
+      "proofs": [
+        {
+          "project": "bcl-native-pointers",
+          "level": "runtime",
+          "sources": ["bcl/packages/native-pointers/src/App.ts","bcl/packages/native-pointers/NativePointerHarness.cs"],
+          "assertions": [
+            {"file":"bcl/packages/native-pointers/NativePointerHarness.cs","contains":"int result = App.copyAndRead(&source, &destination, 0);"},
+            {"file":"scripts/verify/probes.mjs","contains":"assert.equal(output, \"Native pointers: 41, 41\");"}
+          ],
+          "outcome": "Native harness invokes the generated TS function; exact stdout is Native pointers: 41, 41."
+        }
+      ]
+    },
+    {
+      "id": "dotnet/native-aot-execution",
+      "classification": "native-only",
+      "contract": "NativeAOT-published executables satisfy the same finite-output contract as their managed executions.",
+      "reason": ".NET NativeAOT publication is a native toolchain contract, not a Rust counterpart requirement.",
+      "proofs": [
+        {
+          "project": "bcl-hello",
+          "level": "runtime",
+          "sources": ["bcl/packages/hello-world/src/App.ts"],
+          "assertions": [
+            {"file":"scripts/verify/projects.mjs","contains":"if (project.nativeAot) await verifyNativeAot(context, task, project, projectDirectory, dotnetProject, commonEnvironment);"},
+            {"file":"scripts/verify/probes.mjs","contains":"\"Pointer value field: 3\""}
+          ],
+          "outcome": "Published typed/native-memory proof satisfies assertBclTypedLocations."
+        },
+        {
+          "project": "js-regexp-complete",
+          "level": "runtime",
+          "sources": ["js/packages/regexp-complete/src/App.ts"],
+          "assertions": [
+            {"file":"scripts/verify/projects.mjs","contains":"id: `${project.id}-nativeaot-run`,"},
+            {"file":"scripts/verify/probes.mjs","contains":"\"regexp-complete\": (value) => assert.equal(value, \"regexp-complete\"),"}
+          ],
+          "outcome": "Published regex proof emits only regexp-complete."
+        }
+      ]
+    },
+    {
+      "id": "dotnet/span-memory-views-and-copy",
+      "classification": "native-only",
+      "contract": "CLR Span slicing/fill mutates the original array, chunking respects bounds, Memory exposes length and Span.CopyTo copies three elements.",
+      "reason": "Explicit CLR Span/Memory provider contracts; not equivalent to Rust fixed-array syntax.",
+      "proofs": [
+        {
+          "project": "bcl-high-performance",
+          "level": "runtime",
+          "sources": ["bcl/packages/high-performance/src/App.ts"],
+          "assertions": [
+            {"file":"scripts/verify/probes.mjs","contains":"\"[1, 2, 99, 99, 99, 99, 99, 8, 9, 10]\""},
+            {"file":"scripts/verify/probes.mjs","contains":"\"After copy: [100, 200, 300, 0, 0]\""}
+          ],
+          "outcome": "Exact full demo output checks lengths 10/5, fill 99, chunk sizes 3/3/3/1 and destination 100,200,300,0,0."
+        }
+      ]
+    },
+    {
+      "id": "dotnet/parallel-worker-results",
+      "classification": "native-only",
+      "contract": "CLR Parallel.Invoke completes three 100000-iteration sums and exposes a positive processor count.",
+      "reason": "CLR Parallel.Invoke is the selected native concurrency API.",
+      "proofs": [
+        {
+          "project": "bcl-parallel",
+          "level": "runtime",
+          "sources": ["bcl/packages/multithreading/src/App.ts"],
+          "assertions": [
+            {"file":"scripts/verify/probes.mjs","contains":"\"Total: 14999850000\""},
+            {"file":"scripts/verify/probes.mjs","contains":"assert.match(lines[2], /^Processors: [1-9][0-9]*$/u);"}
+          ],
+          "outcome": "Each worker sum is 4999950000 and total is 14999850000; worker event order is ignored, timing/speedup is not asserted."
+        }
+      ]
+    },
+    {
+      "id": "dotnet/httplistener-todo-crud",
+      "classification": "native-only",
+      "contract": "A CLR HttpListener todo server enforces seeded JSON, create/update/delete results and malformed-input/not-found status codes.",
+      "reason": "Explicit CLR HttpListener/System.Text.Json proof; the Node version is a separate portable lane.",
+      "proofs": [
+        {
+          "project": "bcl-todo",
+          "level": "runtime",
+          "sources": ["bcl/packages/todolist-api/src/App.ts","bcl/packages/todolist-api/src/JsonHelpers.ts","bcl/packages/todolist-api/src/TodoStore.ts"],
+          "assertions": [
+            {"file":"scripts/verify/probes.mjs","contains":"assert.deepEqual(created, { id: 4, title: \"Airplane grade\", completed: false });"},
+            {"file":"scripts/verify/probes.mjs","contains":"assert.deepEqual(await requestJson(task, item, undefined, 404), { error: \"Todo not found\" });"}
+          ],
+          "outcome": "Seed count 3; POST 201 id 4; PUT 200; DELETE 204; subsequent GET 404; malformed input 400."
+        }
+      ]
+    },
+    {
+      "id": "node/http-todo-crud",
+      "classification": "unpaired",
+      "contract": "A node:http todo server enforces seeded JSON, create/update/delete results and malformed-input/not-found status codes.",
+      "reason": "No Rust Pudding node:http application probe. Runtime package tests elsewhere are not substitutes.",
+      "proofs": [
+        {
+          "project": "js-todo",
+          "level": "runtime",
+          "sources": ["js/packages/todolist-api/src/App.ts","js/packages/todolist-api/src/JsonHelpers.ts","js/packages/todolist-api/src/TodoStore.ts"],
+          "assertions": [
+            {"file":"scripts/verify/probes.mjs","contains":"\"js-todo\": probeTodoApi,"},
+            {"file":"scripts/verify/probes.mjs","contains":"assert.deepEqual(created, { id: 4, title: \"Airplane grade\", completed: false });"},
+            {"file":"scripts/verify/probes.mjs","contains":"await request(task, collection, jsonRequest(\"POST\", \"{\"), 400);"}
+          ],
+          "outcome": "Same probeTodoApi status/body assertions as the CLR variant, using Node transport with the JS surface; parsing still imports System.Text.Json."
+        }
+      ]
+    },
+    {
+      "id": "node/http-notes-crud",
+      "classification": "unpaired",
+      "contract": "A node:http notes server serves health/HTML and enforces note CRUD status codes, JSON shapes and parseable timestamps.",
+      "reason": "No Rust Pudding notes HTTP proof; C# input deserialization uses a native provider.",
+      "proofs": [
+        {
+          "project": "js-notes",
+          "level": "runtime",
+          "sources": ["js/packages/notes-webapp/src/App.ts","js/packages/notes-webapp/src/NotesStore.ts","js/packages/notes-webapp/src/JsonHelpers.ts"],
+          "assertions": [
+            {"file":"scripts/verify/probes.mjs","contains":"assert.equal(updated.content, \"Airplane grade\");"},
+            {"file":"scripts/verify/probes.mjs","contains":"assert.deepEqual(await requestJson(task, item, undefined, 404), { error: \"Note not found\" });"},
+            {"file":"scripts/verify/probes.mjs","contains":"assert.deepEqual(Object.keys(note).sort(), [\"content\", \"createdAt\", \"id\", \"title\", \"updatedAt\"]);"}
+          ],
+          "outcome": "Two initial notes; POST 201; PUT content Airplane grade; DELETE 204; GET 404; IDs/types/dates checked. Browser JS and timestamp monotonicity are not checked."
+        }
+      ]
+    },
+    {
+      "id": "node/http-text-response",
+      "classification": "unpaired",
+      "contract": "GET / on a node:http server returns status 200 and the text Hello from Tsonic!.",
+      "reason": "No Rust Pudding node:http executable server.",
+      "proofs": [
+        {
+          "project": "node-web",
+          "level": "runtime",
+          "sources": ["nodejs/packages/webserver/src/App.ts"],
+          "assertions": [
+            {"file":"scripts/verify/probes.mjs","contains":"assert.equal(await request(task, `${base}/`, undefined, 200), \"Hello from Tsonic!\");"}
+          ],
+          "outcome": "probeNodeWeb checks status and exact text only, not headers or binary bodies."
+        }
+      ]
+    },
+    {
+      "id": "dotnet/aspnet-blog-create",
+      "classification": "native-only",
+      "contract": "An ASP.NET minimal API serves blog HTML, lists a seeded post, rejects invalid create JSON and creates a second post.",
+      "reason": "ASP.NET framework/provider/user-project ownership is native-specific; no emulated Rust framework lane.",
+      "proofs": [
+        {
+          "project": "aspnet-blog",
+          "level": "runtime",
+          "sources": ["aspnetcore/packages/blog/src/App.ts"],
+          "assertions": [
+            {"file":"scripts/verify/probes.mjs","contains":"async function probeAspNetBlog(task, base) {"},
+            {"file":"scripts/verify/probes.mjs","contains":"{ id: 2, title: \"Architecture\", content: \"Airplane grade\" },"}
+          ],
+          "outcome": "GET seed exact; detail route 404; malformed/wrong-shape POST 400; create 201 id 2."
+        }
+      ]
+    },
+    {
+      "id": "dotnet/ef-sqlite-blog-crud",
+      "classification": "native-only",
+      "contract": "An ASP.NET EF Core/SQLite blog creates, reads, updates and deletes posts, creates/lists comments and returns typed dated JSON.",
+      "reason": "EF Core, SQLite package/provider materialization and ASP.NET are explicit native dependencies.",
+      "proofs": [
+        {
+          "project": "aspnet-ef",
+          "level": "runtime",
+          "sources": ["aspnetcore/packages/blog-ef/src/App.ts","aspnetcore/packages/blog-ef/src/server.ts","aspnetcore/packages/blog-ef/src/db/context.ts","aspnetcore/packages/blog-ef/src/db/options.ts","aspnetcore/packages/blog-ef/src/routes/posts.ts","aspnetcore/packages/blog-ef/src/routes/comments.ts"],
+          "assertions": [
+            {"file":"scripts/verify/probes.mjs","contains":"async function probeAspNetEf(task, base) {"},
+            {"file":"scripts/verify/probes.mjs","contains":"assert.equal(comments.length, 1);"},
+            {"file":"scripts/verify/probes.mjs","contains":"assert.equal(comment.author, \"Reviewer\");"},
+            {"file":"scripts/verify/probes.mjs","contains":"assert.deepEqual(await requestJson(task, postUrl, undefined, 404), { error: \"Post not found\" });"}
+          ],
+          "outcome": "Health true, initial post count 1, exact JSON keys/types and parseable dates, CRUD statuses, one Reviewer/Verified comment. Restart persistence, cascade deletion and browser interaction are not asserted."
+        }
+      ]
+    },
+    {
+      "id": "js/cooperative-worker-results",
+      "classification": "unpaired",
+      "contract": "Three Promise.all workers yield via timers and each sum 0..99999 to 4999950000, totaling 14999850000.",
+      "reason": "Rust native-async is compile-only and not a JS timer/Promise.all worker proof.",
+      "proofs": [
+        {
+          "project": "js-concurrency",
+          "level": "runtime",
+          "sources": ["js/packages/concurrency/src/App.ts"],
+          "assertions": [
+            {"file":"scripts/verify/probes.mjs","contains":"\"js-concurrency\": assertJsConcurrency,"},
+            {"file":"scripts/verify/probes.mjs","contains":"\"Total: 14999850000\""}
+          ],
+          "outcome": "All six start/done events and ordered result lines are checked; no timing or parallel speedup claim."
+        }
+      ]
+    },
+    {
+      "id": "node/cooperative-worker-results",
+      "classification": "unpaired",
+      "contract": "Three Promise.all workers yield via timers and each sum 0..99999 to 4999950000, totaling 14999850000.",
+      "reason": "No Rust Pudding node:timers/os worker execution.",
+      "proofs": [
+        {
+          "project": "node-concurrency",
+          "level": "runtime",
+          "sources": ["nodejs/packages/concurrency/src/App.ts"],
+          "assertions": [
+            {"file":"scripts/verify/probes.mjs","contains":"\"node-concurrency\": assertNodeConcurrency,"},
+            {"file":"scripts/verify/probes.mjs","contains":"\"Total: 14999850000\""}
+          ],
+          "outcome": "All six start/done events and ordered result lines are checked; no timing or parallel speedup claim."
+        }
+      ]
+    },
+    {
+      "id": "console/greeting-text",
+      "classification": "unpaired",
+      "contract": "The JS console prints exactly Hello from Tsonic! followed by one newline.",
+      "reason": "Rust JS hello checks mixed console arguments, an empty info call and string operations, not this output.",
+      "proofs": [
+        {
+          "project": "js-hello",
+          "level": "runtime",
+          "sources": ["js/packages/hello-world/src/App.ts"],
+          "assertions": [
+            {"file":"scripts/verify/probes.mjs","contains":"assert.equal(output, \"Hello from Tsonic!\");"}
+          ],
+          "outcome": "The complete normalized stdout is Hello from Tsonic!."
+        }
+      ]
+    },
+    {
+      "id": "node/path-decompose-and-join",
+      "classification": "paired",
+      "contract": "For /home/user/documents/file.txt, basename is file.txt, dirname is /home/user/documents, extension is .txt; joining home,user,docs yields home/user/docs.",
+      "proofs": [
+        {
+          "project": "node-env",
+          "level": "runtime",
+          "sources": ["nodejs/packages/env-info/src/App.ts"],
+          "assertions": [
+            {"file":"scripts/verify/probes.mjs","contains":"\"Basename: file.txt\""},
+            {"file":"scripts/verify/probes.mjs","contains":"\"Dirname: /home/user/documents\""},
+            {"file":"scripts/verify/probes.mjs","contains":"\"Extension: .txt\""},
+            {"file":"scripts/verify/probes.mjs","contains":"\"Joined path: home/user/docs\""}
+          ],
+          "outcome": "Exact path component and join output is enforced under the pure native source profile."
+        }
+      ]
+    },
+    {
+      "id": "dotnet/node-process-without-js-surface",
+      "classification": "native-only",
+      "contract": "Node process/path capabilities work without selecting the JS source surface and print the configured runtime identity through System.Console.",
+      "reason": "Rust env-path selects the JS surface and checks nonempty values/PATH, not this native-profile isolation contract.",
+      "proofs": [
+        {
+          "project": "node-env",
+          "level": "runtime",
+          "sources": ["nodejs/packages/env-info/src/App.ts"],
+          "assertions": [
+            {"file":"scripts/verify/probes.mjs","contains":"assert.equal(lines[2], `Current directory: ${projectDirectory}`);"},
+            {"file":"scripts/verify/probes.mjs","contains":"assert.equal(lines[5], \"Node version: v24.0.0-tsonic\");"},
+            {"file":"scripts/verify/probes.mjs","contains":"assert.match(lines[6], /^PID: [1-9][0-9]*$/u);"}
+          ],
+          "outcome": "cwd equals staged project directory, platform linux, architecture x64, Node version v24.0.0-tsonic and positive PID."
+        }
+      ]
+    },
+    {
+      "id": "node/fs/read-text-async",
+      "classification": "unpaired",
+      "contract": "Await node:fs/promises readFile with UTF-8 encoding and validate the returned file content.",
+      "reason": "Rust async-fs only exports an uncalled library function; synchronous file-system is a different operation.",
+      "proofs": [
+        {
+          "project": "node-file-reader",
+          "level": "runtime",
+          "sources": ["nodejs/packages/file-reader/src/App.ts"],
+          "assertions": [
+            {"file":"nodejs/packages/file-reader/src/App.ts","contains":"const content = await readFile(\"./fixture.txt\", \"utf8\");"},
+            {"file":"scripts/verify/probes.mjs","contains":"assert.equal(output, \"Fixture present: true\\nFixture content: proof-file-reader-fixture\");"}
+          ],
+          "outcome": "The trimmed fixture content must be proof-file-reader-fixture."
+        }
+      ]
+    },
+    {
+      "id": "node/fs/readdir-async",
+      "classification": "unpaired",
+      "contract": "Await node:fs/promises readdir and verify that the fixture is present.",
+      "reason": "Neither Rust filesystem input calls asynchronous readdir.",
+      "proofs": [
+        {
+          "project": "node-file-reader",
+          "level": "runtime",
+          "sources": ["nodejs/packages/file-reader/src/App.ts"],
+          "assertions": [
+            {"file":"nodejs/packages/file-reader/src/App.ts","contains":"const files = await readdir(\".\");"},
+            {"file":"scripts/verify/probes.mjs","contains":"assert.equal(output, \"Fixture present: true\\nFixture content: proof-file-reader-fixture\");"}
+          ],
+          "outcome": "Fixture present must be true."
+        }
+      ]
+    },
+    {
+      "id": "workspace/scoped-todo-toggle",
+      "classification": "paired",
+      "contract": "Consume TodoItem from @acme/domain/index.js, preserve constructor fields and toggle completed from false to true.",
+      "proofs": [
+        {
+          "project": "scoped-api",
+          "level": "runtime",
+          "sources": ["workspaces/scoped-multi-project/packages/api/src/App.ts","workspaces/scoped-multi-project/packages/domain/src/index.ts","workspaces/scoped-multi-project/packages/domain/src/TodoItem.ts"],
+          "assertions": [
+            {"file":"scripts/verify/probes.mjs","contains":"\"1: Make npm workspaces work in Tsonic (todo)\""},
+            {"file":"scripts/verify/probes.mjs","contains":"\"1: Make npm workspaces work in Tsonic (done)\""}
+          ],
+          "outcome": "String ID 1 and authored title survive; formatted todo/done states are exact. Rust uses numeric ID 7 and isComplete, not identical output or field types.",
+          "requires": ["scoped-domain"]
+        }
+      ]
+    },
+    {
+      "id": "workspace/unscoped-todo-toggle",
+      "classification": "unpaired",
+      "contract": "Consume TodoItem from acme-domain/index.js and preserve ID/title while toggling its formatted todo/done state.",
+      "reason": "Rust consumes Counter with increments 40 -> 41 -> 42, not TodoItem toggle behavior.",
+      "proofs": [
+        {
+          "project": "unscoped-api",
+          "level": "runtime",
+          "sources": ["workspaces/unscoped-multi-project/packages/acme-api/src/App.ts","workspaces/unscoped-multi-project/packages/acme-domain/src/index.ts","workspaces/unscoped-multi-project/packages/acme-domain/src/TodoItem.ts"],
+          "assertions": [
+            {"file":"scripts/verify/probes.mjs","contains":"\"1: Make npm workspaces work in Tsonic (unscoped) (todo)\""},
+            {"file":"scripts/verify/probes.mjs","contains":"\"1: Make npm workspaces work in Tsonic (unscoped) (done)\""}
+          ],
+          "outcome": "Two exact string-ID/title status lines.",
+          "requires": ["unscoped-domain"]
+        }
+      ]
+    },
+    {
+      "id": "js/regexp/state-patterns-and-string-operations",
+      "classification": "paired",
+      "contract": "Validate RegExp identity/flags, pattern and Unicode matching, captures/indices, lastIndex, replacement tokens, split captures, search restoration and escaping.",
+      "proofs": [
+        {
+          "project": "js-regexp-complete",
+          "level": "runtime",
+          "sources": ["js/packages/regexp-complete/src/App.ts"],
+          "assertions": [
+            {"file":"js/packages/regexp-complete/src/App.ts","contains":"console.log(`regexp-failure:${message}`);"},
+            {"file":"js/packages/regexp-complete/src/App.ts","contains":"requireValue(original.lastIndex === 3, \"RegExp call identity\");"},
+            {"file":"js/packages/regexp-complete/src/App.ts","contains":"requireValue(searchExpression.lastIndex === 2, \"search state restoration\");"},
+            {"file":"scripts/verify/probes.mjs","contains":"\"regexp-complete\": (value) => assert.equal(value, \"regexp-complete\"),"}
+          ],
+          "outcome": "Every requireValue condition in these families must stay true or exact stdout rejects the emitted failure label."
+        }
+      ]
+    },
+    {
+      "id": "js/regexp/callback-arguments-and-matchall-captures",
+      "classification": "unpaired",
+      "contract": "RegExp replacement callbacks receive exact captures/offset/input and rest arity; matchAll preserves named and numeric captures.",
+      "reason": "Rust checks replacement whole-match results and matchAll letters, not exact callback arguments/rest arity or numeric matchAll captures.",
+      "proofs": [
+        {
+          "project": "js-regexp-complete",
+          "level": "runtime",
+          "sources": ["js/packages/regexp-complete/src/App.ts"],
+          "assertions": [
+            {"file":"js/packages/regexp-complete/src/App.ts","contains":"requireValue(callbackArgumentsAreExact && callbackReplacement === \"1a\", \"replacement callback arguments\");"},
+            {"file":"js/packages/regexp-complete/src/App.ts","contains":"requireValue(allReplacement === \"a[1]b[2]\" && restArgumentCount === 2, \"replaceAll callback rest arguments\");"},
+            {"file":"js/packages/regexp-complete/src/App.ts","contains":"requireValue(all.length === 2 && all[0] === \"a1\" && all[1] === \"b22\", \"matchAll iteration\");"},
+            {"file":"scripts/verify/probes.mjs","contains":"\"regexp-complete\": (value) => assert.equal(value, \"regexp-complete\"),"}
+          ],
+          "outcome": "Callback replacement 1a with exact arguments; replaceAll a[1]b[2] with two rest args; matchAll a1,b22."
+        }
+      ]
+    }
+  ]
+}

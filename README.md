@@ -1,6 +1,6 @@
 # Proof Is in the Pudding
 
-This repository is the executable downstream proof for Tsonic’s C# target. Every project is real TypeScript input, is checked through the selected source contract, emits C#, builds with the .NET SDK, and either runs to an exact finite result or passes an HTTP behavior contract.
+This repository contains downstream proofs for Tsonic’s C# target. Every project is real TypeScript input, checked through the selected source contract, emitted as C#, and built with the .NET SDK. Executables must produce an exact finite result or pass an HTTP behavior contract. Workspace libraries are compiled and exercised through their executable consumers.
 
 ## Source Contracts
 
@@ -44,11 +44,13 @@ Installing the Node capability does not select JavaScript globals. `nodejs/packa
 
 ## npm Ownership
 
-Each workspace is installed once at its workspace root. Each project directly declares only:
+Each workspace is installed once at its workspace root. Each project directly declares the compiler and its selected capabilities:
 
 - `@tsonic/cli`;
 - `@tsonic/target-csharp`;
 - `@tsonic/csharp-nodejs` when that project imports `node:*`.
+
+The native-memory proof also declares its local `@proof/csharp-memory-abi` capability, which supplies its exact layout contract.
 
 The C# target owns its runtime dependencies transitively. There are no direct proof dependencies on `@tsonic/csharp-runtime`, `@tsonic/csharp-js`, generated binding packages, or retired EF packages.
 
@@ -56,13 +58,13 @@ The C# target owns its runtime dependencies transitively. There are no direct pr
 
 | Group | Proofs |
 | --- | --- |
-| `bcl` | Hello World, calculator, Fibonacci, `Span<T>`/`Memory<T>`, CLR parallel execution, `HttpListener` todo API |
-| `js` | Hello World, calculator, Fibonacci, Promise-based concurrency, notes API, todo API |
+| `bcl` | Hello World and typed locations, calculator, Fibonacci, generators/resources, native pointers, `Span<T>`/`Memory<T>`, CLR parallel execution, `HttpListener` todo API |
+| `js` | Hello World, calculator, Fibonacci, Promise-based concurrency, RegExp, notes API, todo API |
 | `nodejs` | Pure-C# Node isolation, file I/O, Promise-based Node concurrency, HTTP server |
 | `aspnetcore` | Minimal API blog and EF Core/SQLite blog using dynamic `@tsonic/dotnet/*` provider declarations |
 | `workspaces` | Scoped and unscoped source-package consumption, each with a library and executable |
 
-The inventory contains 22 `tsonic.json` projects. `node scripts/check-architecture.mjs` derives that count from the filesystem and fails if a project is missing from the verifier model.
+`node scripts/check-architecture.mjs` derives the project inventory from every `tsonic.json` file and fails if a project is missing from the verifier model. Scenario reports identify the exact checked contracts within those projects.
 
 ## Building One Workspace
 
@@ -114,7 +116,7 @@ The verifier follows one bounded model:
 3. pack exact local npm artifacts and record their SHA-256 hashes;
 4. copy proof inputs into a fresh run directory, excluding all prior installs and outputs;
 5. install the packed artifacts into each staged workspace without persistent sibling symlinks;
-6. run the 22 project lifecycles through a dependency-aware dynamic queue;
+6. run every inventoried project lifecycle through a dependency-aware dynamic queue;
 7. constrain every command with a systemd memory scope and finite timeout;
 8. assert complete finite output or complete HTTP behavior, scan emitted C# for forbidden reflection/dynamic semantics, and verify NativeAOT execution;
 9. consolidate every task log and resource measurement into one report.
@@ -122,6 +124,17 @@ The verifier follows one bounded model:
 The default queue has at most eight workers and reserves at most 11,264 MiB across concurrent project tasks. Override those finite bounds with `PROOF_JOBS` and `PROOF_MEMORY_MIB`.
 
 Every run uses a new `.tests/verify-*` directory. It never consumes an existing `node_modules`, generated C# tree, binary, provider cache, or prior report as semantic input. An OS file lock prevents two full verifiers from sharing state. The final report contains exact task counts, zero implicit skips/todos, package hashes, repository heads, elapsed time, CPU use, and peak memory for each command.
+
+The run also writes `scenarios.json`, separating runtime assertions,
+compile-only checks, and native-specific or unpaired coverage. Inspect the
+declared pairs without running projects:
+
+```sh
+node scripts/verify-all.mjs --scenarios --peer ../rust-pudding
+```
+
+See [proof alignment](https://github.com/tsoniclang/tsonic/blob/main/docs/architecture/target-pack-contract.md#proof-alignment)
+for the evidence contract. Inventory inspection is not execution certification.
 
 ## Requirements
 

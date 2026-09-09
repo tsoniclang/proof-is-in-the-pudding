@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { spawn, spawnSync } from "node:child_process";
 import { appendFile, mkdir, readFile, writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
+import { createScenarioReport, summarizeScenarioReport } from "./scenarios.mjs";
 
 const commandOutputLimit = 64 * 1024 * 1024;
 const metricPrefix = "PROOF_TIME|";
@@ -276,6 +277,11 @@ export async function writeConsolidatedReport(context, expectedProjectCount) {
   const passed = context.results.filter(({ status }) => status === "passed").length;
   const failed = context.results.length - passed;
   const projectResults = context.results.filter(({ id }) => id.startsWith("project-"));
+  const scenarioReport = context.scenarios === undefined
+    ? { metadata: "not-validated", verification: "not-established" }
+    : createScenarioReport(context.scenarios, context.results);
+  const scenarioReportPath = resolve(context.runRoot, "scenarios.json");
+  await writeFile(scenarioReportPath, `${JSON.stringify(scenarioReport, null, 2)}\n`, "utf8");
   let report = [
     "PROOF_PUDDING_VERIFICATION",
     `RUN_ROOT=${context.runRoot}`,
@@ -293,6 +299,9 @@ export async function writeConsolidatedReport(context, expectedProjectCount) {
     `DURATION_MS=${ended - context.started}`,
     "",
     ...context.evidence,
+    "",
+    `SCENARIO_REPORT=${scenarioReportPath}`,
+    ...summarizeScenarioReport(scenarioReport),
     "",
     "TASK_SUMMARY",
   ].join("\n");
